@@ -1,0 +1,119 @@
+var x = 10;
+
+// Test if statement
+
+//if (x < 4)
+//  var s = x + 2;
+//else if (x > 10)
+//  var t = x + 4;
+//else
+//  var u = x + 6;
+
+// if (a < 10 && b > 5)
+//   var s = x + 2;
+// else if (t > 10)
+//  var t = x + 41;
+//else
+//  var u = x+1;
+
+// var y = a < 10 || b > 5;
+
+//var x = 5 | 100 & 12 ^ 4;
+//4 + 2;
+//var y = 1 + 10 / 4;
+//return 5;
+
+// var s = x == 4;
+// var t = x != 4;
+
+// var x = 1 | true;
+//var y = 0 & false;
+
+//var x = (1 + 5) * 4;
+
+// Test unit
+//var a = ();
+
+//return ();
+
+// Test 1-tuple
+//var b = (2,);
+
+// Test n-tuple
+// var c = (2, 4);
+
+// Test imaginary
+// var z = 3 + 4j;
+// 1 + 2j;
+// 15j + 1;
+
+// Test function calls
+//var a = foo(x, 4);
+
+// Test array access
+//var b = bar[i+5];
+
+// Test object access
+//var c = foo.bar;
+
+// Test function call on function object returned from another function call
+//var d = foo(x)(y, z);
+
+// Test function call on function object returned from collection
+//var e = bar[x](y, z);
+
+// Test function call on function object returned from object
+//var f = baz.x(y,z);
+
+// Test unit vs. expressions vs. tuples
+// var a = ();
+// var b = (s);
+// var c = (s,);
+// var d = (s, t);
+// var e = (s, t,);
+
+// Test arrays
+// var a = [];
+// var b = [s];
+// var c = [s,];
+// var d = [s, t];
+// var e = [s, t,];
+
+// (x) = expression
+// (x,) = tuple
+// (x, y) = tuple
+// (x) -> x + 1 = lambda function
+// (x,) -> x + 1 = lambda function?
+// (x, y) -> x + y = lambda function
+
+// For now support no parenthesis for arity-0 only
+// Later on might support it with arity-N using '@' notation
+// t.foo(x, 4); // seen as function call
+// t.foo @(x, 4); // method call foo with tuple argument (using special lexer trick)
+// t.foo[x, 4]; // seen as array access
+// t.foo @[x, 4]; // method call foo with array argument (using special lexer trick)
+// t.foo @{ 'x' => 1, 'y' => z }
+
+// list.each { (x) -> x + 1 }
+
+// var t = myfun { 'apple' => 1, 'banana' => 3 };
+
+//val A = new Matrix([1, 2, 3]);
+//val B = mat [1, 2, 3];
+
+// Test alternative function/method calls
+// foo(x) --> foo.apply(x)
+// foo x --> foo (x) --> foo.apply(x)
+// foo --> might only work for methods because this is the function object itself
+
+// Test array access
+// foo[x]
+
+// Test object access
+// foo.x
+
+//fun strlen (x) = 1;
+
+//while (x)
+// var x = 1;
+
