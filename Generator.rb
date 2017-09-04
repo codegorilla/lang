@@ -9,10 +9,20 @@ class Generator
 
     @label = 0
 
-    # Not sure if we'll use this or not - instruction can just be a linked list
+    # A list of chains
+    @chains = []
+
+    # Each chain is a list of instructions
     @chain = []
   end
   
+  def addChain ()
+    # Might change the name of this function to pushChain if this needs to be a stack
+    # Push the current chain onto the chains list
+    @chains.push(@chain)
+    @chain = []
+  end
+
   def add (instruction)
     @chain.push(instruction)
   end
@@ -23,6 +33,7 @@ class Generator
 
   def start ()
     @logger.debug("start")
+    addChain
     node = root
     case node.kind
     when :ROOT
@@ -83,6 +94,22 @@ class Generator
     @logger.debug("functionDecl")
     # This needs to kick off code generation for a new function
     # LEFT OFF HERE 03 SEP 2017
+    #addChain
+    # Ignore parameters for now
+    n = node.child(1)
+    functionBody(n)
+  end
+
+  def functionBody (node)
+    @logger.debug("functionBody")
+    n = node.child(0)
+    # Ignore statement for now
+    case n.kind
+    when :BLOCK
+      block(n)
+    end
+    # LEFT OFF HERE 04 SEP 2017
+    # Need to finish code generation for functions
   end
 
   # Block
