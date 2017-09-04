@@ -23,7 +23,7 @@ class Parser
     if nextToken.kind == kind
       @ts.consume
     else
-      puts "Error: No match. Expecting '#{kind}' but found '#{t.kind}' instead."
+      puts "Error: No match. Expecting '#{kind}' but found '#{nextToken.kind}' instead."
     end
   end
   
@@ -131,14 +131,14 @@ class Parser
 
   def parameter ()
     @logger.debug("parameter")
-    n = new Node(:PARAMETER)
+    n = Node.new(:PARAMETER)
     n.addChild(name)
     n
   end
   
   def functionBody ()
     @logger.debug("functionBody")
-    n = new Node(:FUNCTION_BODY)
+    n = Node.new(:FUNCTION_BODY)
     if nextToken.kind == '{'
       n.addChild(block)
     else

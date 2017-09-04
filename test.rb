@@ -9,13 +9,16 @@ require './Instruction'
 require 'pp'
 require 'logger'
 
-def main ()
+def main (filename = nil)
   logger = Logger.new(STDOUT)
   logger.level = Logger::DEBUG
 
   # Build token stream
   logger.info("Building token stream from input...")
-  @is = InputStream.new("input.txt")
+  if filename == nil
+    filename = 'input.txt'
+  end  
+  @is = InputStream.new(filename)
   @lexer = Lexer.new(@is)
   @tokens = TokenStream.new(@lexer)
 

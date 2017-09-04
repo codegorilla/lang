@@ -176,7 +176,7 @@ class Lexer
           consume
           if nextChar == '='
             consume
-            @logger.debug("Found '=='")
+            @logger.debug("(Ln #{line}, Col #{column-1}): Found '=='")
             token = makeToken(EQUAL, EQUAL)
           else
             @logger.debug("(Ln #{line}, Col #{column-1}): Found '='")
@@ -199,39 +199,40 @@ class Lexer
           if nextChar == ')'
             consume
             # Maybe make this kind :UNIT
+            @logger.debug("(Ln #{line}, Col #{column-1}): Found '()'")
             token = makeToken('()', "()")
           else
-            @logger.debug("Found '('")
+            @logger.debug("(Ln #{line}, Col #{column-1}): Found '('")
             token = makeToken(L_PAREN, L_PAREN)
           end
           done = true
           
         when ')'
-          @logger.debug("Found ')'")
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found ')'")
           consume
           token = makeToken(R_PAREN, R_PAREN)
           done = true
 
         when '['
-          @logger.debug("Found '['")
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found '['")
           consume
           token = makeToken(L_BRACKET, L_BRACKET)
           done = true
 
         when ']'
-          @logger.debug("Found ']'")
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found ']'")
           consume
           token = makeToken(R_BRACKET, R_BRACKET)
           done = true
 
         when '{'
-          @logger.debug("Found '{'")
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found '{'")
           consume
           token = makeToken(L_BRACE, L_BRACE)
           done = true
 
         when '}'
-          @logger.debug("Found '}'")
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found '}'")
           consume
           token = makeToken(R_BRACE, R_BRACE)
           done = true
@@ -243,19 +244,19 @@ class Lexer
           done = true
 
         when ':'
-          @logger.debug("Found ':'")
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found ':'")
           consume
           token = makeToken(COLON, COLON)
           done = true
 
         when ','
-          @logger.debug("Found ','")
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found ','")
           consume
           token = makeToken(COMMA, COMMA)
           done = true
           
         when '.'
-          @logger.debug("Found '.'")
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found '.'")
           consume
           token = makeToken(DOT, DOT)
           done = true
@@ -346,8 +347,10 @@ class Lexer
           # Check if it is a keyword first
           t = @kt.lookup(text)
           token = if t
-            makeToken(t.kind, t.text)
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found keyword '#{t.text}'")
+          makeToken(t.kind, t.text)
           else
+            @logger.debug("(Ln #{line}, Col #{column-1}): Found name '#{text}'")
             makeToken(:IDENTIFIER, text)
           end
           done = true

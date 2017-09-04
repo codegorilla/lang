@@ -35,6 +35,8 @@ class Generator
           valueDecl(n)
         when :VARIABLE_DECL
           variableDecl(n)
+        when :FUNCTION_DECL
+          functionDecl(n)
         when :EMPTY_STMT
           emptyStmt(n)
         when :EXPR_STMT
@@ -75,6 +77,12 @@ class Generator
     inst = Instruction.new(:STORE)
     inst.setText(lhs.text)
     add(inst)
+  end
+
+  def functionDecl (node)
+    @logger.debug("functionDecl")
+    # This needs to kick off code generation for a new function
+    # LEFT OFF HERE 03 SEP 2017
   end
 
   # Block
