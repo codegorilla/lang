@@ -101,7 +101,7 @@ class Generator
   end
 
   def functionBody (node)
-    @logger.debug("functionBody")
+    @logger.debug("functionBody1")
     n = node.child(0)
     # Ignore statement for now
     case n.kind
