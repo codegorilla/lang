@@ -16,11 +16,13 @@ class Generator
     @chain = []
   end
   
-  def addChain ()
-    # Might change the name of this function to pushChain if this needs to be a stack
-    # Push the current chain onto the chains list
+  def pushChain ()
     @chains.push(@chain)
     @chain = []
+  end
+
+  def popChain ()
+    @chain = @chains.pop
   end
 
   def add (instruction)
@@ -33,7 +35,7 @@ class Generator
 
   def start ()
     @logger.debug("start")
-    addChain
+    pushChain
     node = root
     case node.kind
     when :ROOT
@@ -61,7 +63,8 @@ class Generator
       # Add HALT instruction at very end
       add(Instruction.new(:HALT))
     end
-    @chain
+    node.setAttribute('chain', @chain)
+    popChain
   end
 
   def valueDecl (node)
@@ -102,14 +105,17 @@ class Generator
 
   def functionBody (node)
     @logger.debug("functionBody")
+    # Save current chain
+    pushChain
     n = node.child(0)
-    # Ignore statement for now
+    # Ignore statement for now, just worry about blocks
     case n.kind
     when :BLOCK
       block(n)
     end
-    # LEFT OFF HERE 04 SEP 2017
-    # Need to finish code generation for functions
+    node.setAttribute('chain', @chain)
+    # Restore saved chain
+    popChain
   end
 
   # Block

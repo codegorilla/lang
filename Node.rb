@@ -4,6 +4,9 @@ class Node
     @kind = kind
     @text = text
     @zchildren = []
+
+    # Syntesized attributes
+    @attributes = {}
   end
 
   UNIT_LITERAL = Node.new(:UNIT_LITERAL, "()")
@@ -42,6 +45,14 @@ class Node
 
   def addChild (node)
     @zchildren.push(node)
+  end
+
+  def setAttribute (name, value)
+    @attributes[name] = value
+  end
+
+  def getAttribute (name)
+    @attribute[name]
   end
 
 end
