@@ -28,6 +28,14 @@ def main (filename = nil)
   @parser.setLogLevel(Logger::DEBUG)
   @root = @parser.start
 
+  # Build scopes and symbol tables
+  # This phase does not generate a new data structure per se.
+  # It just populates the AST with scopes and symbol table data.
+  logger.info("Building scopes...")
+  @sb = ScopeBuilder.new(@root)
+  @sb.setLogLevel(Logger::DEBUG)
+  @sb.start
+
   # Generate IR
   logger.info("Generating intermediate representation (IR)...")
   @gen = Generator.new(@root)

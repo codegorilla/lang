@@ -142,7 +142,10 @@ class Parser
     if nextToken.kind == '{'
       n.addChild(block)
     else
-      n.addChild(statement)
+      # Insert a block
+      p = Node.new(:BLOCK)
+      p.addChild(statement)
+      n.addChild(p)
     end
     n
   end
