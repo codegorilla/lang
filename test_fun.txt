@@ -1,4 +1,12 @@
-var x = 1;
+var s = 10;
+
+var t = 20;
+
+var u = 30;
+
+var v = 40;
+
+var w = 21;
 
 fun x ( ) = {
     var y = 12;

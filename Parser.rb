@@ -144,6 +144,7 @@ class Parser
     else
       # Insert a block
       p = Node.new(:BLOCK)
+      # Should allow declarations or statements
       p.addChild(statement)
       n.addChild(p)
     end
@@ -167,7 +168,7 @@ class Parser
     @logger.debug("blockElement")
     case nextToken.kind
     when 'val', 'var', 'def', 'fun', 'class'
-      # Not sure class declarations should be valid inside blocks
+      # Not sure class declarations should be valid inside blocks - maybe only inside class bodies
       n = declaration
     else
       n = statement
@@ -274,6 +275,7 @@ class Parser
   end
 
   def ifStmt ()
+    # The ifStmt appears here to avoid the need for a ';' at the end, which would be required for an exprStmt
     @logger.debug("ifStmt")
     n = Node.new(:IF_STMT)
     n.addChild(ifExpr)

@@ -19,7 +19,17 @@ class Scope
   end
 
   def define (symbol)
-    @symbols.insert(symbol)
+    if @symbols.lookup(symbol) == nil
+      @symbols.insert(symbol)
+      return true
+    else
+      return false
+    end
+  end
+
+  def resolve (symbol)
+    # This might be partially a runtime thing
+    # Needs to be defined
   end
 
 end #class

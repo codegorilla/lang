@@ -4,6 +4,12 @@ require './Token'
 require './TokenStream'
 require './Parser'
 require './Node'
+require './SymbolTable'
+require './Scope'
+require './ScopeBuilder'
+require './Frame'
+require './TauObject'
+require './Interpreter'
 require './Generator'
 require './Instruction'
 require 'pp'
@@ -36,11 +42,21 @@ def main (filename = nil)
   @sb.setLogLevel(Logger::DEBUG)
   @sb.start
 
+  # Interpret
+  logger.info("Commence interpreting...")
+  @int = Interpreter.new(@root)
+  @int.setLogLevel(Logger::DEBUG)
+  @int.start
+
+  # LEFT OFF HERE 20SEP2017
+  # Modified scope class to check for existence of symbol before defining it
+  # to prevent re-defining an existing variable.
+
   # Generate IR
-  logger.info("Generating intermediate representation (IR)...")
-  @gen = Generator.new(@root)
-  @gen.setLogLevel(Logger::DEBUG)
-  @chain = @gen.start
+  #logger.info("Generating intermediate representation (IR)...")
+  #@gen = Generator.new(@root)
+  #@gen.setLogLevel(Logger::DEBUG)
+  #@chain = @gen.start
 
   nil
 end

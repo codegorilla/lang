@@ -17,6 +17,11 @@ class ScopeBuilder
     @logger.level = level
   end
 
+  # Temporary for troubleshooting
+  def GET_SCOPE()
+    @scope
+  end
+
   def start ()
     @logger.debug("start")
     node = root
@@ -28,13 +33,12 @@ class ScopeBuilder
         n = node.child(i)
         case n.kind
         when :VALUE_DECL
+          # Anything that can contain a block can contain a scope
           valueDecl(n)
         when :VARIABLE_DECL
           variableDecl(n)
         when :FUNCTION_DECL
           functionDecl(n)
-        # Might only need to descend into constructs that define things or can contain definitions
-        # Pretty much anything that can contain a block can contain a scope
         when :EXPR_STMT
           exprStmt(n)
         when :IF_STMT
@@ -51,19 +55,19 @@ class ScopeBuilder
     @logger.debug("valueDecl")
     # There should be some way to mark this name as not re-assignable
     # But that might be something handled by the compiler, not the runtime
-    # Note that names are defined here instead of descending to a name node
-    # because names may be used in non-definition contexts
+    # Note that names are defined here instead of descending to the name node
+    # function because name nodes may appear in non-definition contexts.
     nameNode = node.leftChild
     @scope.define(nameNode.text)
-    # I think we need to descend into rhs because it may contain a block expression with its own scope
+    # Need to descend into expression because it may contain a block
     expression(node.rightChild)
   end
-
+  
   def variableDecl (node)
     @logger.debug("variableDecl")
     nameNode = node.leftChild
     @scope.define(nameNode.text)
-    # I think we need to descend into expression because it may contain a block expression with its own scope
+    # Need to descend into expression because it may contain a block
     expression(node.rightChild)
   end
   
@@ -75,6 +79,8 @@ class ScopeBuilder
     @scope = Scope.new(@scope)
     node.setAttribute("scope", @scope)
     # Pretend there are ZERO parameters for now
+    # Parameters are the only thing that will appear in this scope
+    # However, this scope will be the parent scope for the enclosed block's scope
     functionBody(node.child(1))
     # Pop the scope
     @scope = @scope.link
@@ -106,6 +112,7 @@ class ScopeBuilder
     # This could either be a declaration or a statement
     case node.kind
     when :VALUE_DECL
+      # Anything that can contain a block can contain a scope
       valueDecl(node)
     when :VARIABLE_DECL
       variableDecl(node)
