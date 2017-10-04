@@ -25,6 +25,8 @@ class Lexer
   PLUS = '+'
   EQUALS = '='
 
+  PIPE = '|'
+
   L_PAREN = '('
   R_PAREN = ')'
   L_BRACKET = '['
@@ -62,6 +64,7 @@ class Lexer
 
     @line = 1
     @column = 1
+    @start = 1
 
     @logger = Logger.new(STDOUT)
     @logger.level = Logger::DEBUG
@@ -83,6 +86,10 @@ class Lexer
 
   def column ()
     @column
+  end
+
+  def start ()
+    @start
   end
 
   def makeToken (kind, text)
@@ -306,6 +313,7 @@ class Lexer
         else
           if ch.match(/[A-Za-z_]/)
             consume
+            @start = @column # mark start of pattern
             text = ch
             state = STATE_IDENTIFIER
             @logger.debug("Switched to identifier state.")
@@ -347,10 +355,10 @@ class Lexer
           # Check if it is a keyword first
           t = @kt.lookup(text)
           token = if t
-          @logger.debug("(Ln #{line}, Col #{column-1}): Found keyword '#{t.text}'")
+          @logger.debug("(Ln #{line}, Col #{start-1}): Found keyword '#{t.text}'")
           makeToken(t.kind, t.text)
           else
-            @logger.debug("(Ln #{line}, Col #{column-1}): Found name '#{text}'")
+            @logger.debug("(Ln #{line}, Col #{start-1}): Found name '#{text}'")
             makeToken(:IDENTIFIER, text)
           end
           done = true

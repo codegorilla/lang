@@ -14,6 +14,11 @@ require './Generator'
 require './Instruction'
 require 'pp'
 require 'logger'
+require './BoolFactory'
+require './IntFactory'
+require './FloatFactory'
+require './Types'
+
 
 def main (filename = nil)
   logger = Logger.new(STDOUT)

@@ -17,11 +17,20 @@ class Interpreter
     # The type of ANY is CLASS
     @ANY = TauObject.new(@CLASS)
 
+    @EXCEPTION = TauObject.new(@CLASS)
+    @EXCEPTION.setMember('super', @ANY)
+
+    # The BOOL class represents booleans
+    bfact = BoolFactory.new
+    bfact.make
+
     # The INT class represents integers
-    @INT = TauObject.new(@CLASS)
-    @INT.setMember('super', @ANY)
-    @INT.setMember('add', lambda { |x, y| x + y })
-    @INT.setMember('sub', lambda { |x, y| x - y })
+    ifact = IntFactory.new
+    ifact.make
+    
+    # The FLOAT class represents floating point numbers
+    ffact = FloatFactory.new
+    ffact.make
 
     # Frame pointer
     @fp = nil
@@ -115,6 +124,24 @@ class Interpreter
     b = expr(node.rightChild)
     op = node.text
     c = case op
+      when '|'
+        classObj = a.type
+        if classObj == nil
+          # Throw exception
+        end
+        classObj.getMember('bor').call(a, b)
+      when '^'
+        classObj = a.type
+        if classObj == nil
+          # Throw exception
+        end
+        classObj.getMember('bxor').call(a, b)
+      when '&'
+        classObj = a.type
+        if classObj == nil
+          # Throw exception
+        end
+        classObj.getMember('band').call(a, b)
       when '+'
         # This assumes an integer, but it can be anything
         # First, need to get the type of a, which will yield a class
@@ -125,20 +152,28 @@ class Interpreter
         # Then call the 'add' method stored in the class, passing a and b
         # The add method will check the type of b and perform a type
         # compatibility check, determining the type of the result
-        classObj.getMember('add').call(a.value, b.value)
+        classObj.getMember('add').call(a, b)
       when '-'
         classObj = a.type
         if classObj == nil
           # Throw exception
         end
-        classObj.getMember('sub').call(a.value, b.value)
+        classObj.getMember('sub').call(a, b)
       when '*'
-        a * b
+        classObj = a.type
+        if classObj == nil
+          # Throw exception
+        end
+        classObj.getMember('mul').call(a, b)
       when '/'
-        a / b
+        classObj = a.type
+        if classObj == nil
+          # Throw exception
+        end
+        classObj.getMember('div').call(a, b)
     end
     # Assume integer but it could be something else
-    result = TauObject.new(@INT, c)
+    result = c
     result
   end
 
@@ -149,22 +184,24 @@ class Interpreter
 
   def booleanLiteral (node)
     @logger.debug("booleanLiteral")
-    TauObject.new('bool', true)
+    t = node.text
+    value = if t == "true" then true elsif t == "false" then false end
+    TauObject.new($Bool, value)
   end
 
   def integerLiteral (node)
     @logger.debug("integerLiteral")
-    TauObject.new(@INT, node.text.to_i)
+    TauObject.new($Int, node.text.to_i)
   end
 
   def floatLiteral (node)
     @logger.debug("floatLiteral")
-    TauObject.new('float64', node.text.to_f)
+    TauObject.new($Float, node.text.to_f)
   end
 
   def imaginaryLiteral (node)
     @logger.debug("imaginaryLiteral")
-    TauObject.new('complex64', node.text.to_f)
+    TauObject.new(@COMPLEX, [0.0, node.text.to_f])
   end
 
 end

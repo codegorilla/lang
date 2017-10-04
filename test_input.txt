@@ -1,4 +1,6 @@
-var x = 12 + 4 - 2;
+var = 1 | 2;
+
+//var x = 12 + 4.5 / 1.25;
 
 // Test if statement
 
