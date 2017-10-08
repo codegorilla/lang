@@ -9,6 +9,7 @@ class Node
     @attributes = {}
   end
 
+  NULL_LITERAL = Node.new(:NULL_LITERAL, "null")
   UNIT_LITERAL = Node.new(:UNIT_LITERAL, "()")
 
   def setText (text)

@@ -16,7 +16,7 @@ class KeywordTable
   IF = Token.new('if', "if")
   IMPORT = Token.new('import', "import")
   NEW = Token.new('new', "new")
-  NIL = Token.new('nil', "nil")
+  NULL = Token.new(:NULL, "null")
   RETURN = Token.new('return', "return")
   SUPER = Token.new('super', "super")
   THIS = Token.new('this', "this")
@@ -51,7 +51,7 @@ class KeywordTable
       'if' => IF,
       'import' => IMPORT,
       'new' => NEW,
-      'nil' => NIL,
+      'null' => NULL,
       'return' => RETURN,
       'super' => SUPER,
       'this' => THIS,

@@ -714,6 +714,8 @@ class Parser
   def literal ()
     @logger.debug("literal")
     case nextToken.kind
+    when :NULL
+      n = nullLiteral
     when '()'
       n = unitLiteral
     when :BOOLEAN
@@ -732,6 +734,13 @@ class Parser
       puts "ERROR - literal not found!"
       exit
     end
+    n
+  end
+
+  def nullLiteral ()
+    @logger.debug("nullLiteral")
+    n = Node::NULL_LITERAL
+    match(:NULL)
     n
   end
 

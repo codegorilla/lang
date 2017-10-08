@@ -104,6 +104,8 @@ class Interpreter
     case node.kind
     when :BINARY_EXPR
       result = binaryExpr(node)
+    when :NULL_LITERAL
+      result = nullLiteral(node)
     when :BOOLEAN_LITERAL
       result = booleanLiteral(node)
     when :INTEGER_LITERAL
@@ -225,6 +227,13 @@ class Interpreter
     # Assume integer but it could be something else
     result = c
     result
+  end
+
+  def nullLiteral (node)
+    @logger.debug("nullLiteral")
+    # Should this have a value?
+    # Is it just there so something will print?
+    TauObject.new($Null, "null")
   end
 
   def unitLiteral (node)
