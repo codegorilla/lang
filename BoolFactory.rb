@@ -50,22 +50,45 @@ class BoolFactory
       result
     end
 
-    def add (x, y)
+    def equ (x, y)
+      result = case y.type
+      when $Bool
+        z = x.value == y.value
+        TauObject.new($Bool, z)
+      when $Int
+        TauObject.new($Bool, false)
+      when $Float
+        TauObject.new($Bool, false)
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for ==: Bool and <other>")
+      end
+      result
     end
 
-    def sub (x, y)
-    end    
-
-    def mul (x, y)
+    def neq (x, y)
+      result = case y.type
+      when $Bool
+        z = x.value != y.value
+        TauObject.new($Bool, z)
+      when $Int
+        TauObject.new($Bool, true)
+      when $Float
+        TauObject.new($Bool, true)
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for !=: Bool and <other>")
+      end
+      result
     end
 
-    def div (x, y)
-    end
+    # Should Bool type be promoted to Int so that add, sub, mul, div and
+    # other numerical operators work? Python does this, but Ruby does not.
     
     def make ()
       $Bool.setMember('bor', method(:bor))
       $Bool.setMember('bxor', method(:bxor))
       $Bool.setMember('band', method(:band))
+      $Bool.setMember('equ', method(:equ))
+      $Bool.setMember('neq', method(:neq))
     end
 end
 

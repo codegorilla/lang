@@ -60,7 +60,7 @@ class IntFactory
         z = x.value == y.value
         TauObject.new($Bool, z)
       when $Bool
-        TauObject.new($Exception, "Type error: unsupported operand types for ==: Int and Bool")
+        TauObject.new($Bool, false)
       else
         TauObject.new($Exception, "Type error: unsupported operand types for ==: Int and <other>")
       end
@@ -76,7 +76,7 @@ class IntFactory
         z = x.value != y.value
         TauObject.new($Bool, z)
       when $Bool
-        TauObject.new($Exception, "Type error: unsupported operand types for !=: Int and Bool")
+        TauObject.new($Bool, true)
       else
         TauObject.new($Exception, "Type error: unsupported operand types for !=: Int and <other>")
       end
