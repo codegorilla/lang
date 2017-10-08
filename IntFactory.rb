@@ -11,10 +11,13 @@ class IntFactory
         z = x.value | y.value
         TauObject.new($Int, z)
       when $Float
-        #TauObject.new(@EXCEPTION, "Type error: int + bool")
-      #else
-        #TauObject.new(@EXCEPTION, "Type error: int + bool")
-      end
+        TauObject.new($Exception, "Type error: unsupported operand types for |: Int and Float")
+      when $Bool
+        # Should Bool get promoted to Int in bitwise operations?
+        TauObject.new($Exception, "Type error: unsupported operand types for |: Int and Bool")
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for |: Int and <other>")
+    end
       result
     end
 
@@ -24,9 +27,11 @@ class IntFactory
         z = x.value ^ y.value
         TauObject.new($Int, z)
       when $Float
-        #TauObject.new(@EXCEPTION, "Type error: int + bool")
-      #else
-        #TauObject.new(@EXCEPTION, "Type error: int + bool")
+        TauObject.new($Exception, "Type error: unsupported operand types for ^: Int and Float")
+      when $Bool
+        TauObject.new($Exception, "Type error: unsupported operand types for ^: Int and Bool")
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for ^: Int and <other>")
       end
       result
     end
@@ -37,9 +42,137 @@ class IntFactory
         z = x.value & y.value
         TauObject.new($Int, z)
       when $Float
-        #TauObject.new(@EXCEPTION, "Type error: int + bool")
-      #else
-        #TauObject.new(@EXCEPTION, "Type error: int + bool")
+        TauObject.new($Exception, "Type error: unsupported operand types for &: Int and Float")
+      when $Bool
+        TauObject.new($Exception, "Type error: unsupported operand types for &: Int and Bool")
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for &: Int and <other>")
+      end
+      result
+    end
+
+    def equ (x, y)
+      result = case y.type
+      when $Int
+        z = x.value == y.value
+        TauObject.new($Bool, z)
+      when $Float
+        z = x.value == y.value
+        TauObject.new($Bool, z)
+      when $Bool
+        TauObject.new($Exception, "Type error: unsupported operand types for ==: Int and Bool")
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for ==: Int and <other>")
+      end
+      result
+    end
+
+    def neq (x, y)
+      result = case y.type
+      when $Int
+        z = x.value != y.value
+        TauObject.new($Bool, z)
+      when $Float
+        z = x.value != y.value
+        TauObject.new($Bool, z)
+      when $Bool
+        TauObject.new($Exception, "Type error: unsupported operand types for !=: Int and Bool")
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for !=: Int and <other>")
+      end
+      result
+    end
+
+    def gt (x, y)
+      result = case y.type
+      when $Int
+        z = x.value > y.value
+        TauObject.new($Bool, z)
+      when $Float
+        z = x.value > y.value
+        TauObject.new($Bool, z)
+      when $Bool
+        TauObject.new($Exception, "Type error: unsupported operand types for >: Int and Bool")
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for >: Int and <other>")
+      end
+      result
+    end
+
+    def lt (x, y)
+      result = case y.type
+      when $Int
+        z = x.value < y.value
+        TauObject.new($Bool, z)
+      when $Float
+        z = x.value < y.value
+        TauObject.new($Bool, z)
+      when $Bool
+        TauObject.new($Exception, "Type error: unsupported operand types for <: Int and Bool")
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for <: Int and <other>")
+      end
+      result
+    end
+
+    def ge (x, y)
+      result = case y.type
+      when $Int
+        z = x.value >= y.value
+        TauObject.new($Bool, z)
+      when $Float
+        z = x.value >= y.value
+        TauObject.new($Bool, z)
+      when $Bool
+        TauObject.new($Exception, "Type error: unsupported operand types for >=: Int and Bool")
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for >=: Int and <other>")
+      end
+      result
+    end
+
+    def le (x, y)
+      result = case y.type
+      when $Int
+        z = x.value <= y.value
+        TauObject.new($Bool, z)
+      when $Float
+        z = x.value <= y.value
+        TauObject.new($Bool, z)
+      when $Bool
+        TauObject.new($Exception, "Type error: unsupported operand types for <=: Int and Bool")
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for <=: Int and <other>")
+      end
+      result
+    end
+
+    def shl (x, y)
+      result = case y.type
+      when $Int
+        z = x.value << y.value
+        TauObject.new($Int, z)
+      when $Float
+        TauObject.new($Exception, "Type error: unsupported operand types for <<: Int and Float")
+      when $Bool
+        TauObject.new($Exception, "Type error: unsupported operand types for <<: Int and Bool")
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for <<: Int and <other>")
+      end
+      result
+    end
+
+    def shr (x, y)
+      result = case y.type
+      when $Int
+        z = x.value >> y.value
+        TauObject.new($Int, z)
+      when $Float
+        TauObject.new($Exception, "Type error: unsupported operand types for >>: Int and Float")
+      when $Bool
+        TauObject.new($Exception, "Type error: unsupported operand types for >>: Int and Bool")
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for >>: Int and <other>")
       end
       result
     end
@@ -52,8 +185,10 @@ class IntFactory
       when $Float
         z = x.value + y.value
         TauObject.new($Float, z)
-      #else
-        #TauObject.new(@EXCEPTION, "Type error: int + bool")
+      when $Bool
+        TauObject.new($Exception, "Type error: unsupported operand types for +: Int and Bool")
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for +: Int and <other>")
       end
       result
     end
@@ -66,8 +201,10 @@ class IntFactory
       when $Float
         z = x.value - y.value
         TauObject.new($Float, z)
-      #else
-        #TauObject.new(@EXCEPTION, "Type error: int + bool")
+      when $Bool
+        TauObject.new($Exception, "Type error: unsupported operand types for -: Int and Bool")
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for -: Int and <other>")
       end
       result
     end    
@@ -80,8 +217,10 @@ class IntFactory
       when $Float
         z = x.value * y.value
         TauObject.new($Float, z)
-      #else
-        #TauObject.new(@EXCEPTION, "Type error: int + bool")
+      when $Bool
+        TauObject.new($Exception, "Type error: unsupported operand types for *: Int and Bool")
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for *: Int and <other>")
       end
       result
     end
@@ -94,8 +233,10 @@ class IntFactory
       when $Float
         z = x.value / y.value
         TauObject.new($Float, z)
-      #else
-        #TauObject.new(@EXCEPTION, "Type error: int + bool")
+      when $Bool
+        TauObject.new($Exception, "Type error: unsupported operand types for /: Int and Bool")
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for /: Int and <other>")
       end
       result
     end
@@ -104,6 +245,14 @@ class IntFactory
       $Int.setMember('bor', method(:bor))
       $Int.setMember('bxor', method(:bxor))
       $Int.setMember('band', method(:band))
+      $Int.setMember('equ', method(:equ))
+      $Int.setMember('neq', method(:neq))
+      $Int.setMember('gt', method(:gt))
+      $Int.setMember('lt', method(:lt))
+      $Int.setMember('ge', method(:ge))
+      $Int.setMember('le', method(:le))
+      $Int.setMember('shl', method(:shl))
+      $Int.setMember('shr', method(:shr))
       $Int.setMember('add', method(:add))
       $Int.setMember('sub', method(:sub))
       $Int.setMember('mul', method(:mul))

@@ -112,6 +112,8 @@ class Interpreter
       result = floatLiteral(node)
     when :IMAGINARY_LITERAL
       result = imaginaryLiteral(node)
+    when :EXPRESSION
+      result = expression(node)
     else
       puts "Something else!"
     end
@@ -142,6 +144,54 @@ class Interpreter
           # Throw exception
         end
         classObj.getMember('band').call(a, b)
+      when '=='
+        classObj = a.type
+        if classObj == nil
+          # Throw exception
+        end
+        classObj.getMember('equ').call(a, b)
+      when '!='
+        classObj = a.type
+        if classObj == nil
+          # Throw exception
+        end
+        classObj.getMember('neq').call(a, b)
+      when '>'
+        classObj = a.type
+        if classObj == nil
+          # Throw exception
+        end
+        classObj.getMember('gt').call(a, b)
+      when '<'
+        classObj = a.type
+        if classObj == nil
+          # Throw exception
+        end
+        classObj.getMember('lt').call(a, b)
+      when '>='
+        classObj = a.type
+        if classObj == nil
+          # Throw exception
+        end
+        classObj.getMember('ge').call(a, b)
+      when '<='
+        classObj = a.type
+        if classObj == nil
+          # Throw exception
+        end
+        classObj.getMember('le').call(a, b)
+      when '<<'
+        classObj = a.type
+        if classObj == nil
+          # Throw exception
+        end
+        classObj.getMember('shl').call(a, b)
+      when '>>'
+        classObj = a.type
+        if classObj == nil
+          # Throw exception
+        end
+        classObj.getMember('shr').call(a, b)
       when '+'
         # This assumes an integer, but it can be anything
         # First, need to get the type of a, which will yield a class

@@ -482,7 +482,7 @@ class Parser
     @logger.debug("relationalExpr")
     n = shiftExpr
     t = nextToken
-    while t.kind == '>' || t.kind == '>=' || t.kind == '<' || t.kind == '<='
+    while t.kind == '>' || t.kind == '<' || t.kind == '>=' || t.kind == '<='
       match(t.kind)
       p = Node.new(:BINARY_EXPR)
       p.setText(t.text)
@@ -498,7 +498,9 @@ class Parser
     @logger.debug("shiftExpr")
     n = additiveExpr
     t = nextToken
-    while t.kind == '>>' || t.kind == '<<'
+    # The >>> operator would perform a logical right shift
+    # We are not defining that for now due to the complexity
+    while t.kind == '<<' || t.kind == '>>'
       match(t.kind)
       p = Node.new(:BINARY_EXPR)
       p.setText(t.text)

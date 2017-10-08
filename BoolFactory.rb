@@ -5,33 +5,17 @@ class BoolFactory
       $Bool.setMember('super', $Any)
     end
 
-    def add (x, y)
-      #TauObject.new(@EXCEPTION, "Type error: int + bool")
-    end
-
-    def sub (x, y)
-      #TauObject.new(@EXCEPTION, "Type error: int + bool")
-    end    
-
-    def mul (x, y)
-      #TauObject.new(@EXCEPTION, "Type error: int + bool")
-    end
-
-    def div (x, y)
-      #TauObject.new(@EXCEPTION, "Type error: int + bool")
-    end
-
     def bor (x, y)
       result = case y.type
       when $Bool
         z = x.value | y.value
         TauObject.new($Bool, z)
       when $Int
-        #TauObject.new(@EXCEPTION, "Type error: bool | int")
+        TauObject.new($Exception, "Type error: unsupported operand types for |: Bool and Int")
       when $Float
-        #TauObject.new(@EXCEPTION, "Type error: bool | float")
-      #else
-        #TauObject.new(@EXCEPTION, "Type error: int + bool")
+        TauObject.new($Exception, "Type error: unsupported operand types for |: Bool and Float")
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for |: Bool and <other>")
       end
       result
     end
@@ -42,11 +26,11 @@ class BoolFactory
         z = x.value ^ y.value
         TauObject.new($Bool, z)
       when $Int
-        #TauObject.new(@EXCEPTION, "Type error: bool | int")
+        TauObject.new($Exception, "Type error: unsupported operand types for |: Bool and Int")
       when $Float
-        #TauObject.new(@EXCEPTION, "Type error: bool | float")
-      #else
-        #TauObject.new(@EXCEPTION, "Type error: int + bool")
+        TauObject.new($Exception, "Type error: unsupported operand types for |: Bool and Float")
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for |: Bool and <other>")
       end
       result
     end
@@ -57,15 +41,27 @@ class BoolFactory
         z = x.value & y.value
         TauObject.new($Bool, z)
       when $Int
-        #TauObject.new(@EXCEPTION, "Type error: bool | int")
+        TauObject.new($Exception, "Type error: unsupported operand types for |: Bool and Int")
       when $Float
-        #TauObject.new(@EXCEPTION, "Type error: bool | float")
-      #else
-        #TauObject.new(@EXCEPTION, "Type error: int + bool")
+        TauObject.new($Exception, "Type error: unsupported operand types for |: Bool and Float")
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for |: Bool and <other>")
       end
       result
     end
 
+    def add (x, y)
+    end
+
+    def sub (x, y)
+    end    
+
+    def mul (x, y)
+    end
+
+    def div (x, y)
+    end
+    
     def make ()
       $Bool.setMember('bor', method(:bor))
       $Bool.setMember('bxor', method(:bxor))

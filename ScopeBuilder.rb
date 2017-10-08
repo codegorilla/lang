@@ -156,11 +156,13 @@ class ScopeBuilder
   # ********** Expressions **********
 
   def expression (node)
+    @logger.debug('expression')
     # This is an "expression root" that only happens at the root of the expression
     expr(node.child)
   end
 
   def expr (node)
+    @logger.debug('expr')
     case node.kind
     when :FUNCTION_CALL
       functionCall(node)
@@ -177,7 +179,7 @@ class ScopeBuilder
     when :NAME
       name(node)
     when :EXPRESSION
-      expression(n)
+      expression(node)
     end
   end
 

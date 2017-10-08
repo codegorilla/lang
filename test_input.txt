@@ -1,6 +1,5 @@
-var = 1 | 2;
-
-//var x = 12 + 4.5 / 1.25;
+var x = (7 & 5) << 2;
+var y = 12 + 4.5 / 1.25;
 
 // Test if statement
 

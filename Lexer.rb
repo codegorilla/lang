@@ -100,7 +100,7 @@ class Lexer
   def getToken ()
     done = false
     state = STATE_START
-    @logger.debug("Starting scan.")
+    #@logger.debug("Starting scan.")
     
     while (!done)
       case state
@@ -121,11 +121,13 @@ class Lexer
         when nil
           # end of input
           consume
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found '<EOF>'")
           token = makeToken(EOF, EOF)
           done = true
 
         when '~'
           consume
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found '~'")
           token = makeToken(TILDE, TILDE)
           done = true
 
@@ -133,24 +135,29 @@ class Lexer
           consume
           if nextChar == '='
             consume
+            @logger.debug("(Ln #{line}, Col #{column-2}): Found '!='")
             token = makeToken(NOT_EQUAL, NOT_EQUAL)
           else
+            @logger.debug("(Ln #{line}, Col #{column-1}): Found '!'")
             token = makeToken(BANG, BANG)
           end
           done = true
         
         when '$'
           consume
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found '$'")
           token = makeToken(DOLLAR, DOLLAR)
           done = true
 
         when '%'
           consume
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found '%'")
           token = makeToken(PERCENT, PERCENT)
           done = true
         
         when '^'
           consume
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found '^'")
           token = makeToken(CARET, CARET)
           done = true
 
@@ -158,24 +165,29 @@ class Lexer
           consume
           if nextChar == '&'
             consume
+            @logger.debug("(Ln #{line}, Col #{column-2}): Found '&&'")
             token = makeToken(AND, AND)
           else
+            @logger.debug("(Ln #{line}, Col #{column-1}): Found '&'")
             token = makeToken(AMPERSAND, AMPERSAND)
           end
           done = true
 
         when '*'
           consume
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found '*'")
           token = makeToken(ASTERISK, ASTERISK)
           done = true
 
         when '-'
           consume
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found '-'")
           token = makeToken(MINUS, MINUS)
           done = true
 
         when '+'
           consume
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found '+'")
           token = makeToken(PLUS, PLUS)
           done = true
         
@@ -183,7 +195,7 @@ class Lexer
           consume
           if nextChar == '='
             consume
-            @logger.debug("(Ln #{line}, Col #{column-1}): Found '=='")
+            @logger.debug("(Ln #{line}, Col #{column-2}): Found '=='")
             token = makeToken(EQUAL, EQUAL)
           else
             @logger.debug("(Ln #{line}, Col #{column-1}): Found '='")
@@ -195,8 +207,10 @@ class Lexer
           consume
           if nextChar == '|'
             consume
+            @logger.debug("(Ln #{line}, Col #{column-2}): Found '||'")
             token = makeToken(OR, OR)
           else
+            @logger.debug("(Ln #{line}, Col #{column-1}): Found '|'")
             token = makeToken(PIPE, PIPE)
           end
           done = true
@@ -206,6 +220,7 @@ class Lexer
           if nextChar == ')'
             consume
             # Maybe make this kind :UNIT
+            # Debug might need to be column-2
             @logger.debug("(Ln #{line}, Col #{column-1}): Found '()'")
             token = makeToken('()', "()")
           else
@@ -215,32 +230,32 @@ class Lexer
           done = true
           
         when ')'
-          @logger.debug("(Ln #{line}, Col #{column-1}): Found ')'")
           consume
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found ')'")
           token = makeToken(R_PAREN, R_PAREN)
           done = true
 
         when '['
-          @logger.debug("(Ln #{line}, Col #{column-1}): Found '['")
           consume
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found '['")
           token = makeToken(L_BRACKET, L_BRACKET)
           done = true
 
         when ']'
-          @logger.debug("(Ln #{line}, Col #{column-1}): Found ']'")
           consume
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found ']'")
           token = makeToken(R_BRACKET, R_BRACKET)
           done = true
 
         when '{'
-          @logger.debug("(Ln #{line}, Col #{column-1}): Found '{'")
           consume
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found '{'")
           token = makeToken(L_BRACE, L_BRACE)
           done = true
 
         when '}'
-          @logger.debug("(Ln #{line}, Col #{column-1}): Found '}'")
           consume
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found '}'")
           token = makeToken(R_BRACE, R_BRACE)
           done = true
         
@@ -251,20 +266,20 @@ class Lexer
           done = true
 
         when ':'
-          @logger.debug("(Ln #{line}, Col #{column-1}): Found ':'")
           consume
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found ':'")
           token = makeToken(COLON, COLON)
           done = true
 
         when ','
-          @logger.debug("(Ln #{line}, Col #{column-1}): Found ','")
           consume
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found ','")
           token = makeToken(COMMA, COMMA)
           done = true
           
         when '.'
-          @logger.debug("(Ln #{line}, Col #{column-1}): Found '.'")
           consume
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found '.'")
           token = makeToken(DOT, DOT)
           done = true
 
@@ -273,11 +288,16 @@ class Lexer
           ch = nextChar
           if ch == '/'
             consume
+            # suppress logging comments
+            #@logger.debug("(Ln #{line}, Col #{column-2}): Found comment")
             state = STATE_COMMENT
           elsif ch == '*'
             consume
+            # suppress logging comments
+            #@logger.debug("(Ln #{line}, Col #{column-2}): Found block comment")
             state = STATE_BLOCK_COMMENT
           else
+            @logger.debug("(Ln #{line}, Col #{column-1}): Found '/'")
             token = makeToken(SLASH, SLASH)
             done = true
           end
@@ -287,11 +307,14 @@ class Lexer
           ch = nextChar
           if ch == '<'
             consume
+            @logger.debug("(Ln #{line}, Col #{column-2}): Found '<<'")
             token = makeToken(L_SHIFT, L_SHIFT)
           elsif ch == '='
             consume
+            @logger.debug("(Ln #{line}, Col #{column-2}): Found '<='")
             token = makeToken(LT_OR_EQUAL, LT_OR_EQUAL)
           else
+            @logger.debug("(Ln #{line}, Col #{column-1}): Found '<'")
             token = makeToken(L_ANGLE, L_ANGLE)
           end
           done = true
@@ -301,11 +324,14 @@ class Lexer
           ch = nextChar
           if ch == '>'
             consume
+            @logger.debug("(Ln #{line}, Col #{column-2}): Found '>>'")
             token = makeToken(R_SHIFT, R_SHIFT)
           elsif ch == '='
             consume
+            @logger.debug("(Ln #{line}, Col #{column-2}): Found '>='")
             token = makeToken(GT_OR_EQUAL, GT_OR_EQUAL)
           else
+            @logger.debug("(Ln #{line}, Col #{column-1}): Found '>'")
             token = makeToken(R_ANGLE, R_ANGLE)
           end
           done = true
@@ -316,19 +342,20 @@ class Lexer
             @start = @column # mark start of pattern
             text = ch
             state = STATE_IDENTIFIER
-            @logger.debug("Switched to identifier state.")
+            #@logger.debug("Switched to identifier state.")
           elsif ch.match(/[0-9]/)
             consume
+            @start = @column # mark start of pattern
             text = ch
             state = STATE_NUMBER
-            @logger.debug("Switched to number state.")
+            #@logger.debug("Switched to number state.")
           elsif ch.match(/[.]/)
             # FIX: This will never be reached
             # Not all periods are beginning of floats
             consume
             text = ch
             state = STATE_FLOAT
-            @logger.debug("Switched to float state.")
+            #@logger.debug("Switched to float state.")
           else
             consume
             token = makeToken(ERROR, ERROR)
@@ -359,6 +386,7 @@ class Lexer
           makeToken(t.kind, t.text)
           else
             @logger.debug("(Ln #{line}, Col #{start-1}): Found name '#{text}'")
+            # Should this symbol be :NAME?
             makeToken(:IDENTIFIER, text)
           end
           done = true
@@ -379,7 +407,7 @@ class Lexer
           token = makeToken(:IMAGINARY, text)
           done = true
         else
-          @logger.debug("(Ln #{line}, Col #{column-1}): Found integer '#{text}'")
+          @logger.debug("(Ln #{line}, Col #{start-1}): Found integer '#{text}'")
           token = makeToken(:INTEGER, text)
           done = true
         end
