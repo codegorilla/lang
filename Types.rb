@@ -7,3 +7,7 @@ $Bool = TauObject.new($Class)
 $Int = TauObject.new($Class)
 $Float = TauObject.new($Class)
 
+# Singletons
+$true = TauObject.new($Bool, true)
+$false = TauObject.new($Bool, false)
+

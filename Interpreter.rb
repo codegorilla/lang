@@ -65,6 +65,8 @@ class Interpreter
           #ifStmt(n)
         when :RETURN_STMT
           #returnStmt(n)
+        when :WHILE_STMT
+          whileStmt(n)
         end
       end
     end
@@ -75,34 +77,34 @@ class Interpreter
   def valueDecl (node)
     @logger.debug("valueDecl")
     # Place a variable into the locals table
-    nameNode = node.leftChild
+    identifierNode = node.leftChild
     result = expression(node.rightChild)
     puts result.value
     # The runtime 'symbol table' holds names and bindings to objects
     # Where does immutability get enforced?
-    @fp.define(nameNode.text, result)
+    @fp.define(identifierNode.text, result)
   end
 
   def variableDecl (node)
     @logger.debug("variableDecl")
     # Place a variable into the locals table
-    nameNode = node.leftChild
+    identifierNode = node.leftChild
     result = expression(node.rightChild)
     puts result.value
     # The runtime 'symbol table' holds names and bindings to objects
-    @fp.define(nameNode.text, result)
+    @fp.define(identifierNode.text, result)
   end
 
   def functionDecl (node)
     @logger.debug("functionDecl")
     # fun
-    #   name
+    #   identifier
     #   params?
     #     param1
     #     param2
     #   body
     #     block
-    nameNode = node.firstChild
+    identifierNode = node.firstChild
   end
 
   # Theory of operation for functions vs. methods:
@@ -115,10 +117,29 @@ class Interpreter
 
   # Statements
 
+  def statement (node)
+
+  end
+  
   def expressionStmt (node)
     @logger.debug("expressionStmt")
+    # At global level this should assign to implicit variable 'ans'
+    # At local level the result can be thrown away
     result = expression(node.child)
     result
+  end
+
+  def whileStmt (node)
+    @logger.debug("whileStmt")
+    condition = expression(node.child)
+    # Condition could be of any type, need to convert it to a Bool
+    # If it is already known to be a Bool, then might be able to optimize
+    result = $Bool.getMember('equ').call($true, condition)
+    puts "the result is ", result.value
+    while result.value == true
+      puts "Yes this is true"
+    #  statementNode = statement(node.child)
+    end
   end
 
   # Expressions
@@ -302,8 +323,11 @@ class Interpreter
   def booleanLiteral (node)
     @logger.debug("booleanLiteral")
     t = node.text
-    value = if t == "true" then true elsif t == "false" then false end
-    TauObject.new($Bool, value)
+    if t == "true"
+      $true
+    elsif t == "false"
+      $false
+    end
   end
 
   def integerLiteral (node)

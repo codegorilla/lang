@@ -57,24 +57,24 @@ class ScopeBuilder
     # But that might be something handled by the compiler, not the runtime
     # Note that names are defined here instead of descending to the name node
     # function because name nodes may appear in non-definition contexts.
-    nameNode = node.leftChild
-    @scope.define(nameNode.text)
+    identifierNode = node.leftChild
+    @scope.define(identifierNode.text)
     # Need to descend into expression because it may contain a block
     expression(node.rightChild)
   end
   
   def variableDecl (node)
     @logger.debug("variableDecl")
-    nameNode = node.leftChild
-    @scope.define(nameNode.text)
+    identifierNode = node.leftChild
+    @scope.define(identifierNode.text)
     # Need to descend into expression because it may contain a block
     expression(node.rightChild)
   end
   
   def functionDecl (node)
     @logger.debug("functionDecl")
-    nameNode = node.child(0)
-    @scope.define(nameNode.text)
+    identifierNode = node.child(0)
+    @scope.define(identifierNode.text)
     # Push a new scope
     @scope = Scope.new(@scope)
     node.setAttribute("scope", @scope)
@@ -176,8 +176,8 @@ class ScopeBuilder
       logicalAndExpr(node)
     when :BINARY_EXPR
       binaryExpr(node)
-    when :NAME
-      name(node)
+    when :IDENTIFIER
+      identifier(node)
     when :EXPRESSION
       expression(node)
     end
@@ -223,9 +223,8 @@ class ScopeBuilder
   def arrayAccess (node)
     lhs = node.leftChild
     rhs = node.rightChild
-    # got rid of name method because it is not needed for symbol definition
-    # LEFT OFF HERE 16SEP2017 @ 10:15pm
-    name(lhs)
+    # got rid of identifier method because it is not needed for symbol definition?
+    identifier(lhs)
     expression(rhs)
     inst = Instruction.new(:SUBSCRIPT)
     add(inst)
@@ -234,8 +233,8 @@ class ScopeBuilder
   def objectAccess (node)
     lhs = node.leftChild
     rhs = node.rightChild
-    name(lhs)
-    name(rhs)
+    identifier(lhs)
+    identifier(rhs)
     inst = Instruction.new(:GET)
     add(inst)
   end

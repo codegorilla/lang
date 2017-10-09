@@ -47,7 +47,7 @@ class Parser
       case t.kind
       when 'val', 'var', 'def', 'fun', 'class'
         n.addChild(declaration)
-      when :IDENTIFIER, 'if', 'return', 'while', ';',
+      when :ID, 'if', 'return', 'while', ';',
               '()', :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, '(', '['
         n.addChild(statement)
       when 'EOF'
@@ -83,7 +83,7 @@ class Parser
     @logger.debug("valueDecl")
     n = Node.new(:VALUE_DECL)
     match('val')
-    n.addChild(name)
+    n.addChild(identifier)
     match('=')
     n.addChild(expression)
     match(';')
@@ -94,7 +94,7 @@ class Parser
     @logger.debug("variableDecl")
     n = Node.new(:VARIABLE_DECL)
     match('var')
-    n.addChild(name)
+    n.addChild(identifier)
     match('=')
     n.addChild(expression)
     match(';')
@@ -105,9 +105,9 @@ class Parser
     @logger.debug("functionDecl")
     n = Node.new(:FUNCTION_DECL)
     match('fun')
-    n.addChild(name)
+    n.addChild(identifier)
     match('(')
-    if nextToken.kind == :IDENTIFIER
+    if nextToken.kind == :ID
       n.addChild(parameters)
     end
     match(')')
@@ -132,7 +132,7 @@ class Parser
   def parameter ()
     @logger.debug("parameter")
     n = Node.new(:PARAMETER)
-    n.addChild(name)
+    n.addChild(identifier)
     n
   end
   
@@ -142,10 +142,9 @@ class Parser
     if nextToken.kind == '{'
       n.addChild(block)
     else
-      # Insert a block
+      # Manually insert a block
       p = Node.new(:BLOCK)
-      # Should allow declarations or statements
-      p.addChild(statement)
+      p.addChild(blockElement)
       n.addChild(p)
     end
     n
@@ -180,7 +179,7 @@ class Parser
     @logger.debug("classDecl")
     n = Node.new(:CLASS_DECL)
     match('class')
-    n.addChild(name)
+    n.addChild(identifier)
     n.addChild(classBody)
     n
   end
@@ -309,7 +308,10 @@ class Parser
     if nextToken.kind == '{'
       n.addChild(block)
     else
-      n.addChild(statement)
+      # Manually insert a block
+      p = Node.new(:BLOCK)
+      p.addChild(blockElement)
+      n.addChild(p)
     end
     n
   end
@@ -581,7 +583,7 @@ class Parser
     @logger.debug("primaryExpr")
     t = nextToken
     case t.kind
-    when :IDENTIFIER
+    when :ID
       n = idExpr
     when '('
       n = parenthesizedExpr
@@ -593,7 +595,7 @@ class Parser
 
   def idExpr ()
     @logger.debug("idExpr")
-    n = name
+    n = identifier
     t = nextToken
     if (t.kind == '(' || t.kind == '[' || t.kind == '.')
       p = idTail(n)
@@ -639,7 +641,7 @@ class Parser
         k == :INTEGER ||
         k == :FLOAT ||
         k == :IMAGINARY ||
-        k == :IDENTIFIER ||
+        k == :ID ||
         k == '(' ||
         k == '[' ||
         k == '{')
@@ -675,25 +677,14 @@ class Parser
     n = Node.new(:OBJECT_ACCESS)
     n.addChild(node)
     match('.')
-    n.addChild(name)
+    n.addChild(identifier)
     n
   end
 
-  # NAME FOUND HERE - DEPRECATE -- CHANGE TO identifier()
-  def name ()
-    @logger.debug("name")
-    t = nextToken
-    match(:IDENTIFIER)
-    n = Node.new(:NAME)
-    n.setText(t.text)
-    n
-  end
-  
   def identifier ()
     @logger.debug("identifier")
     t = nextToken
-    match(:IDENTIFIER)
-    # IDENTIFIER_NODE?
+    match(:ID)
     n = Node.new(:IDENTIFIER)
     n.setText(t.text)
     n

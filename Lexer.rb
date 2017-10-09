@@ -385,13 +385,12 @@ class Lexer
           @logger.debug("(Ln #{line}, Col #{start-1}): Found keyword '#{t.text}'")
           makeToken(t.kind, t.text)
           else
-            @logger.debug("(Ln #{line}, Col #{start-1}): Found name '#{text}'")
-            # Should this symbol be :NAME?
-            makeToken(:IDENTIFIER, text)
+            @logger.debug("(Ln #{line}, Col #{start-1}): Found identifier '#{text}'")
+            makeToken(:ID, text)
           end
           done = true
         end
-        
+
       when STATE_NUMBER
         ch = nextChar
         if ch.match(/[0-9]/)

@@ -1,10 +1,19 @@
 // 1 + 2;
 
-var x = !false;
+//var x = 1;
+//var y = 2 < 10;
 
-// var x = (7 & 5) << 2;
-// var y = 12 + 4.5 / 1.25;
-// var z = true != false;
+while (2 < 10)
+  var t = 5;
+
+//var a = true;
+//var b = !true;
+//var c = false;
+//var d = !false;
+
+//var x = (7 & 5) << 2;
+//var y = 12 + 4.5 / 1.25;
+//var z = true != false;
 
 // var a = null;
 
