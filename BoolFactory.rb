@@ -80,6 +80,11 @@ class BoolFactory
       result
     end
 
+    def not (x)
+      result = TauObject.new($Bool, !x.value)
+      result
+    end
+
     # Should Bool type be promoted to Int so that add, sub, mul, div and
     # other numerical operators work? Python does this, but Ruby does not.
     
@@ -89,6 +94,7 @@ class BoolFactory
       $Bool.setMember('band', method(:band))
       $Bool.setMember('equ', method(:equ))
       $Bool.setMember('neq', method(:neq))
+      $Bool.setMember('not', method(:not))
     end
 end
 

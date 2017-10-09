@@ -58,9 +58,9 @@ class Interpreter
         when :VARIABLE_DECL
           variableDecl(n)
         when :FUNCTION_DECL
-          #functionDecl(n)
-        when :EXPR_STMT
-          #exprStmt(n)
+          functionDecl(n)
+        when :EXPRESSION_STMT
+          expressionStmt(n)
         when :IF_STMT
           #ifStmt(n)
         when :RETURN_STMT
@@ -69,6 +69,8 @@ class Interpreter
       end
     end
   end
+
+  # Declarations
 
   def valueDecl (node)
     @logger.debug("valueDecl")
@@ -91,6 +93,36 @@ class Interpreter
     @fp.define(nameNode.text, result)
   end
 
+  def functionDecl (node)
+    @logger.debug("functionDecl")
+    # fun
+    #   name
+    #   params?
+    #     param1
+    #     param2
+    #   body
+    #     block
+    nameNode = node.firstChild
+  end
+
+  # Theory of operation for functions vs. methods:
+  # x = cos # returns function object
+  # y = cos(t) # returns result of function call
+  # x = Math.cos # attempts to call cos with 0 arguments
+  # x = Math.cos(t) # calls cos with 1 argument
+
+  
+
+  # Statements
+
+  def expressionStmt (node)
+    @logger.debug("expressionStmt")
+    result = expression(node.child)
+    result
+  end
+
+  # Expressions
+
   def expression (node)
     @logger.debug("expression")
     # Root expression nodes only exist at the top of an expression tree
@@ -104,6 +136,8 @@ class Interpreter
     case node.kind
     when :BINARY_EXPR
       result = binaryExpr(node)
+    when :UNARY_EXPR
+      result = unaryExpr(node)
     when :NULL_LITERAL
       result = nullLiteral(node)
     when :BOOLEAN_LITERAL
@@ -195,7 +229,6 @@ class Interpreter
         end
         classObj.getMember('shr').call(a, b)
       when '+'
-        # This assumes an integer, but it can be anything
         # First, need to get the type of a, which will yield a class
         classObj = a.type
         if classObj == nil
@@ -224,11 +257,36 @@ class Interpreter
         end
         classObj.getMember('div').call(a, b)
     end
-    # Assume integer but it could be something else
     result = c
     result
   end
 
+  def unaryExpr (node)
+    @logger.debug("unaryExpr")
+    a = expr(node.child)
+    op = node.text
+    b = case op
+      when '-'
+        classObj = a.type
+        if classObj == nil
+          # Throw exception
+        end
+        classObj.getMember('uminus').call(a)
+      when '~'
+        classObj = a.type
+        if classObj == nil
+          # Throw exception
+        end
+        classObj.getMember('bnot').call(a)
+      when '!'
+        classObj = a.type
+        if classObj == nil
+          # Throw exception
+        end
+        classObj.getMember('not').call(a)        
+    end
+  end
+  
   def nullLiteral (node)
     @logger.debug("nullLiteral")
     # Should this have a value?

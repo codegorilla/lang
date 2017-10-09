@@ -39,8 +39,8 @@ class ScopeBuilder
           variableDecl(n)
         when :FUNCTION_DECL
           functionDecl(n)
-        when :EXPR_STMT
-          exprStmt(n)
+        when :EXPRESSION_STMT
+          expressionStmt(n)
         when :IF_STMT
           ifStmt(n)
         when :RETURN_STMT
@@ -116,8 +116,8 @@ class ScopeBuilder
       valueDecl(node)
     when :VARIABLE_DECL
       variableDecl(node)
-    when :EXPR_STMT
-      exprStmt(node)
+    when :EXPRESSION_STMT
+      expressionStmt(node)
     when :IF_STMT
       ifStmt(node)
     when :RETURN_STMT
@@ -127,8 +127,8 @@ class ScopeBuilder
 
   # ********** Statements **********
 
-  def exprStmt (node)
-    @logger.debug("exprStmt")
+  def expressionStmt (node)
+    @logger.debug("expressionStmt")
     expression(node.child)
   end
 

@@ -418,6 +418,7 @@ class Lexer
           consume
           text << ch
         else
+          @logger.debug("(Ln #{line}, Col #{start-1}): Found float '#{text}'")
           token = makeToken(:FLOAT, text)
           done = true
         end

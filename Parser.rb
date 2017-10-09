@@ -214,7 +214,7 @@ class Parser
     when 'while'
       n = whileStmt
     else
-      n = exprStmt
+      n = expressionStmt
     end
     n
   end
@@ -314,9 +314,9 @@ class Parser
     n
   end
 
-  def exprStmt ()
-    @logger.debug("exprStmt")
-    n = Node.new(:EXPR_STMT)
+  def expressionStmt ()
+    @logger.debug("expressionStmt")
+    n = Node.new(:EXPRESSION_STMT)
     n.addChild(expression)
     match(';')
     n
@@ -679,6 +679,7 @@ class Parser
     n
   end
 
+  # NAME FOUND HERE - DEPRECATE -- CHANGE TO identifier()
   def name ()
     @logger.debug("name")
     t = nextToken
@@ -688,6 +689,16 @@ class Parser
     n
   end
   
+  def identifier ()
+    @logger.debug("identifier")
+    t = nextToken
+    match(:IDENTIFIER)
+    # IDENTIFIER_NODE?
+    n = Node.new(:IDENTIFIER)
+    n.setText(t.text)
+    n
+  end
+
   def parenthesizedExpr ()
     @logger.debug("parenthesizedExpr")
     # This could either be a tuple or a plain expression enclosed in parenthesis

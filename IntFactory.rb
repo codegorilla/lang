@@ -241,6 +241,23 @@ class IntFactory
       result
     end
 
+    def neg (x)
+      result = TauObject.new($Int, -x.value)
+      result
+    end
+
+    def bnot (x)
+      result = TauObject.new($Int, ~x.value)
+      result
+    end
+
+    def not (x)
+      # Need to think about this
+      # Do we follow the python/javascript model or the ruby model?
+      result = TauObject.new($Bool, false)
+      result
+    end
+
     def make ()
       $Int.setMember('bor', method(:bor))
       $Int.setMember('bxor', method(:bxor))
@@ -257,5 +274,8 @@ class IntFactory
       $Int.setMember('sub', method(:sub))
       $Int.setMember('mul', method(:mul))
       $Int.setMember('div', method(:div))
+      $Int.setMember('neg', method(:neg))
+      $Int.setMember('bnot', method(:bnot))
+      $Int.setMember('not', method(:not))
     end
 end
