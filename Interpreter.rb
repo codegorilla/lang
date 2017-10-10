@@ -92,6 +92,9 @@ class Interpreter
     result = expression(node.rightChild)
     puts result.value
     # The runtime 'symbol table' holds names and bindings to objects
+    # Rebinding a name to an object is ok
+    # Re-declaring a name is NOT ok, but that is something that is looked
+    # for during semantic analysis, not at runtime. Runtime doesn't care.
     @fp.define(identifierNode.text, result)
   end
 
@@ -155,10 +158,14 @@ class Interpreter
     @logger.debug("expr")
     result = nil
     case node.kind
+    when :ASSIGNMENT_EXPR
+      result = assignmentExpr(node)
     when :BINARY_EXPR
       result = binaryExpr(node)
     when :UNARY_EXPR
       result = unaryExpr(node)
+    when :IDENTIFIER
+      result = identifier(node)
     when :NULL_LITERAL
       result = nullLiteral(node)
     when :BOOLEAN_LITERAL
@@ -175,6 +182,17 @@ class Interpreter
       puts "Something else!"
     end
     result
+  end
+
+  # NOTE: BROKEN ASSIGNMENT LEFT OFF HERE 09OCT2017 @ 10:45pm
+
+  def assignmentExpr(node)
+    @logger.debug("assignmentExpr")
+    # This works because assignment is right associative
+    # Might need to revisit once names become more complex (e.g. x.f[0])
+    identifierNode = node.leftChild
+    result = expr(node.rightChild)
+    @fp.define(identifierNode.text, result)
   end
 
   def binaryExpr (node)
@@ -307,7 +325,21 @@ class Interpreter
         classObj.getMember('not').call(a)        
     end
   end
-  
+
+  def identifier (node)
+    @logger.debug("identifier")
+    # Look up the name
+    # Need to expand this to account for globals, locals, and other scopes
+    result = @fp.resolve(node.text)
+    if result == nil
+      TauObject.new($Exception, "NameError: identifier '#{node.text}' is not defined")
+    else
+      result
+    end
+  end
+
+  # ********** Literals **********
+
   def nullLiteral (node)
     @logger.debug("nullLiteral")
     # Should this have a value?

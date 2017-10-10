@@ -259,5 +259,8 @@ class ScopeBuilder
     expr(node.rightChild)
   end
 
+  def identifier (node)
+  end
+  
 end #class
 

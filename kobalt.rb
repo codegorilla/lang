@@ -43,9 +43,9 @@ def main (filename = nil)
   # This phase does not generate a new data structure per se.
   # It just populates the AST with scopes and symbol table data.
   logger.info("Building scopes...")
-  @sb = ScopeBuilder.new(@root)
-  @sb.setLogLevel(Logger::DEBUG)
-  @sb.start
+  #@sb = ScopeBuilder.new(@root)
+  #@sb.setLogLevel(Logger::DEBUG)
+  #@sb.start
 
   # Interpret
   logger.info("Commence interpreting...")
