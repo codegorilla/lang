@@ -134,14 +134,17 @@ class Interpreter
 
   def whileStmt (node)
     @logger.debug("whileStmt")
-    condition = expression(node.child)
+    condition = expression(node.leftChild)
     # Condition could be of any type, need to convert it to a Bool
     # If it is already known to be a Bool, then might be able to optimize
     result = $Bool.getMember('equ').call($true, condition)
-    puts "the result is ", result.value
     while result.value == true
-      puts "Yes this is true"
-    #  statementNode = statement(node.child)
+      blockNode = node.rightChild
+      # This needs to be fixed -- block can have multiple elements
+      variableDecl(blockNode.child)
+      # Re-evaluate condition
+      condition = expression(node.leftChild)
+      result = $Bool.getMember('equ').call($true, condition)
     end
   end
 
@@ -183,8 +186,6 @@ class Interpreter
     end
     result
   end
-
-  # NOTE: BROKEN ASSIGNMENT LEFT OFF HERE 09OCT2017 @ 10:45pm
 
   def assignmentExpr(node)
     @logger.debug("assignmentExpr")

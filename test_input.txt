@@ -1,18 +1,11 @@
-// 1 + 2;
+// Test file
 
-//var x = 2 < 10;
+var x = 1;
+//var y = x < 10;
+//var z = y == true
 
-var a = 1;
-var b = 1;
-var c = 1;
-
-//a = b = 10;
-
-//var x = a + 5;
-
-
-//while (y < 10)
-//  var a = 5;
+while (x < 10)
+  var x = x + 1;
 
 
 //var a = true;

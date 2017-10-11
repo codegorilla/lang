@@ -370,32 +370,21 @@ class Parser
     n
   end
 
-  # NOTE: BROKEN ASSIGNMENT LEFT OFF HERE 09OCT2017 @ 10:45pm
-  
   def assignmentExpr ()
     @logger.debug("assignmentExpr")
     # Might need to limit this to lvalues
-    # This needs to be right-associative
+    # This is written to be right-associative
     n = logicalOrExpr
     t = nextToken
-    if t.kind == '='
+    if t.kind == '=' then
       match('=')
       p = Node.new(:ASSIGNMENT_EXPR)
       p.addChild(n)
       p.addChild(assignmentExpr)
+      n = p
     end
+    n
   end
-
-  #   while t.kind == '='
-  #     match('=')
-  #     p = Node.new(:ASSIGNMENT_EXPR)
-  #     p.addChild(n)
-  #     p.addChild(logicalOrExpr)
-  #     n = p
-  #     t = nextToken
-  #   end
-  #   n
-  # end
 
   def logicalOrExpr ()
     @logger.debug("logicalOrExpr")
