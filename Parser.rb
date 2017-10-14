@@ -69,7 +69,7 @@ class Parser
     while !done
       t = nextToken
       case t.kind
-      when 'val', 'var', 'def', 'fun', 'class'
+      when 'val', 'var', 'def', 'class'
         n.addChild(declaration)
       when :ID, 'if', 'return', 'while', ';',
               '()', :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, '(', '['
@@ -92,18 +92,11 @@ class Parser
   def declaration ()
     @logger.debug("declaration")
     case nextToken.kind
-    when 'val'
-      n = valueDecl
-    when 'var'
-      n = variableDecl
-    when 'def'
-      n = functionDecl
-    when 'fun'
-      n = functionDecl
-    when 'class'
-      n = classDecl
+      when 'val' then valueDecl
+      when 'var' then variableDecl
+      when 'def' then functionDecl
+      when 'class' then classDecl
     end
-    n
   end
 
   def valueDecl ()
@@ -131,7 +124,7 @@ class Parser
   def functionDecl ()
     @logger.debug("functionDecl")
     n = Node.new(:FUNCTION_DECL)
-    match('fun')
+    match('def')
     n.addChild(identifier)
     match('(')
     if nextToken.kind == :ID
@@ -139,6 +132,8 @@ class Parser
     end
     match(')')
     match('=')
+    # this might change to expression instead
+    # or function body might just contain an expression
     n.addChild(functionBody)
     n
   end
@@ -167,37 +162,12 @@ class Parser
     @logger.debug("functionBody")
     n = Node.new(:FUNCTION_BODY)
     if nextToken.kind == '{'
-      n.addChild(block)
+      n.addChild(blockExpr)
     else
-      # Manually insert a block
-      p = Node.new(:BLOCK)
+      # Manually insert a block node
+      p = Node.new(:BLOCK_EXPR)
       p.addChild(blockElement)
       n.addChild(p)
-    end
-    n
-  end
-
-  def block ()
-    @logger.debug("block")
-    # Not sure if this should be considered a statement or an expression
-    # A function call is always an expression, so this should probably be an expression
-    n = Node.new(:BLOCK)
-    match('{')
-    while nextToken.kind != '}'
-      n.addChild(blockElement)
-    end
-    match('}')
-    n
-  end
-
-  def blockElement ()
-    @logger.debug("blockElement")
-    case nextToken.kind
-    when 'val', 'var', 'def', 'fun', 'class'
-      # Not sure class declarations should be valid inside blocks - maybe only inside class bodies
-      n = declaration
-    else
-      n = statement
     end
     n
   end
@@ -223,26 +193,16 @@ class Parser
   def statement ()
     @logger.debug("statement")
     case nextToken.kind
-    when 'break'
-      n = breakStmt
-    when 'continue'
-      n = continueStmt
-    when 'do'
-      n = doStmt
-    when ';'
-      n = emptyStmt
-    when 'for'
-      n = forStmt
-    when 'if'
-      n = ifStmt
-    when 'return'
-      n = returnStmt
-    when 'while'
-      n = whileStmt
-    else
-      n = expressionStmt
+      when 'break' then breakStmt
+      when 'continue' then continueStmt
+      when 'do' then doStmt
+      when ';' then emptyStmt
+      when 'for' then forStmt
+      when 'if' then ifStmt
+      when 'return' then returnStmt
+      when 'while' then whileStmt
+      else expressionStmt
     end
-    n
   end
 
   def breakStmt ()
@@ -269,8 +229,9 @@ class Parser
     n.addChild(expression)
     match(')')
     if nextToken.kind == '{'
-      n.addChild(block)
+      n.addChild(blockExpr)
     else
+      # probably need to manually add a block node
       n.addChild(statement)
     end
     n
@@ -293,7 +254,7 @@ class Parser
     n.addChild(expression)
     match(')')
     if nextToken.kind == '{'
-      n.addChild(block)
+      n.addChild(blockExpr)
     else
       n.addChild(statement)
     end
@@ -333,10 +294,10 @@ class Parser
     n.addChild(expression)
     match(')')
     if nextToken.kind == '{'
-      n.addChild(block)
+      n.addChild(blockExpr)
     else
-      # Manually insert a block
-      p = Node.new(:BLOCK)
+      # Manually insert a block node
+      p = Node.new(:BLOCK_EXPR)
       p.addChild(blockElement)
       n.addChild(p)
     end
@@ -374,7 +335,7 @@ class Parser
     n.addChild(expression)
     match(')')
     if nextToken.kind == '{'
-      n.addChild(block)
+      n.addChild(blockExpr)
     else
       # Perhaps should insert a block node manually here?
       n.addChild(blockElement)
@@ -390,8 +351,9 @@ class Parser
     @logger.debug("elseClause")
     match('else')
     if nextToken.kind == '{'
-      n = block
+      n = blockExpr
     else
+      # Perhaps should insert a block node manually here?
       n = blockElement
     end
     n
@@ -608,16 +570,33 @@ class Parser
 
   def primaryExpr ()
     @logger.debug("primaryExpr")
-    t = nextToken
-    case t.kind
-    when :ID
-      n = idExpr
-    when '('
-      n = parenthesizedExpr
-    else
-      n = literal
+    case nextToken.kind
+      when :ID then idExpr
+      when '{' then blockExpr
+      when '(' then parenthesizedExpr
+      else literal
     end
+  end
+
+  def blockExpr ()
+    @logger.debug("blockExpr")
+    n = Node.new(:BLOCK_EXPR)
+    match('{')
+    while nextToken.kind != '}'
+      n.addChild(blockElement)
+    end
+    match('}')
     n
+  end
+
+  def blockElement ()
+    @logger.debug("blockElement")
+    # Not sure class declarations should be valid inside blocks --
+    # maybe only inside class bodies (i.e. templates)
+    case nextToken.kind
+      when 'val', 'var', 'def', 'class' then declaration
+      else statement
+    end
   end
 
   def idExpr ()

@@ -12,7 +12,6 @@ class KeywordTable
   EXTENDS = Token.new('extends', "extends")
   FALSE = Token.new(:BOOLEAN, "false")
   FOR = Token.new('for', "for")
-  FUN = Token.new('fun', "fun")
   IF = Token.new('if', "if")
   IMPORT = Token.new('import', "import")
   NEW = Token.new('new', "new")
@@ -47,7 +46,6 @@ class KeywordTable
       'extends' => EXTENDS,
       'false' => FALSE,
       'for' => FOR,
-      'fun' => FUN,
       'if' => IF,
       'import' => IMPORT,
       'new' => NEW,
