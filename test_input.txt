@@ -1,11 +1,20 @@
 // Test file
 
+var myvar1 ; = 1;
+
+var myvar2 # = 2;
+
 var x = 1;
+var y = 2;
+var z = x + y;
+
+var myvar1 = 5;
+
 //var y = x < 10;
 //var z = y == true
 
-while (x < 10)
-  var x = x + 1;
+//while (x < 10)
+//  var x = x + 1;
 
 
 //var a = true;

@@ -57,9 +57,8 @@ class Lexer
   EOF = 'EOF'
   ERROR = 'ERROR'
 
-  def initialize (inputStream)
-    @is = inputStream
-    @is.load
+  def initialize (input)
+    @input = input
     @kt = KeywordTable.new
 
     @line = 1
@@ -67,16 +66,18 @@ class Lexer
     @start = 1
 
     @logger = Logger.new(STDOUT)
-    @logger.level = Logger::DEBUG
+    @logger.level = Logger::WARN
     @logger.info("Initialized lexer.")
+
+    @plog = ProblemLogger.new
   end
   
   def nextChar ()
-    @is.lookahead
+    @input.lookahead
   end
 
   def consume ()
-    @is.consume
+    @input.consume
     @column += 1
   end
 
@@ -95,6 +96,14 @@ class Lexer
   def makeToken (kind, text)
     t = Token.new(kind, text, line, column-1)
     return t
+  end
+
+  def setLogLevel (level)
+    @logger.level = level
+  end
+
+  def problems ()
+    @plog
   end
 
   def getToken ()
@@ -357,9 +366,27 @@ class Lexer
             state = STATE_FLOAT
             #@logger.debug("Switched to float state.")
           else
+            # Error recovery strategy for lexical errors:
+            # Lexical errors are generally caused by invalid characters in the
+            # input stream. Within the START state, if there are no valid
+            # matches then you have a lexical error. The recovery strategy is to
+            # simply throw away the invalid character and proceed as if nothing
+            # was wrong. This means consuming the character and restarting the
+            # scan in the same START state.
+            # The other states don't have to worry about lexical errors because
+            # if they encounter an invalid character then they simply don't
+            # consume it, returning a token, and leaving the invalid character
+            # to be found by the START state.
+            # For now, it appears that all lexical errors can be recovered from
+            # in this manner, so they don't prevent moving on to the parsing
+            # stage. However, note that in order for the interpreter to run,
+            # there must be no errors in any of the stages. Warnings are ok.
+            # One issue with grouping by stages is that the list of errors that
+            # are given to the user might be out of order, because all lexer
+            # errors will be printed before parser errors, even if they occur
+            # later in the input.
             consume
-            token = makeToken(ERROR, ERROR)
-            done = true
+            @plog.error("character '#{ch}' not recognized", @line, @column-1)
           end
         end
 

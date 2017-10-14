@@ -1,18 +1,23 @@
-class ScopeBuilder
+class RefPhase
 
+  # This pass detects if symbols are referenced without valid declarations.
+  # Forward references to functions are permitted, provided they are declared
+  # with the 'def x () = {...}' notation, rather than lambda notation.
+  # Forward references to values and variables are not permitted.
+  
   def initialize (root)
     @root = root
 
     @logger = Logger.new(STDOUT)
-    @logger.level = Logger::WARN
+    @logger.level = Logger::INFO
     @logger.info("Initialized scope builder.")
-
-    @plog = ProblemLogger.new
 
     # Maintain a stack of scopes
     @scope = nil
 
     @label = 0
+
+    @errors = 0
   end
   
   def setLogLevel (level)
@@ -24,8 +29,8 @@ class ScopeBuilder
     @scope
   end
 
-  def problems ()
-    @plog
+  def errors ()
+    @errors
   end
 
   def start ()
@@ -65,11 +70,12 @@ class ScopeBuilder
     # function because name nodes may appear in non-definition contexts.
     identifierNode = node.leftChild
     name = identifierNode.text
-    if @scope.lookup(name) == nil
-      scope.define(name)
-    else
-      # Same variable declared multiple times within scope is error.
-      @plog.error("Multiple declarations of symbol '#{name}'.", identifierNode.line)
+    check = @scope.define(name)
+    if !check
+      # There is an error due to the same value being declared multiple
+      # times within this scope.
+      puts "ERROR: Multiple declarations of symbol '#{name}'."
+      @errors = 1
     end
     # Need to descend into expression because it may contain a block
     expression(node.rightChild)
@@ -79,11 +85,12 @@ class ScopeBuilder
     @logger.debug("variableDecl")
     identifierNode = node.leftChild
     name = identifierNode.text
-    if @scope.lookup(name) == nil
-      @scope.define(name)
-    else
-      # Same variable declared multiple times within scope is error.
-      @plog.error("Multiple declarations of symbol '#{name}'.", identifierNode.line)
+    check = @scope.define(name)
+    if !check
+      # There is an error due to the same variable being declared multiple
+      # times within this scope.
+      puts "ERROR: Multiple declarations of symbol '#{name}'."
+      @errors = 1
     end
     # Need to descend into expression because it may contain a block
     expression(node.rightChild)

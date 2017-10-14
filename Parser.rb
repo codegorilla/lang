@@ -2,40 +2,64 @@ require 'logger'
 
 class Parser
 
-  def initialize (tokenStream)
-    @ts = tokenStream
-    @ts.fill
+  def initialize (tokens)
+    @tokens = tokens
 
     @logger = Logger.new(STDOUT)
-    @logger.level = Logger::INFO
+    @logger.level = Logger::WARN
     @logger.info("Initialized parser.")
+
+    @plog = ProblemLogger.new
   end
   
   def nextToken ()
-    @ts.lookahead
+    @tokens.lookahead
   end
   
   def consume ()
-    @ts.consume
+    @tokens.consume
   end
 
   def match (kind)
-    if nextToken.kind == kind
-      @ts.consume
+    t = nextToken
+    if t.kind == kind
+      @tokens.consume
     else
-      puts "Error: No match. Expecting '#{kind}' but found '#{nextToken.kind}' instead."
+      # Error recovery strategy for failures to match:
+      # First try single-token deletion
+      # If that doesn't work, then declare a mismatch and panic
+      # This is not fully implemented yet
+
+      # Delete a single token
+      @tokens.consume
+      # Now try to match again
+      t2 = nextToken
+      if t2.kind == kind
+        # Token t was just extraneous input, consume it
+        @tokens.consume
+        @plog.error("extraneous input '#{t.kind}', expecting '#{kind}'", t.line, t.column)        
+      else
+        # This is plain mismatched input -- need to enter panic mode to continue
+        # Not full implemented yet
+        @tokens.consume # this is supposed to panic
+        @plog.error("mismatched input '#{t.kind}', expecting '#{kind}'", t.line, t.column)        
+      end
     end
   end
   
   def option (kind)
     t = nextToken
     if t.kind == kind
-      @ts.consume
+      @tokens.consume
     end
   end
   
-  def setLogLevel(level)
+  def setLogLevel (level)
     @logger.level = level
+  end
+
+  def problems ()
+    @plog
   end
 
   def start ()
@@ -53,7 +77,10 @@ class Parser
       when 'EOF'
         done = true
       else
-        puts "ERROR in start()"
+        # Actually, this might be better handled by single-token deletion.
+        # But if there are two or more consecutive bad tokens, then single-token
+        # deletion wouldn't work and it would become a mismatched input error.
+        @plog.error("mismatched input '#{t.text}', expecting declaration or statement", t.line, t.column)
         done = true
       end
     end
@@ -121,7 +148,7 @@ class Parser
     n = Node.new(:PARAMETERS)
     n.addChild(parameter)
     while nextToken.kind == ','
-      @ts.consume
+      @tokens.consume
       n.addChild(parameter)
     end
     # Allow trailing comma
@@ -686,6 +713,10 @@ class Parser
     t = nextToken
     match(:ID)
     n = Node.new(:IDENTIFIER)
+
+    # Experimental - about associating token info with this node
+    n.setLine(t.line)
+
     n.setText(t.text)
     n
   end

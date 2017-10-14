@@ -5,12 +5,26 @@ class Node
     @text = text
     @zchildren = []
 
+    # This is a test about associating some token information with the node
+    # Might delete this field
+    @line = 0
+
     # Syntesized attributes
     @attributes = {}
   end
 
   NULL_LITERAL = Node.new(:NULL_LITERAL, "null")
   UNIT_LITERAL = Node.new(:UNIT_LITERAL, "()")
+
+  # Test about associating token info with node
+  # Might delete this method
+  def setLine (line)
+    @line = line
+  end
+  
+  def line ()
+    @line
+  end
 
   def setText (text)
     @text = text

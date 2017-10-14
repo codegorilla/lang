@@ -3,7 +3,15 @@ class TokenStream
   def initialize (source)
     @source = source
     @buffer = []
+    fill
     @pos = -1
+  end
+
+  def fill ()
+    more = fetch
+    while more == true
+      more = fetch
+    end
   end
 
   def fetch ()
@@ -17,13 +25,6 @@ class TokenStream
     end
   end
 
-  def fill ()
-    more = fetch
-    while more == true
-      more = fetch
-    end
-  end
-  
   def consume ()
     @pos += 1
   end
@@ -44,13 +45,10 @@ class TokenStream
     @buffer[i].text
   end
 
-  def source ()
-    @source
-  end
-  
   def buffer ()
+    # does anything ever need to get the buffer?
     @buffer
   end
-  
+
 end
 

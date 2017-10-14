@@ -5,11 +5,6 @@ class Scope
     @symbols = SymbolTable.new
   end
 
-  # Probably dont need this anymore - creating a new scope will always create a new symbol table
-  # def setSymbolTable (st)
-  #  @symbols = st
-  #end
-
   def symbols ()
     @symbols
   end
@@ -18,18 +13,19 @@ class Scope
     @link
   end
 
-  def define (symbol)
-    if @symbols.lookup(symbol) == nil
-      @symbols.insert(symbol)
-      return true
-    else
-      return false
-    end
+  def define (name)
+    @symbols.put(name)
   end
 
-  def resolve (symbol)
-    # This might be partially a runtime thing
-    # Needs to be defined
+  def lookup (name)
+    @symbols.get(name)
+  end
+
+  def resolve (name)
+    # Eventually, this needs to be defined to recurse.
+    # Depends whether there is ever a need to recurse at compile time.
+    @symbols.get(name)
   end
 
 end #class
+

@@ -1,14 +1,11 @@
 class InputStream
 
   def initialize (filename)
-    @filename = filename
+    # Read contents of file into buffer
+    @file = File.new(filename, 'r')
+    @buffer = @file.read
+    @file.close
     @pos = -1
-  end
-
-  def load ()
-    @source = File.new(@filename, 'r')
-    @buffer = @source.read
-    @source.close
   end
 
   def consume ()
@@ -23,5 +20,5 @@ class InputStream
     @buffer[@pos + 1]
   end  
   
-end
+end # class
 

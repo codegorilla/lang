@@ -5,13 +5,13 @@ class SymbolTable
     @counter = 0
   end
 
-  def insert (name)
-    @table[name] = @counter
+  def put (symbol)
+    @table[symbol] = @counter
     @counter += 1
   end
 
-  def lookup (name)
-    @table[name]
+  def get (symbol)
+    @table[symbol]
   end
 
 end #class
