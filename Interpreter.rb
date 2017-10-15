@@ -53,20 +53,20 @@ class Interpreter
       for i in 0..node.count-1
         n = node.child(i)
         case n.kind
-        when :VALUE_DECL
-          valueDecl(n)
-        when :VARIABLE_DECL
-          variableDecl(n)
-        when :FUNCTION_DECL
-          functionDecl(n)
-        when :EXPRESSION_STMT
-          expressionStmt(n)
+        when :VALUE_DECL then valueDecl(n)
+        when :VARIABLE_DECL then variableDecl(n)
+        when :FUNCTION_DECL then functionDecl(n)
+        when :CLASS_DECL then classDecl(n)
+        when :EXPRESSION_STMT then expressionStmt(n)
         when :IF_STMT
-          #ifStmt(n)
+          # ifStmt(n)
+        when :PRINT_STMT then printStmt(n)
         when :RETURN_STMT
           #returnStmt(n)
-        when :WHILE_STMT
-          whileStmt(n)
+        when :WHILE_STMT then whileStmt(n)
+        else
+          puts "THERE HAS BEEN A MAJOR ERROR"
+          exit
         end
       end
     end
@@ -116,20 +116,20 @@ class Interpreter
   # x = Math.cos # attempts to call cos with 0 arguments
   # x = Math.cos(t) # calls cos with 1 argument
 
-  
-
   # Statements
 
-  def statement (node)
-
-  end
-  
   def expressionStmt (node)
     @logger.debug("expressionStmt")
     # At global level this should assign to implicit variable 'ans'
     # At local level the result can be thrown away
+    # Since the result is thrown away, then optimizer can eliminate the code
     result = expression(node.child)
-    result
+  end
+
+  def printStmt (node)
+    @logger.debug("printStmt")
+    result = expression(node.child)
+    puts result.value
   end
 
   def whileStmt (node)
@@ -139,12 +139,33 @@ class Interpreter
     # If it is already known to be a Bool, then might be able to optimize
     result = $Bool.getMember('equ').call($true, condition)
     while result.value == true
-      blockNode = node.rightChild
-      # This needs to be fixed -- block can have multiple elements
-      variableDecl(blockNode.child)
+      # At some point might create a separate blockExpr function because
+      # blockExpr might be used in many places
+      blockExprNode = node.rightChild
+      for i in 0..blockExprNode.count-1
+        n = blockExprNode.child(i)
+        blockElement(n)
+      end
       # Re-evaluate condition
       condition = expression(node.leftChild)
       result = $Bool.getMember('equ').call($true, condition)
+    end
+  end
+
+  # Belongs under experssions under blockExpr?
+  def blockElement (node)
+    @logger.debug("blockElement")
+    case node.kind
+    when :VALUE_DECL then valueDecl(node)
+    when :VARIABLE_DECL then variableDecl(node)
+    when :FUNCTION_DECL then functionDecl(node)
+    when :CLASS_DECL then classDecl(node)
+    when :EXPRESSION_STMT then expressionStmt(node)
+    when :PRINT_STMT then printStmt(node)
+    when :WHILE_STMT then whileStmt(node)
+    else
+      puts "THERE HAS BEEN A MAJOR ERROR"
+      exit
     end
   end
 

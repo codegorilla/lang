@@ -16,6 +16,7 @@ class KeywordTable
   IMPORT = Token.new('import', "import")
   NEW = Token.new('new', "new")
   NULL = Token.new(:NULL, "null")
+  PRINT = Token.new('print', "print")
   RETURN = Token.new('return', "return")
   SUPER = Token.new('super', "super")
   THIS = Token.new('this', "this")
@@ -50,6 +51,7 @@ class KeywordTable
       'import' => IMPORT,
       'new' => NEW,
       'null' => NULL,
+      'print' => PRINT,
       'return' => RETURN,
       'super' => SUPER,
       'this' => THIS,

@@ -71,7 +71,7 @@ class Parser
       case t.kind
       when 'val', 'var', 'def', 'class'
         n.addChild(declaration)
-      when :ID, 'if', 'return', 'while', ';',
+      when :ID, 'if', 'print', 'return', 'while', ';',
               '()', :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, '(', '['
         n.addChild(statement)
       when 'EOF'
@@ -90,7 +90,6 @@ class Parser
   # ********** Declarations **********
 
   def declaration ()
-    @logger.debug("declaration")
     case nextToken.kind
       when 'val' then valueDecl
       when 'var' then variableDecl
@@ -191,7 +190,6 @@ class Parser
   # ********** Statements **********
 
   def statement ()
-    @logger.debug("statement")
     case nextToken.kind
       when 'break' then breakStmt
       when 'continue' then continueStmt
@@ -199,6 +197,7 @@ class Parser
       when ';' then emptyStmt
       when 'for' then forStmt
       when 'if' then ifStmt
+      when 'print' then printStmt
       when 'return' then returnStmt
       when 'while' then whileStmt
       else expressionStmt
@@ -275,6 +274,7 @@ class Parser
     match('return')
     if nextToken.kind == ';'
       # Return unit implicitly
+      # Might want to add debug logging here
       p = Node.new(:EXPRESSION)
       q = Node.new(:UNIT_LITERAL)
       p.addChild(q)
@@ -282,6 +282,15 @@ class Parser
     else
       n.addChild(expression)
     end
+    match(';')
+    n
+  end
+
+  def printStmt ()
+    @logger.debug("printStmt")
+    n = Node.new(:PRINT_STMT)
+    match('print')
+    n.addChild(expression)
     match(';')
     n
   end
@@ -360,13 +369,13 @@ class Parser
   end
 
   def assignmentExpr ()
-    @logger.debug("assignmentExpr")
     # Might need to limit this to lvalues
     # This is written to be right-associative
     n = logicalOrExpr
     t = nextToken
     if t.kind == '=' then
       match('=')
+      @logger.debug("assignmentExpr")
       p = Node.new(:ASSIGNMENT_EXPR)
       p.addChild(n)
       p.addChild(assignmentExpr)
@@ -376,11 +385,11 @@ class Parser
   end
 
   def logicalOrExpr ()
-    @logger.debug("logicalOrExpr")
     n = logicalAndExpr
     t = nextToken
     while t.kind == '||'
       match('||')
+      @logger.debug("logicalOrExpr")
       p = Node.new(:LOGICAL_OR_EXPR)
       p.addChild(n)
       p.addChild(logicalAndExpr)
@@ -391,11 +400,11 @@ class Parser
   end
 
   def logicalAndExpr ()
-    @logger.debug("logicalAndExpr")
     n = bitwiseOrExpr
     t = nextToken
     while t.kind == '&&'
       match('&&')
+      @logger.debug("logicalAndExpr")
       p = Node.new(:LOGICAL_AND_EXPR)
       p.addChild(n)
       p.addChild(bitwiseOrExpr)
@@ -406,11 +415,11 @@ class Parser
   end
   
   def bitwiseOrExpr ()
-    @logger.debug("bitwiseOrExpr")
     n = bitwiseXorExpr
     t = nextToken
     while t.kind == '|'
       match('|')
+      @logger.debug("bitwiseOrExpr")
       p = Node.new(:BINARY_EXPR)
       p.setText('|')
       p.addChild(n)
@@ -422,11 +431,11 @@ class Parser
   end
 
   def bitwiseXorExpr ()
-    @logger.debug("bitwiseXorExpr")
     n = bitwiseAndExpr
     t = nextToken
     while t.kind == '^'
       match('^')
+      @logger.debug("bitwiseXorExpr")
       p = Node.new(:BINARY_EXPR)
       p.setText('^')
       p.addChild(n)
@@ -438,11 +447,11 @@ class Parser
   end
 
   def bitwiseAndExpr ()
-    @logger.debug("bitwiseAndExpr")
     n = equalityExpr
     t = nextToken
     while t.kind == '&'
       match('&')
+      @logger.debug("bitwiseAndExpr")
       p = Node.new(:BINARY_EXPR)
       p.setText('&')
       p.addChild(n)
@@ -454,11 +463,11 @@ class Parser
   end
 
   def equalityExpr ()
-    @logger.debug("equalityExpr")
     n = relationalExpr
     t = nextToken
     while t.kind == '==' || t.kind == '!='
       match(t.kind)
+      @logger.debug("equalityExpr")
       p = Node.new(:BINARY_EXPR)
       p.setText(t.text)
       p.addChild(n)
@@ -470,11 +479,11 @@ class Parser
   end
 
   def relationalExpr ()
-    @logger.debug("relationalExpr")
     n = shiftExpr
     t = nextToken
     while t.kind == '>' || t.kind == '<' || t.kind == '>=' || t.kind == '<='
       match(t.kind)
+      @logger.debug("relationalExpr")
       p = Node.new(:BINARY_EXPR)
       p.setText(t.text)
       p.addChild(n)
@@ -486,13 +495,13 @@ class Parser
   end
 
   def shiftExpr ()
-    @logger.debug("shiftExpr")
     n = additiveExpr
     t = nextToken
     # The >>> operator would perform a logical right shift
     # We are not defining that for now due to the complexity
     while t.kind == '<<' || t.kind == '>>'
       match(t.kind)
+      @logger.debug("shiftExpr")
       p = Node.new(:BINARY_EXPR)
       p.setText(t.text)
       p.addChild(n)
@@ -504,11 +513,11 @@ class Parser
   end
 
   def additiveExpr ()
-    @logger.debug("additiveExpr")
     n = multiplicativeExpr
     t = nextToken
     while t.kind == '+' || t.kind == '-'
       match(t.kind)
+      @logger.debug("additiveExpr")
       p = Node.new(:BINARY_EXPR)
       p.setText(t.text)
       p.addChild(n)
@@ -520,11 +529,11 @@ class Parser
   end
   
   def multiplicativeExpr ()
-    @logger.debug("multiplicativeExpr")
     n = unaryExpr
     t = nextToken
     while t.kind == '*' || t.kind == '/' || t.kind == '%'
       match(t.kind)
+      @logger.debug("multiplicativeExpr")
       p = Node.new(:BINARY_EXPR)
       p.setText(t.text)
       p.addChild(n)
@@ -536,10 +545,10 @@ class Parser
   end
   
   def unaryExpr ()
-    @logger.debug("unaryExpr")
     t = nextToken
     if t.kind == '-'
       match('-')
+      @logger.debug("unaryExpr")
       n = Node.new(:UNARY_EXPR)
       n.setText('-')
       n.addChild(unaryExpr)
@@ -550,15 +559,16 @@ class Parser
   end
 
   def unaryExprNotPlusMinus ()
-    @logger.debug("unaryExprNotPlusMinus")
     t = nextToken
     if t.kind == '~'
       match('~')
+      @logger.debug("unaryExprNotPlusMinus")
       n = Node.new(:UNARY_EXPR)
       n.setText('~')
       n.addChild(unaryExpr)
     elsif t.kind == '!'
       match('!')
+      @logger.debug("unaryExprNotPlusMinus")
       n = Node.new(:UNARY_EXPR)
       n.setText('!')
       n.addChild(unaryExpr)
@@ -569,7 +579,6 @@ class Parser
   end
 
   def primaryExpr ()
-    @logger.debug("primaryExpr")
     case nextToken.kind
       when :ID then idExpr
       when '{' then blockExpr

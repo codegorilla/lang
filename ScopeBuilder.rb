@@ -49,6 +49,8 @@ class ScopeBuilder
           expressionStmt(n)
         when :IF_STMT
           ifStmt(n)
+        when :PRINT_STMT
+          printStmt(n)
         when :RETURN_STMT
           returnStmt(n)
         end
@@ -157,6 +159,11 @@ class ScopeBuilder
 
   def returnStmt (node)
     @logger.debug("returnStmt")
+    expression(node.child)
+  end
+
+  def printStmt (node)
+    @logger.debug("printStmt")
     expression(node.child)
   end
 

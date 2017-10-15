@@ -31,7 +31,7 @@ def main (filename = 'test_input.txt')
   # Build token stream
   logger.info("Building token stream...")
   @lexer = Lexer.new(@input)
-  @lexer.setLogLevel(Logger::WARN)
+  @lexer.setLogLevel(Logger::DEBUG)
   @tokens = TokenStream.new(@lexer)
   puts @lexer.problems.errors
   puts @lexer.problems.warnings
@@ -43,7 +43,7 @@ def main (filename = 'test_input.txt')
   @root = @parser.start
   puts @parser.problems.errors
   puts @parser.problems.warnings
-  
+
   # Build scopes and symbol tables
   # This phase does not generate a new data structure per se.
   # It just annotates the AST with scopes and symbol table data.
@@ -53,14 +53,19 @@ def main (filename = 'test_input.txt')
   @sb.start
   puts @sb.problems.errors
   puts @sb.problems.warnings
-  
-  # if @sb.problems.errorCount == 0 then
-  #   # Interpret
-  #   logger.info("Commence interpreting...")
-  #   @int = Interpreter.new(@root)
-  #   @int.setLogLevel(Logger::DEBUG)
-  #   @int.start
-  # end
+
+  errorCount =
+    @lexer.problems.errorCount +
+    @parser.problems.errorCount +
+    @sb.problems.errorCount
+
+  if errorCount == 0 then
+    # Interpret
+    logger.info("Interpreting...")
+    @int = Interpreter.new(@root)
+    @int.setLogLevel(Logger::WARN)
+    @int.start
+  end
 
   # Generate IR
   #logger.info("Generating intermediate representation (IR)...")
