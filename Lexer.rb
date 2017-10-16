@@ -23,7 +23,14 @@ class Lexer
   ASTERISK = '*'
   MINUS = '-'
   PLUS = '+'
+
   EQUALS = '='
+
+  PLUS_EQUALS = '+='
+  MINUS_EQUALS = '-='
+
+  MUL_EQUALS = '*='
+  DIV_EQUALS = '/='
 
   PIPE = '|'
 
@@ -184,20 +191,38 @@ class Lexer
 
         when '*'
           consume
-          @logger.debug("(Ln #{line}, Col #{column-1}): Found '*'")
-          token = makeToken(ASTERISK, ASTERISK)
+          if nextChar == '='
+            consume
+            @logger.debug("(Ln #{line}, Col #{column-2}): Found '*='")
+            token = makeToken(MUL_EQUALS, MUL_EQUALS)
+          else
+            @logger.debug("(Ln #{line}, Col #{column-1}): Found '*'")
+            token = makeToken(ASTERISK, ASTERISK)
+          end
           done = true
 
         when '-'
           consume
-          @logger.debug("(Ln #{line}, Col #{column-1}): Found '-'")
-          token = makeToken(MINUS, MINUS)
+          if nextChar == '='
+            consume
+            @logger.debug("(Ln #{line}, Col #{column-2}): Found '-='")
+            token = makeToken(MINUS_EQUALS, MINUS_EQUALS)
+          else
+            @logger.debug("(Ln #{line}, Col #{column-1}): Found '-'")
+            token = makeToken(MINUS, MINUS)
+          end
           done = true
 
         when '+'
           consume
-          @logger.debug("(Ln #{line}, Col #{column-1}): Found '+'")
-          token = makeToken(PLUS, PLUS)
+          if nextChar == '='
+            consume
+            @logger.debug("(Ln #{line}, Col #{column-2}): Found '+='")
+            token = makeToken(PLUS_EQUALS, PLUS_EQUALS)
+          else
+            @logger.debug("(Ln #{line}, Col #{column-1}): Found '+'")
+            token = makeToken(PLUS, PLUS)
+          end
           done = true
         
         when '='
@@ -305,6 +330,11 @@ class Lexer
             # suppress logging comments
             #@logger.debug("(Ln #{line}, Col #{column-2}): Found block comment")
             state = STATE_BLOCK_COMMENT
+          elsif ch == '='
+            consume
+            @logger.debug("(Ln #{line}, Col #{column-2}): Found '/='")
+            token = makeToken(DIV_EQUALS, DIV_EQUALS)
+            done = true
           else
             @logger.debug("(Ln #{line}, Col #{column-1}): Found '/'")
             token = makeToken(SLASH, SLASH)

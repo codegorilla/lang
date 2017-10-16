@@ -4,7 +4,7 @@ class Interpreter
     @root = root
 
     @logger = Logger.new(STDOUT)
-    @logger.level = Logger::INFO
+    @logger.level = Logger::WARN
     @logger.info("Initialized interpreter.")
 
     # Define built-in objects
@@ -79,7 +79,6 @@ class Interpreter
     # Place a variable into the locals table
     identifierNode = node.leftChild
     result = expression(node.rightChild)
-    puts result.value
     # The runtime 'symbol table' holds names and bindings to objects
     # Where does immutability get enforced?
     @fp.define(identifierNode.text, result)
@@ -90,7 +89,6 @@ class Interpreter
     # Place a variable into the locals table
     identifierNode = node.leftChild
     result = expression(node.rightChild)
-    puts result.value
     # The runtime 'symbol table' holds names and bindings to objects
     # Rebinding a name to an object is ok
     # Re-declaring a name is NOT ok, but that is something that is looked
@@ -213,8 +211,50 @@ class Interpreter
     # This works because assignment is right associative
     # Might need to revisit once names become more complex (e.g. x.f[0])
     identifierNode = node.leftChild
-    result = expr(node.rightChild)
-    @fp.define(identifierNode.text, result)
+    b = expr(node.rightChild)
+    op = node.text
+    d = case op
+      when '='
+        @fp.define(identifierNode.text, b)
+      when '+='
+        # Compute id + b
+        a = expr(identifierNode)
+        classObj = a.type
+        if classObj == nil
+          # Throw exception
+        end
+        c = classObj.getMember('add').call(a, b)
+        @fp.define(identifierNode.text, c)
+      when '-='
+        # Compute id - b
+        a = expr(identifierNode)
+        classObj = a.type
+        if classObj == nil
+          # Throw exception
+        end
+        c = classObj.getMember('sub').call(a, b)
+        @fp.define(identifierNode.text, c)
+      when '*='
+        # Compute id * b
+        a = expr(identifierNode)
+        classObj = a.type
+        if classObj == nil
+          # Throw exception
+        end
+        c = classObj.getMember('mul').call(a, b)
+        @fp.define(identifierNode.text, c)
+      when '/='
+        # Compute id / b
+        a = expr(identifierNode)
+        classObj = a.type
+        if classObj == nil
+          # Throw exception
+        end
+        c = classObj.getMember('div').call(a, b)
+        @fp.define(identifierNode.text, c)
+    end
+    result = d
+    result
   end
 
   def binaryExpr (node)

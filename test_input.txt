@@ -1,12 +1,22 @@
 // Test file
 
 var x = 1;
+print x;
 
 while (x < 10) {
-  x = x + 1;
+  x += 1;
   print x;
 }
 
+var y = 24;
+print y;
+y *= 4;
+print y;
+
+var z = 32;
+print z;
+z /= 4;
+print z;
 
 //var a = true;
 //var b = !true;

@@ -31,7 +31,7 @@ def main (filename = 'test_input.txt')
   # Build token stream
   logger.info("Building token stream...")
   @lexer = Lexer.new(@input)
-  @lexer.setLogLevel(Logger::DEBUG)
+  @lexer.setLogLevel(Logger::WARN)
   @tokens = TokenStream.new(@lexer)
   puts @lexer.problems.errors
   puts @lexer.problems.warnings
@@ -39,7 +39,7 @@ def main (filename = 'test_input.txt')
   # Build AST
   logger.info("Building abstract syntax tree...")
   @parser = Parser.new(@tokens)
-  @parser.setLogLevel(Logger::DEBUG)
+  @parser.setLogLevel(Logger::WARN)
   @root = @parser.start
   puts @parser.problems.errors
   puts @parser.problems.warnings

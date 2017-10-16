@@ -42,3 +42,15 @@ Built-in Types
 * Float
 
 
+## TODO
+
+* Floating point DFA
+
+* if statements
+
+* nested symbol tables / scopes
+
+* Panic-mode error handling
+
+* +=, -=, operators
+

@@ -373,13 +373,26 @@ class Parser
     # This is written to be right-associative
     n = logicalOrExpr
     t = nextToken
-    if t.kind == '=' then
-      match('=')
+    if t.kind == '='  ||
+       t.kind == '+=' ||
+       t.kind == '-=' ||
+       t.kind == '*=' ||
+       t.kind == '/=' then
+      match(t.kind)
       @logger.debug("assignmentExpr")
       p = Node.new(:ASSIGNMENT_EXPR)
+      p.setText(t.text)
       p.addChild(n)
       p.addChild(assignmentExpr)
       n = p
+    # elsif t.kind == '+=' then
+    #   match('+=')
+    #   @logger.debug("compoundAssignmentExpr")
+    #   p = Node.new(:ASSIGNMENT_EXPR)
+    #   p.setText('+=')
+    #   p.addChild(n)
+    #   p.addChild(assignmentExpr)
+    #   n = p
     end
     n
   end
