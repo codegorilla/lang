@@ -41,15 +41,17 @@ class Interpreter
   end
 
   def start ()
-    @logger.debug("start")
-    node = root
+    program(@root)
+  end
 
+  def program (node)
+    @logger.debug("program")
     # Build first execution frame
     @fp = Frame.new
 
     case node.kind
     # FIX: This will always be a root node so the case statement shouldn't be required.
-    when :ROOT
+    when :PROGRAM
       for i in 0..node.count-1
         n = node.child(i)
         case n.kind

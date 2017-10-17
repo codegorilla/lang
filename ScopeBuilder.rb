@@ -29,31 +29,31 @@ class ScopeBuilder
   end
 
   def start ()
-    @logger.debug("start")
-    node = root
+    program(@root)
+  end
+
+  def program (node)
+    @logger.debug("program")
     # Create global scope
     @scope = Scope.new
-    case node.kind
-    when :ROOT
-      for i in 0..node.count-1
-        n = node.child(i)
-        case n.kind
-        when :VALUE_DECL
-          # Anything that can contain a block can contain a scope
-          valueDecl(n)
-        when :VARIABLE_DECL
-          variableDecl(n)
-        when :FUNCTION_DECL
-          functionDecl(n)
-        when :EXPRESSION_STMT
-          expressionStmt(n)
-        when :IF_STMT
-          ifStmt(n)
-        when :PRINT_STMT
-          printStmt(n)
-        when :RETURN_STMT
-          returnStmt(n)
-        end
+    for i in 0..node.count-1
+      n = node.child(i)
+      case n.kind
+      when :VALUE_DECL
+        # Anything that can contain a block can contain a scope
+        valueDecl(n)
+      when :VARIABLE_DECL
+        variableDecl(n)
+      when :FUNCTION_DECL
+        functionDecl(n)
+      when :EXPRESSION_STMT
+        expressionStmt(n)
+      when :IF_STMT
+        ifStmt(n)
+      when :PRINT_STMT
+        printStmt(n)
+      when :RETURN_STMT
+        returnStmt(n)
       end
     end
     node.setAttribute("scope", @scope)

@@ -62,11 +62,11 @@ class Parser
     @plog
   end
 
-  def start ()
-    @logger.debug("start")
+  def program ()
+    @logger.debug("program")
     done = false
-    n = Node.new(:ROOT)
-    while !done
+    n = Node.new(:PROGRAM)
+    while !done do
       t = nextToken
       case t.kind
       when 'val', 'var', 'def', 'class'
@@ -84,7 +84,7 @@ class Parser
         done = true
       end
     end
-    n
+    n    
   end
 
   # ********** Declarations **********
@@ -371,6 +371,7 @@ class Parser
   def assignmentExpr ()
     # Might need to limit this to lvalues
     # This is written to be right-associative
+    # A -> b | b op A
     n = logicalOrExpr
     t = nextToken
     if t.kind == '='  ||
@@ -385,14 +386,6 @@ class Parser
       p.addChild(n)
       p.addChild(assignmentExpr)
       n = p
-    # elsif t.kind == '+=' then
-    #   match('+=')
-    #   @logger.debug("compoundAssignmentExpr")
-    #   p = Node.new(:ASSIGNMENT_EXPR)
-    #   p.setText('+=')
-    #   p.addChild(n)
-    #   p.addChild(assignmentExpr)
-    #   n = p
     end
     n
   end
@@ -494,7 +487,10 @@ class Parser
   def relationalExpr ()
     n = shiftExpr
     t = nextToken
-    while t.kind == '>' || t.kind == '<' || t.kind == '>=' || t.kind == '<='
+    while t.kind == '>'  ||
+          t.kind == '<'  ||
+          t.kind == '>=' ||
+          t.kind == '<=' do
       match(t.kind)
       @logger.debug("relationalExpr")
       p = Node.new(:BINARY_EXPR)
@@ -544,7 +540,9 @@ class Parser
   def multiplicativeExpr ()
     n = unaryExpr
     t = nextToken
-    while t.kind == '*' || t.kind == '/' || t.kind == '%'
+    while t.kind == '*' ||
+          t.kind == '/' ||
+          t.kind == '%' do
       match(t.kind)
       @logger.debug("multiplicativeExpr")
       p = Node.new(:BINARY_EXPR)
@@ -665,14 +663,14 @@ class Parser
 
   def expression? (token)
     k = token.kind
-    if (k == :BOOLEAN ||
-        k == :INTEGER ||
-        k == :FLOAT ||
-        k == :IMAGINARY ||
-        k == :ID ||
-        k == '(' ||
-        k == '[' ||
-        k == '{')
+    if k == :BOOLEAN   ||
+       k == :INTEGER   ||
+       k == :FLOAT     ||
+       k == :IMAGINARY ||
+       k == :ID ||
+       k == '(' ||
+       k == '[' ||
+       k == '{' then
       true
     else
       false

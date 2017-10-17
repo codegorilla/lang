@@ -40,7 +40,7 @@ def main (filename = 'test_input.txt')
   logger.info("Building abstract syntax tree...")
   @parser = Parser.new(@tokens)
   @parser.setLogLevel(Logger::WARN)
-  @root = @parser.start
+  @root = @parser.program
   puts @parser.problems.errors
   puts @parser.problems.warnings
 

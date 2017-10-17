@@ -30,6 +30,7 @@ class TokenStream
   end
 
   def index ()
+    # Does this ever get used?
     @pos + 1
   end
 
