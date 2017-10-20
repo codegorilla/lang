@@ -139,20 +139,25 @@ class Interpreter
     # If it is already known to be a Bool, then might be able to optimize
     result = $Bool.getMember('equ').call($true, condition)
     while result.value == true
-      # At some point might create a separate blockExpr function because
-      # blockExpr might be used in many places
-      blockExprNode = node.rightChild
-      for i in 0..blockExprNode.count-1
-        n = blockExprNode.child(i)
-        blockElement(n)
-      end
+      blockExpr(node.rightChild)
       # Re-evaluate condition
       condition = expression(node.leftChild)
       result = $Bool.getMember('equ').call($true, condition)
     end
   end
 
-  # Belongs under experssions under blockExpr?
+  # moves to expression area?
+  # NEED TO PUSH A NEW FRAME AND THEN POP IT WHEN DONE
+  # That seems inefficient to do on every loop iteration - does it have to
+  # occur on each iteration or just at the start and finish?
+  def blockExpr (node)
+    @logger.debug("blockExpr")
+    for i in 0..node.count-1
+      blockElement(node.child(i))
+    end
+  end
+
+  # Belongs under expressions under blockExpr?
   def blockElement (node)
     @logger.debug("blockElement")
     case node.kind

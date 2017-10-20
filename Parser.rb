@@ -62,6 +62,10 @@ class Parser
     @plog
   end
 
+  def start ()
+    program
+  end
+
   def program ()
     @logger.debug("program")
     done = false
