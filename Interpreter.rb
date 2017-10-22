@@ -34,6 +34,9 @@ class Interpreter
 
     # Frame pointer
     @fp = nil
+
+    # Scope pointer
+    @scope = nil
   end
 
   def setLogLevel (level)
@@ -83,7 +86,7 @@ class Interpreter
     result = expression(node.rightChild)
     # The runtime 'symbol table' holds names and bindings to objects
     # Where does immutability get enforced?
-    @fp.define(identifierNode.text, result)
+    @fp.store(identifierNode.text, result)
   end
 
   def variableDecl (node)
@@ -95,7 +98,7 @@ class Interpreter
     # Rebinding a name to an object is ok
     # Re-declaring a name is NOT ok, but that is something that is looked
     # for during semantic analysis, not at runtime. Runtime doesn't care.
-    @fp.define(identifierNode.text, result)
+    @fp.store(identifierNode.text, result)
   end
 
   def functionDecl (node)
@@ -148,13 +151,30 @@ class Interpreter
 
   # moves to expression area?
   # NEED TO PUSH A NEW FRAME AND THEN POP IT WHEN DONE
-  # That seems inefficient to do on every loop iteration - does it have to
-  # occur on each iteration or just at the start and finish?
+  # That seems inefficient to do on every loop iteration
+  # Need to investigate optimizations
   def blockExpr (node)
     @logger.debug("blockExpr")
+    # set the scope to the scope attribute stored in the node
+    @scope = node.getAttribute("scope")
+    # 21 oct 2017 @ 10:38pm
+    # Left off here - had a problem in ScopeBuilder because of missing whileStmt
+    # but that is fixed now.  The @scope test below is working!
+    if (@scope)
+      puts "this is the scope here: "
+    else
+      puts "what a flop!"
+    end
+
+    # Push new frame
+    # For blocks, the dynamic and static links are the same
+    f = Frame.new(@fp, @fp)
+    @fp = f
     for i in 0..node.count-1
       blockElement(node.child(i))
     end
+    #pop the frame
+    @fp = @fp.dynamicLink
   end
 
   # Belongs under expressions under blockExpr?
@@ -222,7 +242,14 @@ class Interpreter
     op = node.text
     d = case op
       when '='
-        @fp.define(identifierNode.text, b)
+        # need to see if the variable is defined in this block
+        # if not, then it is in a higher lexical scope
+        # can this be done at compile time?
+        if @fp.load(identifierNode.text) != nil
+          @fp.store(identifierNode.text, b)
+        else
+          @fp.staticLink.store(identifierNode.text, b)
+        end
       when '+='
         # Compute id + b
         a = expr(identifierNode)
@@ -231,7 +258,11 @@ class Interpreter
           # Throw exception
         end
         c = classObj.getMember('add').call(a, b)
-        @fp.define(identifierNode.text, c)
+        if @fp.load(identifierNode.text) != nil
+          @fp.store(identifierNode.text, c)
+        else
+          @fp.staticLink.store(identifierNode.text, c)
+        end
       when '-='
         # Compute id - b
         a = expr(identifierNode)
@@ -240,7 +271,11 @@ class Interpreter
           # Throw exception
         end
         c = classObj.getMember('sub').call(a, b)
-        @fp.define(identifierNode.text, c)
+        if @fp.load(identifierNode.text) != nil
+          @fp.store(identifierNode.text, c)
+        else
+          @fp.staticLink.store(identifierNode.text, c)
+        end
       when '*='
         # Compute id * b
         a = expr(identifierNode)
@@ -249,7 +284,11 @@ class Interpreter
           # Throw exception
         end
         c = classObj.getMember('mul').call(a, b)
-        @fp.define(identifierNode.text, c)
+        if @fp.load(identifierNode.text) != nil
+          @fp.store(identifierNode.text, c)
+        else
+          @fp.staticLink.store(identifierNode.text, c)
+        end
       when '/='
         # Compute id / b
         a = expr(identifierNode)
@@ -258,7 +297,11 @@ class Interpreter
           # Throw exception
         end
         c = classObj.getMember('div').call(a, b)
-        @fp.define(identifierNode.text, c)
+        if @fp.load(identifierNode.text) != nil
+          @fp.store(identifierNode.text, c)
+        else
+          @fp.staticLink.store(identifierNode.text, c)
+        end
     end
     result = d
     result
@@ -397,12 +440,21 @@ class Interpreter
 
   def identifier (node)
     @logger.debug("identifier")
-    # Look up the name
-    # Need to expand this to account for globals, locals, and other scopes
-    result = @fp.resolve(node.text)
-    if result == nil
-      TauObject.new($Exception, "NameError: identifier '#{node.text}' is not defined")
+    # Load the name from locals, else search for it by walking static links
+    result = @fp.load(node.text)
+    if result != nil
+      result
     else
+      tfp = @fp
+      while result == nil
+        # add in some logic to throw an exception if not found by the time we
+        # reach the global scope
+        # if result == nil
+        #   TauObject.new($Exception, "NameError: identifier '#{node.text}' is not defined")
+        # else
+        tfp = tfp.staticLink
+        result = tfp.load(node.text)
+      end
       result
     end
   end

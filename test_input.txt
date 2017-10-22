@@ -3,18 +3,20 @@
 var x = 0;
 //print x;
 
-var t = 102;
-print t;
+//var t = 120;
+//print t;
 
-while (x < 10) {
-  var t = x + 1;
+while (x < 12) {
+//  var t = 240;
   x += 1;
-  //print x;
-  print t;
+//  print x;
+//  print t;
 }
 
-t;
-print t;
+
+
+//t;
+//print t;
 
 //var a = true;
 //var b = !true;

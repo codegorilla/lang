@@ -67,7 +67,7 @@ class Node
   end
 
   def getAttribute (name)
-    @attribute[name]
+    @attributes[name]
   end
 
 end

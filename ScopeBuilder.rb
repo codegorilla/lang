@@ -54,6 +54,8 @@ class ScopeBuilder
         printStmt(n)
       when :RETURN_STMT
         returnStmt(n)
+      when :WHILE_STMT
+        whileStmt(n)
       end
     end
     node.setAttribute("scope", @scope)
@@ -171,7 +173,7 @@ class ScopeBuilder
     @logger.debug("whileStmt")
     expression(node.leftChild)
     n = node.rightChild
-    if n.kind == :BLOCK
+    if n.kind == :BLOCK_EXPR
       block(n)
     else
       blockElement(n)
