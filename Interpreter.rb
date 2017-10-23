@@ -52,27 +52,32 @@ class Interpreter
     # Build first execution frame
     @fp = Frame.new
 
-    case node.kind
-    # FIX: This will always be a root node so the case statement shouldn't be required.
-    when :PROGRAM
-      for i in 0..node.count-1
-        n = node.child(i)
-        case n.kind
-        when :VALUE_DECL then valueDecl(n)
-        when :VARIABLE_DECL then variableDecl(n)
-        when :FUNCTION_DECL then functionDecl(n)
-        when :CLASS_DECL then classDecl(n)
-        when :EXPRESSION_STMT then expressionStmt(n)
-        when :IF_STMT
-          # ifStmt(n)
-        when :PRINT_STMT then printStmt(n)
-        when :RETURN_STMT
-          #returnStmt(n)
-        when :WHILE_STMT then whileStmt(n)
-        else
-          puts "THERE HAS BEEN A MAJOR ERROR"
-          exit
-        end
+    # Fetch the global scope
+    # Not sure if this will really be the global scope or if it is in some kind
+    # of module namespace
+    @scope = node.getAttribute("scope")
+
+    if (node.kind != :PROGRAM)
+      # This should *always* be a program node so throw exception if it is not
+    end
+
+    for i in 0..node.count-1
+      n = node.child(i)
+      case n.kind
+      when :VALUE_DECL then valueDecl(n)
+      when :VARIABLE_DECL then variableDecl(n)
+      when :FUNCTION_DECL then functionDecl(n)
+      when :CLASS_DECL then classDecl(n)
+      when :EXPRESSION_STMT then expressionStmt(n)
+      when :IF_STMT
+        # ifStmt(n)
+      when :PRINT_STMT then printStmt(n)
+      when :RETURN_STMT
+        #returnStmt(n)
+      when :WHILE_STMT then whileStmt(n)
+      else
+        puts "THERE HAS BEEN A MAJOR ERROR"
+        exit
       end
     end
   end
@@ -81,24 +86,19 @@ class Interpreter
 
   def valueDecl (node)
     @logger.debug("valueDecl")
-    # Place a variable into the locals table
+    # Note: Where does immutability of vals get enforced?
+    # Is that a compile-time or runtime check?
     identifierNode = node.leftChild
-    result = expression(node.rightChild)
-    # The runtime 'symbol table' holds names and bindings to objects
-    # Where does immutability get enforced?
-    @fp.store(identifierNode.text, result)
+    index = @scope.lookup(identifierNode.text)
+    @fp.store(index, expression(node.rightChild))
   end
 
   def variableDecl (node)
     @logger.debug("variableDecl")
-    # Place a variable into the locals table
+    # Store the expression result into the locals table
     identifierNode = node.leftChild
-    result = expression(node.rightChild)
-    # The runtime 'symbol table' holds names and bindings to objects
-    # Rebinding a name to an object is ok
-    # Re-declaring a name is NOT ok, but that is something that is looked
-    # for during semantic analysis, not at runtime. Runtime doesn't care.
-    @fp.store(identifierNode.text, result)
+    index = @scope.lookup(identifierNode.text)
+    @fp.store(index, expression(node.rightChild))
   end
 
   def functionDecl (node)
@@ -155,17 +155,9 @@ class Interpreter
   # Need to investigate optimizations
   def blockExpr (node)
     @logger.debug("blockExpr")
-    # set the scope to the scope attribute stored in the node
+    # Fetch the scope attribute stored in the node
+    saveScope = @scope
     @scope = node.getAttribute("scope")
-    # 21 oct 2017 @ 10:38pm
-    # Left off here - had a problem in ScopeBuilder because of missing whileStmt
-    # but that is fixed now.  The @scope test below is working!
-    if (@scope)
-      puts "this is the scope here: "
-    else
-      puts "what a flop!"
-    end
-
     # Push new frame
     # For blocks, the dynamic and static links are the same
     f = Frame.new(@fp, @fp)
@@ -173,8 +165,10 @@ class Interpreter
     for i in 0..node.count-1
       blockElement(node.child(i))
     end
-    #pop the frame
+    # pop the frame
     @fp = @fp.dynamicLink
+    # restore scope
+    @scope = saveScope
   end
 
   # Belongs under expressions under blockExpr?
@@ -245,11 +239,19 @@ class Interpreter
         # need to see if the variable is defined in this block
         # if not, then it is in a higher lexical scope
         # can this be done at compile time?
-        if @fp.load(identifierNode.text) != nil
-          @fp.store(identifierNode.text, b)
-        else
-          @fp.staticLink.store(identifierNode.text, b)
+        fp = @fp
+        scope = @scope
+        index = scope.lookup(identifierNode.text)
+    
+        # probably want while scope != global
+        #while !index
+        if !index
+          fp = fp.staticLink
+          scope = scope.link
+          index = scope.lookup(identifierNode.text)
         end
+        result = fp.load(index)
+        fp.store(index, b)
       when '+='
         # Compute id + b
         a = expr(identifierNode)
@@ -258,11 +260,19 @@ class Interpreter
           # Throw exception
         end
         c = classObj.getMember('add').call(a, b)
-        if @fp.load(identifierNode.text) != nil
-          @fp.store(identifierNode.text, c)
-        else
-          @fp.staticLink.store(identifierNode.text, c)
+        fp = @fp
+        scope = @scope
+        index = scope.lookup(identifierNode.text)
+    
+        # probably want while scope != global
+        #while !index
+        if !index
+          fp = fp.staticLink
+          scope = scope.link
+          index = scope.lookup(identifierNode.text)
         end
+        result = fp.load(index)
+        fp.store(index, c)
       when '-='
         # Compute id - b
         a = expr(identifierNode)
@@ -271,11 +281,19 @@ class Interpreter
           # Throw exception
         end
         c = classObj.getMember('sub').call(a, b)
-        if @fp.load(identifierNode.text) != nil
-          @fp.store(identifierNode.text, c)
-        else
-          @fp.staticLink.store(identifierNode.text, c)
+        fp = @fp
+        scope = @scope
+        index = scope.lookup(identifierNode.text)
+    
+        # probably want while scope != global
+        #while !index
+        if !index
+          fp = fp.staticLink
+          scope = scope.link
+          index = scope.lookup(identifierNode.text)
         end
+        result = fp.load(index)
+        fp.store(index, c)
       when '*='
         # Compute id * b
         a = expr(identifierNode)
@@ -284,11 +302,19 @@ class Interpreter
           # Throw exception
         end
         c = classObj.getMember('mul').call(a, b)
-        if @fp.load(identifierNode.text) != nil
-          @fp.store(identifierNode.text, c)
-        else
-          @fp.staticLink.store(identifierNode.text, c)
+        fp = @fp
+        scope = @scope
+        index = scope.lookup(identifierNode.text)
+    
+        # probably want while scope != global
+        #while !index
+        if !index
+          fp = fp.staticLink
+          scope = scope.link
+          index = scope.lookup(identifierNode.text)
         end
+        result = fp.load(index)
+        fp.store(index, c)
       when '/='
         # Compute id / b
         a = expr(identifierNode)
@@ -297,11 +323,19 @@ class Interpreter
           # Throw exception
         end
         c = classObj.getMember('div').call(a, b)
-        if @fp.load(identifierNode.text) != nil
-          @fp.store(identifierNode.text, c)
-        else
-          @fp.staticLink.store(identifierNode.text, c)
+        fp = @fp
+        scope = @scope
+        index = scope.lookup(identifierNode.text)
+    
+        # probably want while scope != global
+        #while !index
+        if !index
+          fp = fp.staticLink
+          scope = scope.link
+          index = scope.lookup(identifierNode.text)
         end
+        result = fp.load(index)
+        fp.store(index, c)
     end
     result = d
     result
@@ -440,23 +474,19 @@ class Interpreter
 
   def identifier (node)
     @logger.debug("identifier")
-    # Load the name from locals, else search for it by walking static links
-    result = @fp.load(node.text)
-    if result != nil
-      result
-    else
-      tfp = @fp
-      while result == nil
-        # add in some logic to throw an exception if not found by the time we
-        # reach the global scope
-        # if result == nil
-        #   TauObject.new($Exception, "NameError: identifier '#{node.text}' is not defined")
-        # else
-        tfp = tfp.staticLink
-        result = tfp.load(node.text)
-      end
-      result
+    # Look up the index in the current scope and use it to load from local table
+    fp = @fp
+    scope = @scope
+    index = scope.lookup(node.text)
+
+    #while !index
+    if !index
+      fp = fp.staticLink
+      scope = scope.link
+      index = scope.lookup(node.text)
     end
+    result = fp.load(index)
+    result
   end
 
   # ********** Literals **********

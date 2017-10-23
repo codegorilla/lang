@@ -3,7 +3,7 @@ class Frame
   def initialize (dynamicLink = nil, staticLink = nil)
     @dynamicLink = dynamicLink
     @staticLink = staticLink
-    @locals = {}
+    @locals = []
   end
 
   def dynamicLink ()
@@ -14,10 +14,6 @@ class Frame
     @staticLink
   end
 
-  # locals should probably be an array[value]
-  # rather than a map[name, value]
-  # this is closer to how a VM would work
-  # and we don't want to maintain a runtime symbol table, do we?
   # how to access...
   # y = x + 1;
   # x is an identifier node, so check the lexical scope for the name
@@ -30,14 +26,12 @@ class Frame
   # runtime frames. This is where the static link (aka access link) comes into
   # play.  Need to compute the access link.
 
-  # Need to take care of lexical scoping rules, which requires a "static link"
-  # Note: Runtime has no notion of declarations
-  def store (name, value)
-    @locals[name] = value
+  def store (index, value)
+    @locals[index] = value
   end
 
-  def load (name)
-    @locals[name]
+  def load (index)
+    @locals[index]
   end
 
 end

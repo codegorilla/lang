@@ -39,23 +39,14 @@ class ScopeBuilder
     for i in 0..node.count-1
       n = node.child(i)
       case n.kind
-      when :VALUE_DECL
-        # Anything that can contain a block can contain a scope
-        valueDecl(n)
-      when :VARIABLE_DECL
-        variableDecl(n)
-      when :FUNCTION_DECL
-        functionDecl(n)
-      when :EXPRESSION_STMT
-        expressionStmt(n)
-      when :IF_STMT
-        ifStmt(n)
-      when :PRINT_STMT
-        printStmt(n)
-      when :RETURN_STMT
-        returnStmt(n)
-      when :WHILE_STMT
-        whileStmt(n)
+        when :VALUE_DECL then valueDecl(n)
+        when :VARIABLE_DECL then variableDecl(n)
+        when :FUNCTION_DECL then functionDecl(n)
+        when :EXPRESSION_STMT then expressionStmt(n)
+        when :IF_STMT then ifStmt(n)
+        when :PRINT_STMT then printStmt(n)
+        when :RETURN_STMT then returnStmt(n)
+        when :WHILE_STMT then whileStmt(n)
       end
     end
     node.setAttribute("scope", @scope)
@@ -123,8 +114,10 @@ class ScopeBuilder
     @scope = Scope.new(@scope)
     node.setAttribute("scope", @scope)
     # Right now this only does the first element -- need to loop through all elements
-    n = node.child(0)
-    blockElement(n)
+    for i in 0..node.count-1
+      n = node.child(i)
+      blockElement(n)
+    end
     # Pop the scope
     @scope = @scope.link
   end
