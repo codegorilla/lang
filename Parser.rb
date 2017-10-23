@@ -75,8 +75,9 @@ class Parser
       case t.kind
       when 'val', 'var', 'def', 'class'
         n.addChild(declaration)
-      when :ID, 'if', 'print', 'return', 'while', ';',
-              '()', :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, '(', '['
+      when 'break', 'continue', 'do', ';', 'for', 'print', 'return', 'while'
+        n.addChild(statement)
+      when 'if', :ID, '()', :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, '(', '['
         n.addChild(statement)
       when 'EOF'
         done = true
@@ -200,7 +201,7 @@ class Parser
       when 'do' then doStmt
       when ';' then emptyStmt
       when 'for' then forStmt
-      when 'if' then ifStmt
+      #when 'if' then ifStmt
       when 'print' then printStmt
       when 'return' then returnStmt
       when 'while' then whileStmt
@@ -264,13 +265,15 @@ class Parser
     n
   end
 
-  def ifStmt ()
-    # The ifStmt appears here to avoid the need for a ';' at the end, which would be required for an exprStmt
-    @logger.debug("ifStmt")
-    n = Node.new(:IF_STMT)
-    n.addChild(ifExpr)
-    n
-  end
+  # Testing to see if it is possible to deprecate ifStmt
+
+  # def ifStmt ()
+  #   # The ifStmt appears here to avoid the need for a ';' at the end, which would be required for an exprStmt
+  #   @logger.debug("ifStmt")
+  #   n = Node.new(:IF_STMT)
+  #   n.addChild(ifExpr)
+  #   n
+  # end
 
   def returnStmt ()
     @logger.debug("returnStmt")
@@ -330,48 +333,15 @@ class Parser
   def expression ()
     @logger.debug("expression")
     n = Node.new(:EXPRESSION)
-    t = nextToken
-    if t.kind == 'if'
-      n.addChild(ifExpr)
-    else
+    #t = nextToken
+    #if t.kind == 'if'
+    #  n.addChild(ifExpr)
+    #else
       n.addChild(assignmentExpr)
-    end
+    #end
     n
   end
   
-  def ifExpr ()
-    # Draft node implementation
-    @logger.debug("ifExpr")
-    n = Node.new(:IF_EXPR)
-    match('if')
-    match('(')
-    n.addChild(expression)
-    match(')')
-    if nextToken.kind == '{'
-      n.addChild(blockExpr)
-    else
-      # Perhaps should insert a block node manually here?
-      n.addChild(blockElement)
-    end
-    if nextToken.kind == 'else'
-      n.addChild(elseClause)
-    end
-    n
-  end
-
-  def elseClause ()
-    # Needs node implementation
-    @logger.debug("elseClause")
-    match('else')
-    if nextToken.kind == '{'
-      n = blockExpr
-    else
-      # Perhaps should insert a block node manually here?
-      n = blockElement
-    end
-    n
-  end
-
   def assignmentExpr ()
     # Might need to limit this to lvalues
     # This is written to be right-associative
@@ -595,11 +565,57 @@ class Parser
 
   def primaryExpr ()
     case nextToken.kind
+      when 'if' then ifExpr
       when :ID then idExpr
       when '{' then blockExpr
       when '(' then parenthesizedExpr
       else literal
     end
+  end
+
+  def ifExpr ()
+    # Draft node implementation
+    @logger.debug("ifExpr")
+    n = Node.new(:IF_EXPR)
+    match('if')
+    match('(')
+    n.addChild(expression)
+    match(')')
+    if nextToken.kind == '{'
+      n.addChild(blockExpr)
+    else
+      # Manually insert a block node
+      p = Node.new(:BLOCK_EXPR)
+      #
+      # p.addChild(blockElement)
+      #
+
+      
+      case nextToken.kind
+      when 'if', :ID, '()', :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, '(', '['
+        p.addChild(expression)
+      else
+        p.addChild(blockElement)
+      end
+      n.addChild(p)
+    end
+    if nextToken.kind == 'else'
+      n.addChild(elseClause)
+    end
+    n
+  end
+
+  def elseClause ()
+    # Needs node implementation
+    @logger.debug("elseClause")
+    match('else')
+    if nextToken.kind == '{'
+      n = blockExpr
+    else
+      # Perhaps should insert a block node manually here?
+      n = blockElement
+    end
+    n
   end
 
   def blockExpr ()
