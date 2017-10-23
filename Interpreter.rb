@@ -61,20 +61,19 @@ class Interpreter
       # This should *always* be a program node so throw exception if it is not
     end
 
-    for i in 0..node.count-1
+    # might do away with if statements and just have expressions
+    node.count.times do |i|
       n = node.child(i)
       case n.kind
-      when :VALUE_DECL then valueDecl(n)
-      when :VARIABLE_DECL then variableDecl(n)
-      when :FUNCTION_DECL then functionDecl(n)
-      when :CLASS_DECL then classDecl(n)
-      when :EXPRESSION_STMT then expressionStmt(n)
-      when :IF_STMT
-        # ifStmt(n)
-      when :PRINT_STMT then printStmt(n)
-      when :RETURN_STMT
-        #returnStmt(n)
-      when :WHILE_STMT then whileStmt(n)
+        when :VALUE_DECL then valueDecl(n)
+        when :VARIABLE_DECL then variableDecl(n)
+        when :FUNCTION_DECL then functionDecl(n)
+        when :CLASS_DECL then classDecl(n)
+        when :EXPRESSION_STMT then expressionStmt(n)
+        when :IF_STMT then ifStmt(n)
+        when :PRINT_STMT then printStmt(n)
+        when :RETURN_STMT then returnStmt(n)
+        when :WHILE_STMT then whileStmt(n)
       else
         puts "THERE HAS BEEN A MAJOR ERROR"
         exit
@@ -129,10 +128,21 @@ class Interpreter
     result = expression(node.child)
   end
 
+  def ifStmt (node)
+    @logger.debug("ifStmt")
+    puts "IF STATEMENT!"
+  end
+
   def printStmt (node)
     @logger.debug("printStmt")
     result = expression(node.child)
     puts result.value
+  end
+
+  def returnStmt (node)
+    @logger.debug("returnStmt")
+    # TODO: Needs implementation
+    puts "RETURN STATEMENT NEEDS IMPLEMENTATION"
   end
 
   def whileStmt (node)
@@ -146,45 +156,6 @@ class Interpreter
       # Re-evaluate condition
       condition = expression(node.leftChild)
       result = $Bool.getMember('equ').call($true, condition)
-    end
-  end
-
-  # moves to expression area?
-  # NEED TO PUSH A NEW FRAME AND THEN POP IT WHEN DONE
-  # That seems inefficient to do on every loop iteration
-  # Need to investigate optimizations
-  def blockExpr (node)
-    @logger.debug("blockExpr")
-    # Fetch the scope attribute stored in the node
-    saveScope = @scope
-    @scope = node.getAttribute("scope")
-    # Push new frame
-    # For blocks, the dynamic and static links are the same
-    f = Frame.new(@fp, @fp)
-    @fp = f
-    for i in 0..node.count-1
-      blockElement(node.child(i))
-    end
-    # pop the frame
-    @fp = @fp.dynamicLink
-    # restore scope
-    @scope = saveScope
-  end
-
-  # Belongs under expressions under blockExpr?
-  def blockElement (node)
-    @logger.debug("blockElement")
-    case node.kind
-    when :VALUE_DECL then valueDecl(node)
-    when :VARIABLE_DECL then variableDecl(node)
-    when :FUNCTION_DECL then functionDecl(node)
-    when :CLASS_DECL then classDecl(node)
-    when :EXPRESSION_STMT then expressionStmt(node)
-    when :PRINT_STMT then printStmt(node)
-    when :WHILE_STMT then whileStmt(node)
-    else
-      puts "THERE HAS BEEN A MAJOR ERROR"
-      exit
     end
   end
 
@@ -469,6 +440,43 @@ class Interpreter
           # Throw exception
         end
         classObj.getMember('not').call(a)        
+    end
+  end
+
+  def blockExpr (node)
+    @logger.debug("blockExpr")
+    # Fetch the scope attribute stored in the node
+    saveScope = @scope
+    @scope = node.getAttribute("scope")
+    # Push new frame
+    # Pushing and popping frames for blocks seems very inefficient
+    # Need to investigate optimizations
+    # For blocks, the dynamic and static links are the same
+    f = Frame.new(@fp, @fp)
+    @fp = f
+    for i in 0..node.count-1
+      blockElement(node.child(i))
+    end
+    # pop the frame
+    @fp = @fp.dynamicLink
+    # restore scope
+    @scope = saveScope
+  end
+
+  # Belongs under expressions under blockExpr?
+  def blockElement (node)
+    @logger.debug("blockElement")
+    case node.kind
+    when :VALUE_DECL then valueDecl(node)
+    when :VARIABLE_DECL then variableDecl(node)
+    when :FUNCTION_DECL then functionDecl(node)
+    when :CLASS_DECL then classDecl(node)
+    when :EXPRESSION_STMT then expressionStmt(node)
+    when :PRINT_STMT then printStmt(node)
+    when :WHILE_STMT then whileStmt(node)
+    else
+      puts "THERE HAS BEEN A MAJOR ERROR"
+      exit
     end
   end
 

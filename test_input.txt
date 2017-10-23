@@ -2,17 +2,21 @@
 
 var x = 0;
 
-var t = 120;
-print t;
+if (x == 0)
+  print 1;
 
-while (x < 12) {
-  print x;
-  x = x + 1;
-  var t = 240;
-  print t;
-}
 
-print t;
+//var t = 120;
+//print t;
+
+//while (x < 12) {
+//  print x;
+//  x = x + 1;
+//  var t = 240;
+//  print t;
+//}
+
+//print t;
 
 //var a = true;
 //var b = !true;
