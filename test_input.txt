@@ -1,10 +1,54 @@
 // Test file
 
-var x = 0;
+var x = 1;
+print x;
 
-if (x == 0) 1 else { print 2; };
+// Need to figure out block expressions before doing if expressions
+{
+  print x;
+};
+
+
+//if (x == 0) 1 else 2;
+
+//if (x == 0)
+//  1;
+//else
+//  2;
+
+//if (x == 0) {
+//  print 1;
+//}
+//else {
+//  print 2;
+//};
+
+
+
+//if (x == 0) 1 else { print 2; };
 
 //val z = if(x < 10, 0, 1);
+
+//val z = if(x < 10, { 0; }, { 1; });
+
+
+//if (x == 0)
+//  1;
+//else
+//  print 2;
+//;
+
+//val t = if (x == 0)
+//  1
+//else
+//  2;
+
+//if (x == 0)
+//  1;
+//else {
+//  print 2;
+//}
+//;
 
 
 //var t = 120;

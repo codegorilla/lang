@@ -77,7 +77,7 @@ class Parser
         n.addChild(declaration)
       when 'break', 'continue', 'do', ';', 'for', 'print', 'return', 'while'
         n.addChild(statement)
-      when 'if', :ID, '()', :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, '(', '['
+      when 'if', :ID, :NULL, :UNIT, :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, '(', '[', '{'
         n.addChild(statement)
       when 'EOF'
         done = true
@@ -581,23 +581,26 @@ class Parser
     match('(')
     n.addChild(expression)
     match(')')
-    if nextToken.kind == '{'
-      n.addChild(blockExpr)
-    else
+
+    # If expressions are equivalent to the following function
+    # if (cond_expr, true_expr, false_expr)
+    # Functions can only take expressions as arguments, so a declaration or
+    # statement must be wrapped into a block expression in order to be passed
+    # in as arguments.
+    case nextToken.kind
+    when 'val', 'var', 'def', 'class'
       # Manually insert a block node
       p = Node.new(:BLOCK_EXPR)
-      #
-      # p.addChild(blockElement)
-      #
-
-      
-      case nextToken.kind
-      when 'if', :ID, '()', :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, '(', '['
-        p.addChild(expression)
-      else
-        p.addChild(blockElement)
-      end
+      p.addChild(declaration)
       n.addChild(p)
+    when 'break', 'continue', 'do', ';', 'for', 'print', 'return', 'while'
+      # Manually insert a block node
+      p = Node.new(:BLOCK_EXPR)
+      p.addChild(statement)
+      n.addChild(p)
+    when 'if', :ID, :NULL, :UNIT, :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, '(', '[', '{'
+      # Might need to wrap this in a block expression to get a new scope
+      n.addChild(expression)
     end
     if nextToken.kind == 'else'
       n.addChild(elseClause)
@@ -609,11 +612,18 @@ class Parser
     # Needs node implementation
     @logger.debug("elseClause")
     match('else')
-    if nextToken.kind == '{'
-      n = blockExpr
-    else
-      # Perhaps should insert a block node manually here?
-      n = blockElement
+    case nextToken.kind
+    when 'val', 'var', 'def', 'class'
+      # Manually insert a block node
+      n = Node.new(:BLOCK_EXPR)
+      n.addChild(declaration)
+    when 'break', 'continue', 'do', ';', 'for', 'print', 'return', 'while'
+      # Manually insert a block node
+      n = Node.new(:BLOCK_EXPR)
+      n.addChild(statement)
+    when 'if', :ID, :NULL, :UNIT, :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, '(', '[', '{'
+      # Might need to wrap this in a block expression to get a new scope
+      n = expression
     end
     n
   end

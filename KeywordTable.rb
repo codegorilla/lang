@@ -63,6 +63,7 @@ class KeywordTable
   end
   
   def insert (keyword, token)
+    # This may never be used if populated statically
     @table[keyword] = token
   end
 

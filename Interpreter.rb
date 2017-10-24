@@ -62,6 +62,8 @@ class Interpreter
     end
 
     # might do away with if statements and just have expressions
+    # the empty statement will most likely be optimized away before hitting
+    # the interpeter
     node.count.times do |i|
       n = node.child(i)
       case n.kind
@@ -69,6 +71,7 @@ class Interpreter
         when :VARIABLE_DECL then variableDecl(n)
         when :FUNCTION_DECL then functionDecl(n)
         when :CLASS_DECL then classDecl(n)
+        when :EMPTY_STMT then ;
         when :EXPRESSION_STMT then expressionStmt(n)
         when :IF_STMT then ifStmt(n)
         when :PRINT_STMT then printStmt(n)

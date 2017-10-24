@@ -43,7 +43,6 @@ class ScopeBuilder
         when :VARIABLE_DECL then variableDecl(n)
         when :FUNCTION_DECL then functionDecl(n)
         when :EXPRESSION_STMT then expressionStmt(n)
-        when :IF_STMT then ifStmt(n)
         when :PRINT_STMT then printStmt(n)
         when :RETURN_STMT then returnStmt(n)
         when :WHILE_STMT then whileStmt(n)
@@ -103,41 +102,7 @@ class ScopeBuilder
     @logger.debug("functionBody")
     # This will always be a block because if the function consisted of a single
     # statement, then a block node was inserted automatically during the parse.
-    block(node.child)
-  end
-
-  # Block
-
-  def block (node)
-    @logger.debug("block")
-    # Push a new scope
-    @scope = Scope.new(@scope)
-    node.setAttribute("scope", @scope)
-    # Right now this only does the first element -- need to loop through all elements
-    for i in 0..node.count-1
-      n = node.child(i)
-      blockElement(n)
-    end
-    # Pop the scope
-    @scope = @scope.link
-  end
-
-  def blockElement (node)
-    @logger.debug("blockElement")
-    # This could either be a declaration or a statement
-    case node.kind
-    when :VALUE_DECL
-      # Anything that can contain a block can contain a scope
-      valueDecl(node)
-    when :VARIABLE_DECL
-      variableDecl(node)
-    when :EXPRESSION_STMT
-      expressionStmt(node)
-    when :IF_STMT
-      ifStmt(node)
-    when :RETURN_STMT
-      returnStmt(node)
-    end
+    blockExpr(node.child)
   end
 
   # ********** Statements **********
@@ -147,18 +112,13 @@ class ScopeBuilder
     expression(node.child)
   end
 
-  def ifStmt (node)
-    @logger.debug("ifStmt")
-    ifExpr(node.child)
+  def printStmt (node)
+    @logger.debug("printStmt")
+    expression(node.child)
   end
 
   def returnStmt (node)
     @logger.debug("returnStmt")
-    expression(node.child)
-  end
-
-  def printStmt (node)
-    @logger.debug("printStmt")
     expression(node.child)
   end
 
@@ -196,6 +156,10 @@ class ScopeBuilder
       logicalAndExpr(node)
     when :BINARY_EXPR
       binaryExpr(node)
+    when :IF_EXPR
+      ifExpr(node)
+    when :BLOCK_EXPR
+      blockExpr(node)
     when :IDENTIFIER
       identifier(node)
     when :EXPRESSION
@@ -207,19 +171,51 @@ class ScopeBuilder
     @logger.debug("ifExpr")
     expression(node.child(0))
     n = node.child(1)
-    if n.kind == :BLOCK
-      block(n)
+    if n.kind == :BLOCK_EXPR
+      blockExpr(n)
     else
       blockElement(n)
     end
     if (node.count == 3)
       # This means there is an else clause
       n = node.child(2)
-      if n.kind == :BLOCK
-        block(n)
+      if n.kind == :BLOCK_EXPR
+        blockExpr(n)
       else
         blockElement(n)
       end
+    end
+  end
+
+  def blockExpr (node)
+    @logger.debug("blockExpr")
+    # Push a new scope
+    @scope = Scope.new(@scope)
+    node.setAttribute("scope", @scope)
+    # Right now this only does the first element -- need to loop through all elements
+    for i in 0..node.count-1
+      n = node.child(i)
+      blockElement(n)
+    end
+    # Pop the scope
+    @scope = @scope.link
+  end
+
+  def blockElement (node)
+    @logger.debug("blockElement")
+    # This could either be a declaration or a statement
+    case node.kind
+    when :VALUE_DECL
+      # Anything that can contain a block can contain a scope
+      valueDecl(node)
+    when :VARIABLE_DECL
+      variableDecl(node)
+    when :EXPRESSION_STMT
+      expressionStmt(node)
+    when :IF_STMT
+      ifStmt(node)
+    when :RETURN_STMT
+      returnStmt(node)
     end
   end
 

@@ -61,6 +61,7 @@ class Lexer
   L_SHIFT = '<<'
   R_SHIFT = '>>'
 
+  # How does this EOF relate to the token EOF?
   EOF = 'EOF'
   ERROR = 'ERROR'
 
@@ -256,7 +257,7 @@ class Lexer
             # Maybe make this kind :UNIT
             # Debug might need to be column-2
             @logger.debug("(Ln #{line}, Col #{column-1}): Found '()'")
-            token = makeToken('()', "()")
+            token = makeToken(:UNIT, "()")
           else
             @logger.debug("(Ln #{line}, Col #{column-1}): Found '('")
             token = makeToken(L_PAREN, L_PAREN)
