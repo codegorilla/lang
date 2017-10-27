@@ -4,10 +4,52 @@ var x = 1;
 print x;
 
 // Need to figure out block expressions before doing if expressions
-{
+var t = {
+  var x = 2;
   print x;
+  //10;
 };
 
+print x;
+
+print t;
+
+// statement form
+//if (x == 0)
+//  return 4;
+//else
+//  return 10;
+
+//if (expr) stmt [else stmt]
+
+// expression form
+//if (x == 0) 4 else 10;
+
+//if (expr) forceExpr [;] [else forceExpr] ;
+
+//forceExpr:
+//  expression |
+//  statement
+
+//if (expr) expr => if (expr) expr else ();
+
+//if (expr) stmt => if (expr) { stmt } else ();
+
+//def f (x) = if (x == 0) false else true;
+
+
+//def myfun () =
+//  if (x == 0) 4 else 10
+
+//def myfun () =
+//  if (expr) (stmt | expr [;]) else (stmt | expr) ;
+
+//  if (expr) stmt else blockExpr ;
+
+//  if (x == 0) true
+
+//impliedBlock ::=
+//  statementMinus
 
 //if (x == 0) 1 else 2;
 

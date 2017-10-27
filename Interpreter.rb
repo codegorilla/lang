@@ -139,7 +139,14 @@ class Interpreter
   def printStmt (node)
     @logger.debug("printStmt")
     result = expression(node.child)
+    # Temporary comment while fixing block to make it return
+    # last evaluated exprStmt - 27 OCT 2017
+#    puts result
     puts result.value
+#    puts "#{result.value} : #{result}"
+    #result
+    $unit
+    # This should return unit, which makes it an expression!
   end
 
   def returnStmt (node)
@@ -181,6 +188,8 @@ class Interpreter
       result = binaryExpr(node)
     when :UNARY_EXPR
       result = unaryExpr(node)
+    when :BLOCK_EXPR
+      result = blockExpr(node)
     when :IDENTIFIER
       result = identifier(node)
     when :NULL_LITERAL
@@ -457,16 +466,26 @@ class Interpreter
     # For blocks, the dynamic and static links are the same
     f = Frame.new(@fp, @fp)
     @fp = f
-    for i in 0..node.count-1
+    for i in 0..node.count-2
       blockElement(node.child(i))
     end
+    # save the result of the last element
+    result = blockElement(node.child(node.count-1))
     # pop the frame
     @fp = @fp.dynamicLink
     # restore scope
     @scope = saveScope
+
+    # Block evaluates to the value of the last exprStmt evaluated
+    # If the last element was a declaration or statement (other than exprStmt)
+    # then return unit.
+
+    # Can blocks be cleaned up to end in an expression instead of exprStmt?
+    "HELLO THIS IS THE RESULT OF A BLOCK!"
+    TauObject.new($Int, 200)
+    result
   end
 
-  # Belongs under expressions under blockExpr?
   def blockElement (node)
     @logger.debug("blockElement")
     case node.kind

@@ -60,7 +60,7 @@ class ScopeBuilder
     identifierNode = node.leftChild
     name = identifierNode.text
     if @scope.lookup(name) == nil
-      scope.define(name)
+      @scope.define(name)
     else
       # Same variable declared multiple times within scope is error.
       @plog.error("Multiple declarations of symbol '#{name}'.", identifierNode.line)
@@ -192,7 +192,6 @@ class ScopeBuilder
     # Push a new scope
     @scope = Scope.new(@scope)
     node.setAttribute("scope", @scope)
-    # Right now this only does the first element -- need to loop through all elements
     for i in 0..node.count-1
       n = node.child(i)
       blockElement(n)
@@ -203,10 +202,8 @@ class ScopeBuilder
 
   def blockElement (node)
     @logger.debug("blockElement")
-    # This could either be a declaration or a statement
     case node.kind
     when :VALUE_DECL
-      # Anything that can contain a block can contain a scope
       valueDecl(node)
     when :VARIABLE_DECL
       variableDecl(node)
