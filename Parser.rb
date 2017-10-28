@@ -96,10 +96,12 @@ class Parser
 
   def declaration ()
     case nextToken.kind
-      when 'val' then valueDecl
-      when 'var' then variableDecl
-      when 'def' then functionDecl
-      when 'class' then classDecl
+    when 'val' then valueDecl
+    when 'var' then variableDecl
+    when 'def' then functionDecl
+    when 'class' then classDecl
+    else
+      raise "Parse error in declaration(): Can this ever happen?"
     end
   end
 
@@ -164,6 +166,7 @@ class Parser
   
   def functionBody ()
     @logger.debug("functionBody")
+    # Might be possible to just replace this with a plain block
     n = Node.new(:FUNCTION_BODY)
     if nextToken.kind == '{'
       n.addChild(blockExpr)
@@ -196,16 +199,16 @@ class Parser
 
   def statement ()
     case nextToken.kind
-      when 'break' then breakStmt
-      when 'continue' then continueStmt
-      when 'do' then doStmt
-      when ';' then emptyStmt
-      when 'for' then forStmt
-      #when 'if' then ifStmt
-      when 'print' then printStmt
-      when 'return' then returnStmt
-      when 'while' then whileStmt
-      else expressionStmt
+    when 'break' then breakStmt
+    when 'continue' then continueStmt
+    when 'do' then doStmt
+    when ';' then emptyStmt
+    when 'for' then forStmt
+    when 'print' then printStmt
+    when 'return' then returnStmt
+    when 'while' then whileStmt
+    else
+      expressionStmt
     end
   end
 
@@ -264,16 +267,6 @@ class Parser
     end
     n
   end
-
-  # Testing to see if it is possible to deprecate ifStmt
-
-  # def ifStmt ()
-  #   # The ifStmt appears here to avoid the need for a ';' at the end, which would be required for an exprStmt
-  #   @logger.debug("ifStmt")
-  #   n = Node.new(:IF_STMT)
-  #   n.addChild(ifExpr)
-  #   n
-  # end
 
   def returnStmt ()
     @logger.debug("returnStmt")
@@ -742,10 +735,7 @@ class Parser
     t = nextToken
     match(:ID)
     n = Node.new(:IDENTIFIER)
-
-    # Experimental - about associating token info with this node
     n.setLine(t.line)
-
     n.setText(t.text)
     n
   end
@@ -776,27 +766,17 @@ class Parser
   def literal ()
     @logger.debug("literal")
     case nextToken.kind
-    when :NULL
-      n = nullLiteral
-    when '()'
-      n = unitLiteral
-    when :BOOLEAN
-      n = booleanLiteral
-    when :INTEGER
-      n = integerLiteral
-    when :FLOAT
-      n = floatLiteral
-    when :IMAGINARY
-      n = imaginaryLiteral
-    when '['
-      n = arrayLiteral
-    when '{'
-      n = hashLiteral
+    when :NULL then nullLiteral
+    when :UNIT then unitLiteral
+    when :BOOLEAN then booleanLiteral
+    when :INTEGER then integerLiteral
+    when :FLOAT then floatLiteral
+    when :IMAGINARY then imaginaryLiteral
+    when '[' then arrayLiteral
+    when '{' then hashLiteral
     else
-      puts "ERROR - literal not found!"
-      exit
+      raise "Parse error in literal()"
     end
-    n
   end
 
   def nullLiteral ()
@@ -809,7 +789,7 @@ class Parser
   def unitLiteral ()
     @logger.debug("unitLiteral")
     n = Node::UNIT_LITERAL
-    match('()')
+    match(:UNIT)
     n
   end
   

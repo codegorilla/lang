@@ -194,6 +194,8 @@ class Interpreter
       result = identifier(node)
     when :NULL_LITERAL
       result = nullLiteral(node)
+    when :UNIT_LITERAL
+      result = unitLiteral(node)
     when :BOOLEAN_LITERAL
       result = booleanLiteral(node)
     when :INTEGER_LITERAL
@@ -530,17 +532,12 @@ class Interpreter
 
   def unitLiteral (node)
     @logger.debug("unitLiteral")
-    TauObject.new('unit')
+    $unit
   end
 
   def booleanLiteral (node)
     @logger.debug("booleanLiteral")
-    t = node.text
-    if t == "true"
-      $true
-    elsif t == "false"
-      $false
-    end
+    if node.text == "true" then $true else $false end
   end
 
   def integerLiteral (node)

@@ -254,9 +254,7 @@ class Lexer
           consume
           if nextChar == ')'
             consume
-            # Maybe make this kind :UNIT
-            # Debug might need to be column-2
-            @logger.debug("(Ln #{line}, Col #{column-1}): Found '()'")
+            @logger.debug("(Ln #{line}, Col #{column-2}): Found '()'")
             token = makeToken(:UNIT, "()")
           else
             @logger.debug("(Ln #{line}, Col #{column-1}): Found '('")

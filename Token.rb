@@ -8,13 +8,13 @@ class Token
   end
 
   EOF = Token.new(:EOF)
-  UNIT = Token.new(:UNIT, "()")
+  #UNIT = Token.new(:UNIT, "()")
   UNKNOWN = Token.new(:UNKNOWN)
 
   def setText (text)
     @text = text
   end
-  
+
   def kind ()
     @kind
   end
