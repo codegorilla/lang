@@ -247,6 +247,7 @@ class Parser
   def emptyStmt ()
     @logger.debug("emptyStmt")
     # ultimately, should this evaluate to ()? e.g. equivalent to ();
+    # I don't think so, unless all statements need to evaluate to something
     n = Node.new(:EMPTY_STMT)
     match(';')
     n
@@ -326,12 +327,7 @@ class Parser
   def expression ()
     @logger.debug("expression")
     n = Node.new(:EXPRESSION)
-    #t = nextToken
-    #if t.kind == 'if'
-    #  n.addChild(ifExpr)
-    #else
-      n.addChild(assignmentExpr)
-    #end
+    n.addChild(assignmentExpr)
     n
   end
   
@@ -580,6 +576,10 @@ class Parser
     # Functions can only take expressions as arguments, so a declaration or
     # statement must be wrapped into a block expression in order to be passed
     # in as arguments.
+    # This is the form of the if expression:
+    # if (expr) expr [else expr] ;
+    # The else clause is optional, but if ommitted, will be interpreted as
+    # if (expr) expr else () ;
     case nextToken.kind
     when 'val', 'var', 'def', 'class'
       # Manually insert a block node
@@ -619,27 +619,6 @@ class Parser
       n = expression
     end
     n
-  end
-
-  def blockExpr ()
-    @logger.debug("blockExpr")
-    n = Node.new(:BLOCK_EXPR)
-    match('{')
-    while nextToken.kind != '}'
-      n.addChild(blockElement)
-    end
-    match('}')
-    n
-  end
-
-  def blockElement ()
-    @logger.debug("blockElement")
-    # Not sure class declarations should be valid inside blocks --
-    # maybe only inside class bodies (i.e. templates)
-    case nextToken.kind
-      when 'val', 'var', 'def', 'class' then declaration
-      else statement
-    end
   end
 
   def idExpr ()
@@ -740,6 +719,27 @@ class Parser
     n
   end
 
+  def blockExpr ()
+    @logger.debug("blockExpr")
+    n = Node.new(:BLOCK_EXPR)
+    match('{')
+    while nextToken.kind != '}'
+      n.addChild(blockElement)
+    end
+    match('}')
+    n
+  end
+
+  def blockElement ()
+    @logger.debug("blockElement")
+    # Not sure class declarations should be valid inside blocks --
+    # maybe only inside class bodies (i.e. templates)
+    case nextToken.kind
+      when 'val', 'var', 'def', 'class' then declaration
+      else statement
+    end
+  end
+  
   def parenthesizedExpr ()
     @logger.debug("parenthesizedExpr")
     # This could either be a tuple or a plain expression enclosed in parenthesis

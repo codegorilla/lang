@@ -3,17 +3,22 @@
 var x = 1;
 print x;
 
-// Need to figure out block expressions before doing if expressions
-var t = {
-  var x = 2;
+if (x == 1) {
+  x = x + 1;
   print x;
-  10;
 };
 
-var a = null;
-print a;
+// Need to figure out block expressions before doing if expressions
+//var t = {
+//  var x = 2;
+//  print x;
+//  10;
+//};
 
-print t;
+//var a = null;
+//print a;
+
+//print t;
 
 // statement form
 //if (x == 0)

@@ -39,13 +39,13 @@ class ScopeBuilder
     for i in 0..node.count-1
       n = node.child(i)
       case n.kind
-        when :VALUE_DECL then valueDecl(n)
-        when :VARIABLE_DECL then variableDecl(n)
-        when :FUNCTION_DECL then functionDecl(n)
-        when :EXPRESSION_STMT then expressionStmt(n)
-        when :PRINT_STMT then printStmt(n)
-        when :RETURN_STMT then returnStmt(n)
-        when :WHILE_STMT then whileStmt(n)
+      when :VALUE_DECL then valueDecl(n)
+      when :VARIABLE_DECL then variableDecl(n)
+      when :FUNCTION_DECL then functionDecl(n)
+      when :EXPRESSION_STMT then expressionStmt(n)
+      when :PRINT_STMT then printStmt(n)
+      when :RETURN_STMT then returnStmt(n)
+      when :WHILE_STMT then whileStmt(n)
       end
     end
     node.setAttribute("scope", @scope)
@@ -127,7 +127,7 @@ class ScopeBuilder
     expression(node.leftChild)
     n = node.rightChild
     if n.kind == :BLOCK_EXPR
-      block(n)
+      blockExpr(n)
     else
       blockElement(n)
     end

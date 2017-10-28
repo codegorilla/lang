@@ -37,6 +37,8 @@ class Interpreter
 
     # Scope pointer
     @scope = nil
+
+    @breakFlag = false
   end
 
   def setLogLevel (level)
@@ -71,9 +73,11 @@ class Interpreter
         when :VARIABLE_DECL then variableDecl(n)
         when :FUNCTION_DECL then functionDecl(n)
         when :CLASS_DECL then classDecl(n)
+        # This probably doesn't need to be here because break is only valid inside of loops
+        # Can make sure there are no breaks outside of loops during semantic analysis phase
+        when :BREAK_STMT then breakStmt(n)
         when :EMPTY_STMT then ;
         when :EXPRESSION_STMT then expressionStmt(n)
-        when :IF_STMT then ifStmt(n)
         when :PRINT_STMT then printStmt(n)
         when :RETURN_STMT then returnStmt(n)
         when :WHILE_STMT then whileStmt(n)
@@ -123,6 +127,16 @@ class Interpreter
 
   # Statements
 
+  def breakStmt (node)
+    @logger.debug("breakStmt")
+    # Strategy (not sure if this will work)
+    # Only valid inside a blockExpr, and more specifically a loop
+    # Set some kind of flag that gets read before proceeding to next blockElement
+    # If the flag is set, then "return" from the blockExpr immediately
+    # This does seem to work after all!
+    @breakFlag = true
+  end
+
   def expressionStmt (node)
     @logger.debug("expressionStmt")
     # At global level this should assign to implicit variable 'ans'
@@ -131,22 +145,12 @@ class Interpreter
     result = expression(node.child)
   end
 
-  def ifStmt (node)
-    @logger.debug("ifStmt")
-    puts "IF STATEMENT!"
-  end
-
   def printStmt (node)
     @logger.debug("printStmt")
     result = expression(node.child)
-    # Temporary comment while fixing block to make it return
-    # last evaluated exprStmt - 27 OCT 2017
-#    puts result
     puts result.value
-#    puts "#{result.value} : #{result}"
-    #result
+    # Testing idea of statements evaluating to unit
     $unit
-    # This should return unit, which makes it an expression!
   end
 
   def returnStmt (node)
@@ -162,7 +166,9 @@ class Interpreter
     # If it is already known to be a Bool, then might be able to optimize
     result = $Bool.getMember('equ').call($true, condition)
     while result.value == true
-      blockExpr(node.rightChild)
+      breakCheck = blockExpr(node.rightChild)
+      # Very ugly, but this is just a test
+      if breakCheck == nil then break end
       # Re-evaluate condition
       condition = expression(node.leftChild)
       result = $Bool.getMember('equ').call($true, condition)
@@ -188,10 +194,12 @@ class Interpreter
       result = binaryExpr(node)
     when :UNARY_EXPR
       result = unaryExpr(node)
-    when :BLOCK_EXPR
-      result = blockExpr(node)
+    when :IF_EXPR
+      result = ifExpr(node)
     when :IDENTIFIER
       result = identifier(node)
+    when :BLOCK_EXPR
+      result = blockExpr(node)
     when :NULL_LITERAL
       result = nullLiteral(node)
     when :UNIT_LITERAL
@@ -470,13 +478,23 @@ class Interpreter
     @fp = f
     for i in 0..node.count-2
       blockElement(node.child(i))
+      # Break out early if you see a break flag (this is very ugly)
+      if @breakFlag == true then break end
     end
-    # save the result of the last element
-    result = blockElement(node.child(node.count-1))
+
+    # Breakflag checking is ugly but this is just a test
+    if @breakFlag == false
+      # save the result of the last element
+      result = blockElement(node.child(node.count-1))
+    end
+
     # pop the frame
     @fp = @fp.dynamicLink
     # restore scope
     @scope = saveScope
+
+    # Yes this is ugly, but this is just a test
+    if @breakFlag == true then return nil end
 
     # Block evaluates to the value of the last exprStmt evaluated
     # If the last element was a declaration or statement (other than exprStmt)
@@ -495,6 +513,7 @@ class Interpreter
     when :VARIABLE_DECL then variableDecl(node)
     when :FUNCTION_DECL then functionDecl(node)
     when :CLASS_DECL then classDecl(node)
+    when :BREAK_STMT then breakStmt(node)
     when :EXPRESSION_STMT then expressionStmt(node)
     when :PRINT_STMT then printStmt(node)
     when :WHILE_STMT then whileStmt(node)
@@ -502,6 +521,11 @@ class Interpreter
       puts "THERE HAS BEEN A MAJOR ERROR"
       exit
     end
+  end
+
+  def ifExpr (node)
+    @logger.debug("ifExpr")
+    puts "Reached if expression!"
   end
 
   def identifier (node)
