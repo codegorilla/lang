@@ -39,11 +39,17 @@ There are four kinds of declarations:
 
 * variable declarations
 
+Variable declarations create variables and bind them to a corresponding initializing expression.
+All variables must be bound at the time they are declared.
+This is different from a language such as C or JavaScript.
+In those languages you can declare a varaiable without initializing it.
+In C the variable will have whatever random value is in the memory location assigned to the variable.
+In JavaScript, the variable will have the value 'undefined'.
+
 * value declarations
 
-A value declaration is just a special kind of variable declaration that prevents
-the name from being re-bound to a different value. You can think of it as a
-shorthand for something that would look like this in another language:
+A value declaration is just a special kind of variable declaration that prevents the name from being re-bound to a different value.
+You can think of it as a shorthand for something that would look like this in another language:
 
 ````javascript
 const var x = 1;
