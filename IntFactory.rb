@@ -55,12 +55,13 @@ class IntFactory
       result = case y.type
       when $Int
         z = x.value == y.value
-        TauObject.new($Bool, z)
+        # return the singletons not a new value
+        if z == true then $true else $false end
       when $Float
         z = x.value == y.value
-        TauObject.new($Bool, z)
+        if z == true then $true else $false end
       when $Bool
-        TauObject.new($Bool, false)
+        $false
       else
         TauObject.new($Exception, "Type error: unsupported operand types for ==: Int and <other>")
       end

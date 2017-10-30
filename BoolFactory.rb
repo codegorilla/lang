@@ -50,11 +50,17 @@ class BoolFactory
       result
     end
 
+    # Inspiration for making sure you have a singleton
+    # Never do TauObject.new
+    # Just reference the singleton $true and $false
+    # if node.text == "true" then $true else $false end
+      
     def equ (x, y)
       result = case y.type
       when $Bool
         z = x.value == y.value
-        TauObject.new($Bool, z)
+        if z == true then $true else $false end
+        #TauObject.new($Bool, z)
       when $Int
         $false
       when $Float

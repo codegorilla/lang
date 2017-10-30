@@ -1,12 +1,29 @@
 // Test file
 
-var x = 1;
+var x = 0;
 print x;
 
-if (x == 1) {
-  x = x + 1;
-  print x;
-};
+var t = 100;
+
+// var a = if (x == 0) { 100; } else { 200; };
+var a = if (x == 1)
+  t
+else
+  t + 1
+;
+
+print a;
+
+
+//if (x == 1) {
+//  x = 10;
+//} else {
+//  x = 20;
+//};
+
+//print x;
+
+
 
 // Need to figure out block expressions before doing if expressions
 //var t = {

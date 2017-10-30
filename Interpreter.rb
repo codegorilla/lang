@@ -525,7 +525,17 @@ class Interpreter
 
   def ifExpr (node)
     @logger.debug("ifExpr")
-    puts "Reached if expression!"
+    condition = expression(node.child(0))
+    # Condition could be of any type, need to convert it to a Bool
+    # If it is already known to be a Bool, then might be able to optimize
+
+    result = $Bool.getMember('equ').call($true, condition)
+    if result.value == true then
+      r = expression(node.child(1))
+    else
+      r = expression(node.child(2))
+    end
+    r
   end
 
   def identifier (node)

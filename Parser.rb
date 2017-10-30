@@ -592,11 +592,15 @@ class Parser
       p.addChild(statement)
       n.addChild(p)
     when 'if', :ID, :NULL, :UNIT, :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, '(', '[', '{'
-      # Might need to wrap this in a block expression to get a new scope
       n.addChild(expression)
     end
+
     if nextToken.kind == 'else'
       n.addChild(elseClause)
+    else
+      p = Node.new(:EXPRESSION)
+      p.addChild(Node::UNIT_LITERAL)
+      n.addChild(p)
     end
     n
   end
@@ -615,7 +619,6 @@ class Parser
       n = Node.new(:BLOCK_EXPR)
       n.addChild(statement)
     when 'if', :ID, :NULL, :UNIT, :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, '(', '[', '{'
-      # Might need to wrap this in a block expression to get a new scope
       n = expression
     end
     n

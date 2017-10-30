@@ -170,20 +170,9 @@ class ScopeBuilder
   def ifExpr (node)
     @logger.debug("ifExpr")
     expression(node.child(0))
-    n = node.child(1)
-    if n.kind == :BLOCK_EXPR
-      blockExpr(n)
-    else
-      blockElement(n)
-    end
-    if (node.count == 3)
-      # This means there is an else clause
-      n = node.child(2)
-      if n.kind == :BLOCK_EXPR
-        blockExpr(n)
-      else
-        blockElement(n)
-      end
+    expression(node.child(1))
+    if node.count == 3
+      expression(node.child(2))
     end
   end
 
