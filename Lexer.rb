@@ -494,7 +494,7 @@ class Lexer
 
       when STATE_FLOAT1
         ch = nextChar
-        if ch.match(/(-|k)/)
+        if ch.match(/(-|\+)/)
           consume
           text << ch
           state = STATE_FLOAT2
@@ -527,7 +527,7 @@ class Lexer
 
       end
     end
-    
+
     token
   end
 

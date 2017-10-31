@@ -1,18 +1,22 @@
 // Test file
 
-var x = 0;
-print x;
+var b = 4.1e-2;
+// var b = 4e-2; // doesn't work - investigate
+print b;
 
-var t = 100;
+//var x = 0;
+//print x;
+
+//var t = 100;
 
 // var a = if (x == 0) { 100; } else { 200; };
-var a = if (x == 1)
-  t
-else
-  t + 1
-;
+//var a = if (x == 1)
+//  t
+//else
+//  t + 1
+//;
 
-print a;
+//print a;
 
 
 //if (x == 1) {
