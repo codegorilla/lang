@@ -9,8 +9,11 @@ class Lexer
   STATE_IDENTIFIER = 1
   STATE_NUMBER = 2
   STATE_FLOAT = 3
-  STATE_COMMENT = 4
-  STATE_BLOCK_COMMENT = 5
+  STATE_FLOAT1 = 4
+  STATE_FLOAT2 = 5
+  STATE_FLOAT3 = 6
+  STATE_COMMENT = 7
+  STATE_BLOCK_COMMENT = 8
 
   TILDE = '~'
   BANG = '!'
@@ -309,12 +312,19 @@ class Lexer
           @logger.debug("(Ln #{line}, Col #{column-1}): Found ','")
           token = makeToken(COMMA, COMMA)
           done = true
-          
+
         when '.'
           consume
-          @logger.debug("(Ln #{line}, Col #{column-1}): Found '.'")
-          token = makeToken(DOT, DOT)
-          done = true
+          ch = nextChar
+          if ch.match(/[0-9]/)
+            consume
+            text = ".#{ch}"
+            state = STATE_FLOAT
+          else
+            @logger.debug("(Ln #{line}, Col #{column-1}): Found '.'")
+            token = makeToken(DOT, DOT)
+            done = true
+          end
 
         when '/'
           consume
@@ -472,15 +482,52 @@ class Lexer
         if ch.match(/[0-9]/)
           consume
           text << ch
+        elsif ch.match(/(e|E)/)
+          consume
+          text << ch
+          state = STATE_FLOAT1
         else
           @logger.debug("(Ln #{line}, Col #{start-1}): Found float '#{text}'")
           token = makeToken(:FLOAT, text)
           done = true
         end
-        
+
+      when STATE_FLOAT1
+        ch = nextChar
+        if ch.match(/(-|k)/)
+          consume
+          text << ch
+          state = STATE_FLOAT2
+        elsif ch.match(/[0-9]/)
+          consume
+          text << ch
+          state = STATE_FLOAT3
+        end
+        # Needs to be an error if this doesn't move on to next state
+
+      when STATE_FLOAT2
+        ch = nextChar
+        if ch.match(/[0-9]/)
+          consume
+          text << ch
+          state = STATE_FLOAT3
+        end
+        # Needs to be an error if this doesn't move on to next state
+
+      when STATE_FLOAT3
+        ch = nextChar
+        if ch.match(/[0-9]/)
+          consume
+          text << ch
+        else
+          @logger.debug("(Ln #{line}, Col #{start-1}): Found float '#{text}'")
+          token = makeToken(:FLOAT, text)
+          done = true
+        end
+
       end
     end
-
+    
     token
   end
 

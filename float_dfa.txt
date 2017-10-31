@@ -1,0 +1,18 @@
+digraph finite_state_machine {
+  rankdir=LR;
+  size="8, 5"
+  node [shape = doublecircle]; INT FLOAT1 FLOAT4;
+  node [shape = circle];
+  BEGIN  -> INT    [ label = "[0-9]" ];
+  BEGIN  -> FLOAT  [ label = "[.]" ];
+  INT    -> INT    [ label = "[0-9]"];
+  INT    -> FLOAT1 [ label = "[.]"];
+  FLOAT  -> FLOAT1 [ label = "[0-9]"];
+  FLOAT1 -> FLOAT1 [ label = "[0-9]" ];
+  FLOAT1 -> FLOAT2 [ label = "(e|E)" ];
+  FLOAT2 -> FLOAT3 [ label = "(+|-)"];
+  FLOAT2 -> FLOAT4 [ label = "[0-9]"];
+  FLOAT3 -> FLOAT4 [ label = "[0-9]"];
+  FLOAT4 -> FLOAT4 [ label = "[0-9]"];
+}
+
