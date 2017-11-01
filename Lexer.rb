@@ -14,6 +14,7 @@ class Lexer
   STATE_FLOAT3 = 6
   STATE_COMMENT = 7
   STATE_BLOCK_COMMENT = 8
+  STATE_STRING = 9
 
   TILDE = '~'
   BANG = '!'
@@ -383,6 +384,11 @@ class Lexer
             token = makeToken(R_ANGLE, R_ANGLE)
           end
           done = true
+        
+        when '"'
+          consume
+          text = ""
+          state = STATE_STRING
 
         else
           if ch.match(/[A-Za-z_]/)
@@ -466,6 +472,10 @@ class Lexer
           consume
           text << ch
           state = STATE_FLOAT
+        elsif ch.match(/(e|E)/)
+          consume
+          text << ch
+          state = STATE_FLOAT1
         elsif ch == 'j'
           consume
           text << ch
@@ -525,11 +535,24 @@ class Lexer
           done = true
         end
 
+      when STATE_STRING
+        ch = nextChar
+        while (ch != '"')
+          consume
+          text << ch
+          ch = nextChar
+        end
+        consume
+        # Need to adjust line and col, probably need to track line/col start
+        @logger.debug("(Ln #{line}, Col #{start-1}): Found string '#{text}'")
+        token = makeToken(:STRING, text)
+        done = true
+
       end
     end
 
     token
   end
 
-end
+end # class
 

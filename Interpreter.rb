@@ -212,6 +212,8 @@ class Interpreter
       result = floatLiteral(node)
     when :IMAGINARY_LITERAL
       result = imaginaryLiteral(node)
+    when :STRING_LITERAL
+      result = stringLiteral(node)
     when :EXPRESSION
       result = expression(node)
     else
@@ -589,5 +591,10 @@ class Interpreter
     TauObject.new(@COMPLEX, [0.0, node.text.to_f])
   end
 
-end
+  def stringLiteral (node)
+    @logger.debug("stringLiteral")
+    TauObject.new($String, node.text)
+  end
+
+end # class
 

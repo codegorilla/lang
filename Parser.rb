@@ -77,7 +77,7 @@ class Parser
         n.addChild(declaration)
       when 'break', 'continue', 'do', ';', 'for', 'print', 'return', 'while'
         n.addChild(statement)
-      when 'if', :ID, :NULL, :UNIT, :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, '(', '[', '{'
+      when 'if', :ID, :NULL, :UNIT, :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, :STRING, '(', '[', '{'
         n.addChild(statement)
       when 'EOF'
         done = true
@@ -775,6 +775,7 @@ class Parser
     when :INTEGER then integerLiteral
     when :FLOAT then floatLiteral
     when :IMAGINARY then imaginaryLiteral
+    when :STRING then stringLiteral
     when '[' then arrayLiteral
     when '{' then hashLiteral
     else
@@ -825,6 +826,14 @@ class Parser
     n = Node.new(:IMAGINARY_LITERAL)
     n.setText(nextToken.text)
     match(:IMAGINARY)
+    n
+  end
+
+  def stringLiteral ()
+    @logger.debug("stringLiteral")
+    n = Node.new(:STRING_LITERAL)
+    n.setText(nextToken.text)
+    match(:STRING)
     n
   end
 
