@@ -7,6 +7,7 @@ digraph finite_state_machine {
   BEGIN  -> FLOAT  [ label = "[.]" ];
   INT    -> INT    [ label = "[0-9]"];
   INT    -> FLOAT1 [ label = "[.]"];
+  INT    -> FLOAT2 [ label = "(e|E)"];
   FLOAT  -> FLOAT1 [ label = "[0-9]"];
   FLOAT1 -> FLOAT1 [ label = "[0-9]" ];
   FLOAT1 -> FLOAT2 [ label = "(e|E)" ];
