@@ -32,6 +32,10 @@ class Interpreter
     ffact = FloatFactory.new
     ffact.make
 
+    # The STRING class represents strings
+    sfact = StringFactory.new
+    sfact.make
+
     # Frame pointer
     @fp = nil
 

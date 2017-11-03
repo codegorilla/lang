@@ -152,8 +152,6 @@ class Parser
       @tokens.consume
       n.addChild(parameter)
     end
-    # Allow trailing comma
-    option(',')
     n
   end
 

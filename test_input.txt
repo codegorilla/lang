@@ -1,13 +1,23 @@
 // Test file
 
-var a = "hello world!";
-print a;
+var a = "hello ";
+var b = "world!";
 
-var b = 4.1e-2;
-print b;
-
-var c = 4e-2;
+var c = a + b;
 print c;
+
+
+var y = 5;
+var z = 10;
+
+var x = y + z;
+print x;
+
+//var b = 4.1e-2;
+//print b;
+
+//var c = 4e-2;
+//print c;
 
 //var x = 0;
 //print x;

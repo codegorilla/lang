@@ -17,6 +17,7 @@ require 'logger'
 require './BoolFactory'
 require './IntFactory'
 require './FloatFactory'
+require './StringFactory'
 require './Types'
 require './ProblemLogger'
 
