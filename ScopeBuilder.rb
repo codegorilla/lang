@@ -192,30 +192,22 @@ class ScopeBuilder
   def blockElement (node)
     @logger.debug("blockElement")
     case node.kind
-    when :VALUE_DECL
-      valueDecl(node)
-    when :VARIABLE_DECL
-      variableDecl(node)
-    when :EXPRESSION_STMT
-      expressionStmt(node)
-    when :IF_STMT
-      ifStmt(node)
-    when :RETURN_STMT
-      returnStmt(node)
+    when :VALUE_DECL then valueDecl(node)
+    when :VARIABLE_DECL then variableDecl(node)
+    when :EXPRESSION_STMT then expressionStmt(node)
+    when :IF_STMT then ifStmt(node)
+    when :RETURN_STMT then returnStmt(node)
     end
   end
 
   def functionCall (node)
-    lhs = node.leftChild
-    rhs = node.rightChild
-    expr(lhs)
-    arguments(rhs)
-    inst = Instruction.new(:CALL)
-    inst.setText(rhs.count)
-    add(inst)
+    @logger.debug("functionCall")
+    expr(node.leftChild)
+    arguments(node.rightChild)
   end
 
   def arguments (node)
+    @logger.debug("arguments")
     for i in 0..node.count-1
       n = node.child(i)
       expression(n)

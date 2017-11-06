@@ -36,6 +36,10 @@ class Interpreter
     sfact = StringFactory.new
     sfact.make
 
+    # The FUNCTION class represents functions
+    fnfact = FunctionFactory.new
+    fnfact.make
+
     # Frame pointer
     @fp = nil
 
@@ -120,7 +124,23 @@ class Interpreter
     #     param2
     #   body
     #     block
-    identifierNode = node.firstChild
+    # Is there anything to do here? Create a function object and assign it to
+    # the proper slot in the currently executing frame
+    identifierNode = node.child(0)
+    parametersNode = node.child(1)
+    index = @scope.lookup(identifierNode.text)
+    puts "Index is #{index}."
+    @fp.store(index, functionBody(node.child(2)))
+  end
+
+  def functionBody (node)
+    # Create a function object and return it
+    # Later on, lambda expressions will also create function objects
+    # But lambda expressions will be expressions, not declarations
+    # The value inside a function object should be a block of instructions to
+    # execute whenever the function is called. For now, just set it to the
+    # integer 1.
+    result = TauObject.new($Function, 3.14)
   end
 
   # Theory of operation for functions vs. methods:
@@ -200,6 +220,8 @@ class Interpreter
       result = unaryExpr(node)
     when :IF_EXPR
       result = ifExpr(node)
+    when :FUNCTION_CALL
+      result = functionCall(node)
     when :IDENTIFIER
       result = identifier(node)
     when :BLOCK_EXPR
@@ -542,6 +564,11 @@ class Interpreter
       r = expression(node.child(2))
     end
     r
+  end
+
+  def functionCall (node)
+    @logger.debug("functionCall")
+    puts "functionCall!"
   end
 
   def identifier (node)

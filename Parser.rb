@@ -135,6 +135,10 @@ class Parser
     match('(')
     if nextToken.kind == :ID
       n.addChild(parameters)
+    else
+      # Add empty parameters node
+      p = Node.new(:PARAMETERS)
+      n.addChild(p)
     end
     match(')')
     match('=')
@@ -644,6 +648,7 @@ class Parser
     when '.'
       n = objectAccess(node)
     end
+    # What is this for?  Is this for chained expressions like x(1)(2)?
     t = nextToken
     if (t.kind == '(' || t.kind == '[' || t.kind == '.')
       p = idTail(n)
@@ -659,6 +664,9 @@ class Parser
     match('(')
     if expression? nextToken
       n.addChild(arguments)
+    else
+      # Empty arguments list
+      n.addChild(Node.new(:ARGUMENTS))
     end
     match(')')
     n

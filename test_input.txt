@@ -1,17 +1,24 @@
 // Test file
 
-var a = "hello ";
-var b = "world!";
+var a = 1;
 
-var c = a + b;
-print c;
+def myfun (x) = 10;
+
+myfun(1);
 
 
-var y = 5;
-var z = 10;
 
-var x = y + z;
-print x;
+//var b = "world!";
+
+//var c = a + b;
+//print c;
+
+
+//var y = 5;
+//var z = 10;
+
+//var x = y + z;
+//print x;
 
 //var b = 4.1e-2;
 //print b;

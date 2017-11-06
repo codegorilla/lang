@@ -10,6 +10,11 @@ $Float = TauObject.new($Class)
 
 $String = TauObject.new($Class)
 
+# Function objects might need more work, different one based on number of
+# parameters
+# $Function1, $Function2, etc...
+$Function = TauObject.new($Class)
+
 # Singletons
 $true = TauObject.new($Bool, true)
 $false = TauObject.new($Bool, false)

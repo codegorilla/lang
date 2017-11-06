@@ -105,4 +105,6 @@ class StringFactory
       $String.setMember('add', method(:add))
       $String.setMember('not', method(:not))
     end
-end
+    
+end # class
+
