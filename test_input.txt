@@ -7,7 +7,6 @@ def myfun (x) = 10;
 myfun(1);
 
 
-
 //var b = "world!";
 
 //var c = a + b;

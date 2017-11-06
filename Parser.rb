@@ -137,13 +137,18 @@ class Parser
       n.addChild(parameters)
     else
       # Add empty parameters node
-      p = Node.new(:PARAMETERS)
-      n.addChild(p)
+      n.addChild(Node.new(:PARAMETERS))
     end
     match(')')
     match('=')
     # this might change to expression instead
     # or function body might just contain an expression
+    # Unike a variable declaration or block expression, the function body does
+    # not get evaluated when it is seen. A function object is created and bound
+    # to the name (or associated slot within a stack frame) at run time. In a
+    # function call, this function object will then be called. The function
+    # object must have a link to the AST nodes that will be executed. This is
+    # its "value", just as an integer might have a value of 1, 2, 3, etc.
     n.addChild(functionBody)
     n
   end
@@ -665,7 +670,7 @@ class Parser
     if expression? nextToken
       n.addChild(arguments)
     else
-      # Empty arguments list
+      # Add empty arguments list
       n.addChild(Node.new(:ARGUMENTS))
     end
     match(')')

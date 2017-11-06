@@ -138,9 +138,11 @@ class Interpreter
     # Later on, lambda expressions will also create function objects
     # But lambda expressions will be expressions, not declarations
     # The value inside a function object should be a block of instructions to
-    # execute whenever the function is called. For now, just set it to the
-    # integer 1.
-    result = TauObject.new($Function, 3.14)
+    # execute whenever the function is called, i.e. it needs to be an AST node!
+    # In a VM, it would probably be a basic block.
+    # It might even need to be more than that, because it needs to take into
+    # account parameters as well. For now just assume no parameters.
+    result = TauObject.new($Function, node)
   end
 
   # Theory of operation for functions vs. methods:
@@ -569,6 +571,16 @@ class Interpreter
   def functionCall (node)
     @logger.debug("functionCall")
     puts "functionCall!"
+    # evaluate the left side
+    # this should result in a Function object, for which a call can be made
+    lhs = expr(node.leftChild)
+    # evaluate the right side
+    # for now assume argument list is empty
+    # The function call should cause a jump to the location of the code
+    # followed by a return to here
+    jumpNode = lhs.value
+    puts "The value is #{jumpNode}."
+    
   end
 
   def identifier (node)
