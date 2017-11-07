@@ -579,8 +579,16 @@ class Interpreter
     # The function call should cause a jump to the location of the code
     # followed by a return to here
     jumpNode = lhs.value
-    puts "The value is #{jumpNode}."
-    
+    # puts "The value is #{jumpNode}."
+    # jump to the location
+    result = functionBody1(jumpNode)
+    # return here
+  end
+
+  def functionBody1 (node)
+    # Assume there is just an expression
+    result = blockExpr(node.child)
+    result
   end
 
   def identifier (node)
@@ -590,6 +598,7 @@ class Interpreter
     scope = @scope
     index = scope.lookup(node.text)
 
+    # Need to add logic to traverse higher scopes
     #while !index
     if !index
       fp = fp.staticLink

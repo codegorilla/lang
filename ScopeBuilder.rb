@@ -126,6 +126,8 @@ class ScopeBuilder
     @logger.debug("whileStmt")
     expression(node.leftChild)
     n = node.rightChild
+    # This should always be a block, so we should be able to
+    # get rid of the if-statement
     if n.kind == :BLOCK_EXPR
       blockExpr(n)
     else
@@ -144,26 +146,16 @@ class ScopeBuilder
   def expr (node)
     @logger.debug('expr')
     case node.kind
-    when :FUNCTION_CALL
-      functionCall(node)
-    when :ARRAY_ACCESS
-      arrayAccess(node)
-    when :OBJECT_ACCESS
-      objectAccess(node)
-    when :LOGICAL_OR_EXPR
-      logicalOrExpr(node)
-    when :LOGICAL_AND_EXPR
-      logicalAndExpr(node)
-    when :BINARY_EXPR
-      binaryExpr(node)
-    when :IF_EXPR
-      ifExpr(node)
-    when :BLOCK_EXPR
-      blockExpr(node)
-    when :IDENTIFIER
-      identifier(node)
-    when :EXPRESSION
-      expression(node)
+    when :FUNCTION_CALL then functionCall(node)
+    when :ARRAY_ACCESS then arrayAccess(node)
+    when :OBJECT_ACCESS then objectAccess(node)
+    when :LOGICAL_OR_EXPR then logicalOrExpr(node)
+    when :LOGICAL_AND_EXPR then logicalAndExpr(node)
+    when :BINARY_EXPR then binaryExpr(node)
+    when :IF_EXPR then ifExpr(node)
+    when :BLOCK_EXPR then blockExpr(node)
+    when :IDENTIFIER then identifier(node)
+    when :EXPRESSION then expression(node)
     end
   end
 
