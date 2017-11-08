@@ -8,7 +8,8 @@ var b = 80;
   var c = 100;
   {
     10 + 2;
-    print c;
+    b = 10;
+    print b + 400;
     14;
   };
   print b;

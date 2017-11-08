@@ -267,14 +267,17 @@ class Interpreter
         index = scope.lookup(identifierNode.text)
     
         # probably want while scope != global
-        #while !index
-        if !index
+        while !index && scope.link != nil
           fp = fp.staticLink
           scope = scope.link
           index = scope.lookup(identifierNode.text)
         end
-        result = fp.load(index)
-        fp.store(index, b)
+        if index != nil
+          result = fp.load(index)
+          fp.store(index, b)
+        else
+          raise "Undefined variable '#{identifierNode.text}'"
+        end
       when '+='
         # Compute id + b
         a = expr(identifierNode)
@@ -594,19 +597,23 @@ class Interpreter
   def identifier (node)
     @logger.debug("identifier")
     # Look up the index in the current scope and use it to load from local table
-    fp = @fp
     scope = @scope
+    fp = @fp
     index = scope.lookup(node.text)
-
-    # Need to add logic to traverse higher scopes
-    #while !index
-    if !index
-      fp = fp.staticLink
+    # Logic to traverse higher scopes
+    while !index && scope.link != nil
       scope = scope.link
+      # Not sure that the fp needs to always move
+      fp = fp.staticLink
       index = scope.lookup(node.text)
     end
-    result = fp.load(index)
-    result
+    if index != nil
+      result = fp.load(index)
+      result
+    else
+      # This needs to print a stack trace for lx, not ruby
+      raise "variable '#{node.text}' undefined."
+    end
   end
 
   # ********** Literals **********
