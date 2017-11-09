@@ -141,8 +141,7 @@ class Parser
     end
     match(')')
     match('=')
-    # this might change to expression instead
-    # or function body might just contain an expression
+    # Function body might just contain an expression
     # Unike a variable declaration or block expression, the function body does
     # not get evaluated when it is seen. A function object is created and bound
     # to the name (or associated slot within a stack frame) at run time. In a
@@ -173,7 +172,6 @@ class Parser
   
   def functionBody ()
     @logger.debug("functionBody")
-    # Might be possible to just replace this with a plain block
     n = Node.new(:FUNCTION_BODY)
     if nextToken.kind == '{'
       n.addChild(blockExpr)

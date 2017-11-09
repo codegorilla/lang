@@ -127,13 +127,33 @@ class Interpreter
     # Is there anything to do here? Create a function object and assign it to
     # the proper slot in the currently executing frame
     identifierNode = node.child(0)
-    parametersNode = node.child(1)
+
+    # Somehow parameters need to become part of function object?
+    # They shouldn't get processed until function call time
+    # At that point arguments would get bound to parameters
+    # The names are already in the symbol table, so I don't think we need to
+    # descend into these nodes during execution time
+    #parameters(node.child(1))
+
     index = @scope.lookup(identifierNode.text)
     puts "Index is #{index}."
     @fp.store(index, functionBody(node.child(2)))
   end
 
+  def parameters (node)
+    @logger.debug("parameters")
+    node.children.each do |n|
+      parameter(n)
+    end
+  end
+  
+  def parameter (node)
+    @logger.debug("parameter")
+    # Each one of these needs to be processed
+  end
+  
   def functionBody (node)
+    @logger.debug("parameter")
     # Create a function object and return it
     # Later on, lambda expressions will also create function objects
     # But lambda expressions will be expressions, not declarations
@@ -573,12 +593,16 @@ class Interpreter
 
   def functionCall (node)
     @logger.debug("functionCall")
-    puts "functionCall!"
     # evaluate the left side
     # this should result in a Function object, for which a call can be made
     lhs = expr(node.leftChild)
-    # evaluate the right side
-    # for now assume argument list is empty
+    
+    # evaluate the right side, e.g. argument list
+    # the goal is to bind each argument to its associated parameter
+    # the scope would need to be accessible from here
+    # the scope is attached to the node associated with the function object
+    # do something here!
+
     # The function call should cause a jump to the location of the code
     # followed by a return to here
     jumpNode = lhs.value
@@ -590,14 +614,16 @@ class Interpreter
 
   def functionBody1 (node)
     @logger.debug("functionBody1")
-    # scope, frame, etc.
     # Fetch the scope attribute stored in the node
-    # FIX: The scope is currently saved in the function declaration, not body
     # In Parr's book, the function actually has a scope outside of the block
     # that contains code for the function. The function scope holds the
     # parameter locals, while the block holds all other locals.
     saveScope = @scope
     @scope = node.getAttribute("scope")
+
+    # Test what is in the scope
+    puts @scope.symbols.table
+
     # Push new frame
     # For blocks, the dynamic and static links are the same
     # For functions, they are NOT the same, so this needs to be fixed.
@@ -607,9 +633,8 @@ class Interpreter
     # Assume there is just an expression
     result = blockExpr(node.child)
 
-    # pop the frame
+    # pop frame and restore scope
     @fp = @fp.dynamicLink
-    # restore scope
     @scope = saveScope
 
     result

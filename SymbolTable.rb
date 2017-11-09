@@ -14,5 +14,9 @@ class SymbolTable
     @table[symbol]
   end
 
+  def table ()
+    @table
+  end
+
 end #class
 
