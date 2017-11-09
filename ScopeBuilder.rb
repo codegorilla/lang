@@ -87,6 +87,8 @@ class ScopeBuilder
     @logger.debug("functionDecl")
     identifierNode = node.child(0)
     @scope.define(identifierNode.text)
+    # The new scope may need to be attached to the function body, not the
+    # function declaration. Depends if there will be a function body or not.
     # Push a new scope
     @scope = Scope.new(@scope)
     node.setAttribute("scope", @scope)

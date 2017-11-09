@@ -589,8 +589,29 @@ class Interpreter
   end
 
   def functionBody1 (node)
+    @logger.debug("functionBody1")
+    # scope, frame, etc.
+    # Fetch the scope attribute stored in the node
+    # FIX: The scope is currently saved in the function declaration, not body
+    # In Parr's book, the function actually has a scope outside of the block
+    # that contains code for the function. The function scope holds the
+    # parameter locals, while the block holds all other locals.
+    saveScope = @scope
+    @scope = node.getAttribute("scope")
+    # Push new frame
+    # For blocks, the dynamic and static links are the same
+    # For functions, they are NOT the same, so this needs to be fixed.
+    f = Frame.new(@fp, @fp)
+    @fp = f
+
     # Assume there is just an expression
     result = blockExpr(node.child)
+
+    # pop the frame
+    @fp = @fp.dynamicLink
+    # restore scope
+    @scope = saveScope
+
     result
   end
 

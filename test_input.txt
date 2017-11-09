@@ -4,28 +4,30 @@ var a = 1;
 
 var b = 80;
 
-{
-  var c = 100;
-  {
-    10 + 2;
-    b = 10;
-    print b + 400;
-    14;
-  };
+def myfun (x) = {
+  10 + 2;
+  //b = 100;
   print b;
+  14;
 };
 
-//def myfun (x) = {
-//  10 + 2;
-  //print b;
-//  14;
-//};
-
-//val x = myfun(1);
+val x = myfun(1);
 
 //print a;
 
-//print x;
+print x;
+
+//{
+//  var c = 100;
+//  {
+//    10 + 2;
+//    b = 10;
+//    print b + 400;
+//    14;
+//  };
+//  print b;
+//};
+
 
 //var b = "world!";
 
