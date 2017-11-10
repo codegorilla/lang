@@ -668,6 +668,7 @@ class Parser
     n = Node.new(:FUNCTION_CALL)
     n.addChild(node)
     match('(')
+    # can probably just test for NOT ')'
     if expression? nextToken
       n.addChild(arguments)
     else
@@ -684,6 +685,7 @@ class Parser
        k == :INTEGER   ||
        k == :FLOAT     ||
        k == :IMAGINARY ||
+       k == :STRING    ||
        k == :ID ||
        k == '(' ||
        k == '[' ||

@@ -15,7 +15,7 @@ def myfun (x, y) = {
   x + y;
 };
 
-val x = myfun(1);
+val x = myfun("hello", 4, 8);
 
 
 print x;

@@ -596,6 +596,19 @@ class Interpreter
     # the scope would need to be accessible from here
     # the scope is attached to the node associated with the function object
     # do something here!
+    scopeNeeded = functionObj.value.getAttribute("scope")
+    puts scopeNeeded.symbols.table
+    argumentsNode = node.rightChild
+    count = argumentsNode.count
+    puts count
+    # At some point need to enforce numArgs == numParams
+    # for now don't worry about it
+    # evaluate first argument
+    arg1 = argumentsNode.child(0)
+    arg1Eval = expression(arg1)
+    puts arg1Eval.value
+    # The first parameter needs to be bound to the first argument
+    # That is done in the frame, which has not yet been constructed
 
     # The function call should cause a jump to the location of the code
     # followed by a return to here
@@ -614,7 +627,7 @@ class Interpreter
     @scope = node.getAttribute("scope")
 
     # Test what is in the scope
-    puts @scope.symbols.table
+    #puts @scope.symbols.table
 
     # Push new frame
     # For blocks, the dynamic and static links are the same
