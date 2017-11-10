@@ -597,27 +597,29 @@ class Interpreter
     # the scope is attached to the node associated with the function object
     # do something here!
     scopeNeeded = functionObj.value.getAttribute("scope")
-    puts scopeNeeded.symbols.table
+    # puts scopeNeeded.symbols.table
     argumentsNode = node.rightChild
     count = argumentsNode.count
-    puts count
+    # puts count
     # At some point need to enforce numArgs == numParams
     # for now don't worry about it
     # evaluate first argument
     arg1 = argumentsNode.child(0)
-    arg1Eval = expression(arg1)
-    puts arg1Eval.value
+    arg1Obj = expression(arg1)
+    # puts arg1Obj.value
     # The first parameter needs to be bound to the first argument
     # That is done in the frame, which has not yet been constructed
+    # So, as part of the calling sequence, these arguments must be passed in to
+    # function1.
 
     # The function call should cause a jump to the location of the code
     # followed by a return to here
     jumpNode = functionObj.value
     #puts "The value is #{jumpNode}."
-    result = function1(jumpNode)
+    result = function1(jumpNode, arg1Obj)
   end
 
-  def function1 (node)
+  def function1 (node, arg)
     @logger.debug("function1")
     # Fetch the scope attribute stored in the node
     # In Parr's book, the function actually has a scope outside of the block
@@ -635,7 +637,14 @@ class Interpreter
     f = Frame.new(@fp, @fp)
     @fp = f
 
-    # child(0) is parameters -- ignored for now
+    # for each parameter, bind it to the corresponding argument
+    parametersNode = node.child(0)
+    paramNode = parametersNode.child(0)
+    idNode = paramNode.child
+    # get the index from the scope
+    index = @scope.lookup(idNode.text)
+    @fp.store(index, arg)
+
     result = blockExpr(node.child(1))
 
     # pop frame and restore scope

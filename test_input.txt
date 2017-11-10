@@ -5,23 +5,15 @@ var a = 1;
 var b = 81;
 print b;
 
-def myfun (x, y) = {
-  10 + 2;
-  b = 100;
-  x = 10;
-  y = 20;
-  print b;
-  14;
-  x + y;
+def myfun (x) = {
+  x + 1;
 };
 
-val x = myfun("hello", 4, 8);
-
-
+val x = myfun(100);
 print x;
 
 // lambda function
-//val y = fun (x) => x + 1;
+//val y = lambda (x) => x + 1;
 
 //{
 //  var c = 100;
