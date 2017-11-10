@@ -117,16 +117,8 @@ class Interpreter
 
   def functionDecl (node)
     @logger.debug("functionDecl")
-    # fun
-    #   identifier
-    #   function
-    #     params?
-    #       param1
-    #       param2
-    #     body
-    #       block
-    # Is there anything to do here? Create a function object and assign it to
-    # the proper slot in the currently executing frame
+    # (functionDecl identifier [function (params? p1 p2) blockExpr])
+    # Create function object and assign it to proper slot in current frame
     identifierNode = node.child(0)
     index = @scope.lookup(identifierNode.text)
     @fp.store(index, function(node.child(1)))
@@ -134,12 +126,24 @@ class Interpreter
 
   def function (node)
     @logger.debug("function")
+    # Unike a variable declaration or block expression, the function body does
+    # not get evaluated when it is seen. A function object is created and bound
+    # to the name (or associated slot within a stack frame) at run time. In a
+    # function call, this function object will then be called. The function
+    # object must have a link to the AST nodes that will be executed. This is
+    # its "value", just as an integer might have a value of 1, 2, 3, etc.
+
     # Parameters don't get processed until function call time
     # At that point arguments would get bound to parameters
     # The names are already in the symbol table, so we might not even need to
     # descend into these nodes during execution time
-    #parameters(node.child(1))
+    #parameters(node.child(1)) 0?
 
+    # Create a function object and return it
+    # Later on, lambda expressions will also create function objects
+    # The value inside a function object should be a block of instructions to
+    # execute whenever the function is called, i.e. it needs to be an AST node!
+    # In a VM, it would probably be a basic block.
     result = TauObject.new($Function, node)
   end
 
@@ -155,19 +159,6 @@ class Interpreter
     # Each one of these needs to be processed
   end
   
-  #def functionBody (node)
-  #  @logger.debug("functionBody")
-    # Create a function object and return it
-    # Later on, lambda expressions will also create function objects
-    # But lambda expressions will be expressions, not declarations
-    # The value inside a function object should be a block of instructions to
-    # execute whenever the function is called, i.e. it needs to be an AST node!
-    # In a VM, it would probably be a basic block.
-    # It might even need to be more than that, because it needs to take into
-    # account parameters as well. For now just assume no parameters.
-  #  result = TauObject.new($Function, node)
-  #end
-
   # Theory of operation for functions vs. methods:
   # x = cos # returns function object
   # y = cos(t) # returns result of function call
@@ -598,7 +589,7 @@ class Interpreter
     @logger.debug("functionCall")
     # evaluate the left side
     # this should result in a Function object, for which a call can be made
-    lhs = expr(node.leftChild)
+    functionObj = expr(node.leftChild)
     
     # evaluate the right side, e.g. argument list
     # the goal is to bind each argument to its associated parameter
@@ -608,11 +599,9 @@ class Interpreter
 
     # The function call should cause a jump to the location of the code
     # followed by a return to here
-    jumpNode = lhs.value
+    jumpNode = functionObj.value
     #puts "The value is #{jumpNode}."
-    # jump to the location
     result = function1(jumpNode)
-    # return here
   end
 
   def function1 (node)
@@ -634,20 +623,11 @@ class Interpreter
     @fp = f
 
     # child(0) is parameters -- ignored for now
-    result = functionBody1(node.child(1))
+    result = blockExpr(node.child(1))
 
     # pop frame and restore scope
     @fp = @fp.dynamicLink
     @scope = saveScope
-
-    result
-  end
-
-  def functionBody1 (node)
-    @logger.debug("functionBody1")
-
-    # Assume there is just an expression
-    result = blockExpr(node.child)
 
     result
   end

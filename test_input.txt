@@ -20,6 +20,9 @@ val x = myfun(1);
 
 print x;
 
+// lambda function
+//val y = fun (x) => x + 1;
+
 //{
 //  var c = 100;
 //  {

@@ -148,14 +148,14 @@ class Parser
     end
     match(')')
     match('=')
-    # Function body might just contain an expression
-    # Unike a variable declaration or block expression, the function body does
-    # not get evaluated when it is seen. A function object is created and bound
-    # to the name (or associated slot within a stack frame) at run time. In a
-    # function call, this function object will then be called. The function
-    # object must have a link to the AST nodes that will be executed. This is
-    # its "value", just as an integer might have a value of 1, 2, 3, etc.
-    n.addChild(functionBody)
+    if nextToken.kind == '{'
+      n.addChild(blockExpr)
+    else
+      # Manually insert a block node
+      p = Node.new(:BLOCK_EXPR)
+      p.addChild(blockElement)
+      n.addChild(p)
+    end
     n
   end
 
@@ -174,20 +174,6 @@ class Parser
     @logger.debug("parameter")
     n = Node.new(:PARAMETER)
     n.addChild(identifier)
-    n
-  end
-  
-  def functionBody ()
-    @logger.debug("functionBody")
-    n = Node.new(:FUNCTION_BODY)
-    if nextToken.kind == '{'
-      n.addChild(blockExpr)
-    else
-      # Manually insert a block node
-      p = Node.new(:BLOCK_EXPR)
-      p.addChild(blockElement)
-      n.addChild(p)
-    end
     n
   end
 

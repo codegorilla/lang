@@ -85,21 +85,15 @@ class ScopeBuilder
     @logger.debug("function")
     # Push a new scope
     @scope = Scope.new(@scope)
-    # Parameters are the only thing that will appear in this scope
-    # This scope will be the parent scope for the enclosed block's scope
+    # Scope needs to be attached to the function, not the declaration, because
+    # the interpreter will jump to the function, not the declaration!
+    node.setAttribute("scope", @scope)
+
+    # Parameters are the only thing that will appear in this scope, which is the
+    # parent scope for the enclosed block's scope
     parameters(node.child(0))
 
-    # I think the scope needs to be attached to the function body, or "lambda"
-    # Not at the declaration, because the interpreter will jump to the lambda,
-    # not the declaration!
-    # This can be handled by passing the scope into the functionBody, or by
-    # setting the annotation from up here. If the functionBody tried to create
-    # the scope then it would have to reach back to the declaration in order to
-    # get parameters, but there is no parent link in the AST design.
-    node.setAttribute("scope", @scope)
-    #node.child(1).setAttribute("scope", @scope)
-
-    functionBody(node.child(1))
+    blockExpr(node.child(1))
     # Pop the scope
     @scope = @scope.link
   end
@@ -117,13 +111,6 @@ class ScopeBuilder
     # no need to look it up first, unless to detect if someone does
     #def f (x, x)...
     @scope.define(identifierNode.text)
-  end
-
-  def functionBody (node)
-    @logger.debug("functionBody")
-    # This will always be a block because if the function consisted of a single
-    # statement, then a block node was inserted automatically during the parse.
-    blockExpr(node.child)
   end
 
   # ********** Statements **********
