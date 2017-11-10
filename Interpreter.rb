@@ -119,25 +119,28 @@ class Interpreter
     @logger.debug("functionDecl")
     # fun
     #   identifier
-    #   params?
-    #     param1
-    #     param2
-    #   body
-    #     block
+    #   function
+    #     params?
+    #       param1
+    #       param2
+    #     body
+    #       block
     # Is there anything to do here? Create a function object and assign it to
     # the proper slot in the currently executing frame
     identifierNode = node.child(0)
+    index = @scope.lookup(identifierNode.text)
+    @fp.store(index, function(node.child(1)))
+  end
 
-    # Somehow parameters need to become part of function object?
-    # They shouldn't get processed until function call time
+  def function (node)
+    @logger.debug("function")
+    # Parameters don't get processed until function call time
     # At that point arguments would get bound to parameters
-    # The names are already in the symbol table, so I don't think we need to
+    # The names are already in the symbol table, so we might not even need to
     # descend into these nodes during execution time
     #parameters(node.child(1))
 
-    index = @scope.lookup(identifierNode.text)
-    puts "Index is #{index}."
-    @fp.store(index, functionBody(node.child(2)))
+    result = TauObject.new($Function, node)
   end
 
   def parameters (node)
@@ -146,14 +149,14 @@ class Interpreter
       parameter(n)
     end
   end
-  
+
   def parameter (node)
     @logger.debug("parameter")
     # Each one of these needs to be processed
   end
   
-  def functionBody (node)
-    @logger.debug("parameter")
+  #def functionBody (node)
+  #  @logger.debug("functionBody")
     # Create a function object and return it
     # Later on, lambda expressions will also create function objects
     # But lambda expressions will be expressions, not declarations
@@ -162,8 +165,8 @@ class Interpreter
     # In a VM, it would probably be a basic block.
     # It might even need to be more than that, because it needs to take into
     # account parameters as well. For now just assume no parameters.
-    result = TauObject.new($Function, node)
-  end
+  #  result = TauObject.new($Function, node)
+  #end
 
   # Theory of operation for functions vs. methods:
   # x = cos # returns function object
@@ -244,8 +247,8 @@ class Interpreter
       result = ifExpr(node)
     when :FUNCTION_CALL
       result = functionCall(node)
-    when :IDENTIFIER
-      result = identifier(node)
+    when :NAME
+      result = name(node)
     when :BLOCK_EXPR
       result = blockExpr(node)
     when :NULL_LITERAL
@@ -274,7 +277,7 @@ class Interpreter
     @logger.debug("assignmentExpr")
     # This works because assignment is right associative
     # Might need to revisit once names become more complex (e.g. x.f[0])
-    identifierNode = node.leftChild
+    nameNode = node.leftChild
     b = expr(node.rightChild)
     op = node.text
     d = case op
@@ -284,23 +287,23 @@ class Interpreter
         # can this be done at compile time?
         fp = @fp
         scope = @scope
-        index = scope.lookup(identifierNode.text)
+        index = scope.lookup(nameNode.text)
     
         # probably want while scope != global
         while !index && scope.link != nil
           fp = fp.staticLink
           scope = scope.link
-          index = scope.lookup(identifierNode.text)
+          index = scope.lookup(nameNode.text)
         end
         if index != nil
           result = fp.load(index)
           fp.store(index, b)
         else
-          raise "Undefined variable '#{identifierNode.text}'"
+          raise "Undefined variable '#{nameNode.text}'"
         end
       when '+='
         # Compute id + b
-        a = expr(identifierNode)
+        a = expr(nameNode)
         classObj = a.type
         if classObj == nil
           # Throw exception
@@ -308,20 +311,20 @@ class Interpreter
         c = classObj.getMember('add').call(a, b)
         fp = @fp
         scope = @scope
-        index = scope.lookup(identifierNode.text)
+        index = scope.lookup(nameNode.text)
     
         # probably want while scope != global
         #while !index
         if !index
           fp = fp.staticLink
           scope = scope.link
-          index = scope.lookup(identifierNode.text)
+          index = scope.lookup(nameNode.text)
         end
         result = fp.load(index)
         fp.store(index, c)
       when '-='
         # Compute id - b
-        a = expr(identifierNode)
+        a = expr(nameNode)
         classObj = a.type
         if classObj == nil
           # Throw exception
@@ -329,20 +332,20 @@ class Interpreter
         c = classObj.getMember('sub').call(a, b)
         fp = @fp
         scope = @scope
-        index = scope.lookup(identifierNode.text)
+        index = scope.lookup(nameNode.text)
     
         # probably want while scope != global
         #while !index
         if !index
           fp = fp.staticLink
           scope = scope.link
-          index = scope.lookup(identifierNode.text)
+          index = scope.lookup(nameNode.text)
         end
         result = fp.load(index)
         fp.store(index, c)
       when '*='
         # Compute id * b
-        a = expr(identifierNode)
+        a = expr(nameNode)
         classObj = a.type
         if classObj == nil
           # Throw exception
@@ -350,20 +353,20 @@ class Interpreter
         c = classObj.getMember('mul').call(a, b)
         fp = @fp
         scope = @scope
-        index = scope.lookup(identifierNode.text)
+        index = scope.lookup(nameNode.text)
     
         # probably want while scope != global
         #while !index
         if !index
           fp = fp.staticLink
           scope = scope.link
-          index = scope.lookup(identifierNode.text)
+          index = scope.lookup(nameNode.text)
         end
         result = fp.load(index)
         fp.store(index, c)
       when '/='
         # Compute id / b
-        a = expr(identifierNode)
+        a = expr(nameNode)
         classObj = a.type
         if classObj == nil
           # Throw exception
@@ -371,14 +374,14 @@ class Interpreter
         c = classObj.getMember('div').call(a, b)
         fp = @fp
         scope = @scope
-        index = scope.lookup(identifierNode.text)
+        index = scope.lookup(nameNode.text)
     
         # probably want while scope != global
         #while !index
         if !index
           fp = fp.staticLink
           scope = scope.link
-          index = scope.lookup(identifierNode.text)
+          index = scope.lookup(nameNode.text)
         end
         result = fp.load(index)
         fp.store(index, c)
@@ -606,14 +609,14 @@ class Interpreter
     # The function call should cause a jump to the location of the code
     # followed by a return to here
     jumpNode = lhs.value
-    # puts "The value is #{jumpNode}."
+    #puts "The value is #{jumpNode}."
     # jump to the location
-    result = functionBody1(jumpNode)
+    result = function1(jumpNode)
     # return here
   end
 
-  def functionBody1 (node)
-    @logger.debug("functionBody1")
+  def function1 (node)
+    @logger.debug("function1")
     # Fetch the scope attribute stored in the node
     # In Parr's book, the function actually has a scope outside of the block
     # that contains code for the function. The function scope holds the
@@ -630,8 +633,8 @@ class Interpreter
     f = Frame.new(@fp, @fp)
     @fp = f
 
-    # Assume there is just an expression
-    result = blockExpr(node.child)
+    # child(0) is parameters -- ignored for now
+    result = functionBody1(node.child(1))
 
     # pop frame and restore scope
     @fp = @fp.dynamicLink
@@ -640,8 +643,17 @@ class Interpreter
     result
   end
 
-  def identifier (node)
-    @logger.debug("identifier")
+  def functionBody1 (node)
+    @logger.debug("functionBody1")
+
+    # Assume there is just an expression
+    result = blockExpr(node.child)
+
+    result
+  end
+
+  def name (node)
+    @logger.debug("name")
     # Look up the index in the current scope and use it to load from local table
     scope = @scope
     fp = @fp

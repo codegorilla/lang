@@ -3,6 +3,7 @@
 var a = 1;
 
 var b = 81;
+print b;
 
 def myfun (x, y) = {
   10 + 2;
@@ -16,7 +17,6 @@ def myfun (x, y) = {
 
 val x = myfun(1);
 
-print b;
 
 print x;
 

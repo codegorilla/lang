@@ -132,6 +132,13 @@ class Parser
     n = Node.new(:FUNCTION_DECL)
     match('def')
     n.addChild(identifier)
+    n.addChild(function)
+    n
+  end
+  
+  def function ()
+    @logger.debug("function")
+    n = Node.new(:FUNCTION)
     match('(')
     if nextToken.kind == :ID
       n.addChild(parameters)
@@ -199,7 +206,17 @@ class Parser
     match('{')
     match('}')
   end
-  
+
+  def identifier ()
+    @logger.debug("identifier")
+    t = nextToken
+    match(:ID)
+    n = Node.new(:IDENTIFIER)
+    n.setLine(t.line)
+    n.setText(t.text)
+    n
+  end
+
   # ********** Statements **********
 
   def statement ()
@@ -560,7 +577,7 @@ class Parser
   def primaryExpr ()
     case nextToken.kind
       when 'if' then ifExpr
-      when :ID then idExpr
+      when :ID then nameExpr
       when '{' then blockExpr
       when '(' then parenthesizedExpr
       else literal
@@ -629,19 +646,19 @@ class Parser
     n
   end
 
-  def idExpr ()
-    @logger.debug("idExpr")
-    n = identifier
+  def nameExpr ()
+    @logger.debug("nameExpr")
+    n = name
     t = nextToken
     if (t.kind == '(' || t.kind == '[' || t.kind == '.')
-      p = idTail(n)
+      p = nameTail(n)
       n = p
     end
     n
   end
 
-  def idTail (node)
-    @logger.debug("idTail")
+  def nameTail (node)
+    @logger.debug("nameTail")
     case nextToken.kind
     when '('
       n = functionCall(node)
@@ -654,7 +671,7 @@ class Parser
     # What is this for?  Is this for chained expressions like x(1)(2)?
     t = nextToken
     if (t.kind == '(' || t.kind == '[' || t.kind == '.')
-      p = idTail(n)
+      p = nameTail(n)
       n = p
     end
     n
@@ -717,15 +734,15 @@ class Parser
     n = Node.new(:OBJECT_ACCESS)
     n.addChild(node)
     match('.')
-    n.addChild(identifier)
+    n.addChild(name)
     n
   end
 
-  def identifier ()
-    @logger.debug("identifier")
+  def name ()
+    @logger.debug("name")
     t = nextToken
     match(:ID)
-    n = Node.new(:IDENTIFIER)
+    n = Node.new(:NAME)
     n.setLine(t.line)
     n.setText(t.text)
     n

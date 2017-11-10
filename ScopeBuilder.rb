@@ -53,45 +53,41 @@ class ScopeBuilder
 
   def valueDecl (node)
     @logger.debug("valueDecl")
-    # There should be some way to mark this name as not re-assignable
-    # But that might be something handled by the compiler, not the runtime
-    # Note that names are defined here instead of descending to the name node
-    # function because name nodes may appear in non-definition contexts.
-    identifierNode = node.leftChild
-    name = identifierNode.text
-    if @scope.lookup(name) == nil
-      @scope.define(name)
-    else
-      # Same variable declared multiple times within scope is error.
-      @plog.error("Multiple declarations of symbol '#{name}'.", identifierNode.line)
-    end
-    # Need to descend into expression because it may contain a block
+    # There should be some way to mark the variable as final
+    identifier(node.leftChild)
     expression(node.rightChild)
   end
-  
+
   def variableDecl (node)
     @logger.debug("variableDecl")
-    identifierNode = node.leftChild
-    name = identifierNode.text
+    identifier(node.leftChild)
+    expression(node.rightChild)
+  end
+
+  def identifier (node)
+    name = node.text
     if @scope.lookup(name) == nil
       @scope.define(name)
     else
       # Same variable declared multiple times within scope is error.
-      @plog.error("Multiple declarations of symbol '#{name}'.", identifierNode.line)
+      @plog.error("Multiple declarations of symbol '#{name}'.", node.line)
     end
-    # Need to descend into expression because it may contain a block
-    expression(node.rightChild)
   end
-  
+
   def functionDecl (node)
     @logger.debug("functionDecl")
     identifierNode = node.child(0)
     @scope.define(identifierNode.text)
+    function(node.child(1))
+  end
+
+  def function (node)
+    @logger.debug("function")
     # Push a new scope
     @scope = Scope.new(@scope)
     # Parameters are the only thing that will appear in this scope
     # This scope will be the parent scope for the enclosed block's scope
-    parameters(node.child(1))
+    parameters(node.child(0))
 
     # I think the scope needs to be attached to the function body, or "lambda"
     # Not at the declaration, because the interpreter will jump to the lambda,
@@ -100,10 +96,10 @@ class ScopeBuilder
     # setting the annotation from up here. If the functionBody tried to create
     # the scope then it would have to reach back to the declaration in order to
     # get parameters, but there is no parent link in the AST design.
-    node.child(2).setAttribute("scope", @scope)
+    node.setAttribute("scope", @scope)
+    #node.child(1).setAttribute("scope", @scope)
 
-
-    functionBody(node.child(2))
+    functionBody(node.child(1))
     # Pop the scope
     @scope = @scope.link
   end
@@ -179,7 +175,7 @@ class ScopeBuilder
     when :BINARY_EXPR then binaryExpr(node)
     when :IF_EXPR then ifExpr(node)
     when :BLOCK_EXPR then blockExpr(node)
-    when :IDENTIFIER then identifier(node)
+    when :NAME then name(node)
     when :EXPRESSION then expression(node)
     end
   end
@@ -235,7 +231,7 @@ class ScopeBuilder
     lhs = node.leftChild
     rhs = node.rightChild
     # got rid of identifier method because it is not needed for symbol definition?
-    identifier(lhs)
+    name(lhs)
     expression(rhs)
     inst = Instruction.new(:SUBSCRIPT)
     add(inst)
@@ -244,8 +240,8 @@ class ScopeBuilder
   def objectAccess (node)
     lhs = node.leftChild
     rhs = node.rightChild
-    identifier(lhs)
-    identifier(rhs)
+    name(lhs)
+    name(rhs)
     inst = Instruction.new(:GET)
     add(inst)
   end
@@ -270,8 +266,8 @@ class ScopeBuilder
     expr(node.rightChild)
   end
 
-  def identifier (node)
+  def name (node)
+    # Might not even be required?
   end
-  
-end #class
 
+end #class
