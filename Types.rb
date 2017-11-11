@@ -9,7 +9,7 @@ $Int = TauObject.new($Class)
 $Float = TauObject.new($Class)
 
 $String = TauObject.new($Class)
-
+$Array = TauObject.new($Class)
 # Function objects might need more work, different one based on number of
 # parameters
 # $Function1, $Function2, etc...

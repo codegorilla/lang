@@ -36,6 +36,10 @@ class Interpreter
     sfact = StringFactory.new
     sfact.make
 
+    # The ARRAY class represents arrays
+    afact = ArrayFactory.new
+    afact.make
+
     # The FUNCTION class represents functions
     fnfact = FunctionFactory.new
     fnfact.make
@@ -226,41 +230,27 @@ class Interpreter
 
   def expr (node)
     @logger.debug("expr")
-    result = nil
-    case node.kind
-    when :ASSIGNMENT_EXPR
-      result = assignmentExpr(node)
-    when :BINARY_EXPR
-      result = binaryExpr(node)
-    when :UNARY_EXPR
-      result = unaryExpr(node)
-    when :IF_EXPR
-      result = ifExpr(node)
-    when :FUNCTION_CALL
-      result = functionCall(node)
-    when :NAME
-      result = name(node)
-    when :BLOCK_EXPR
-      result = blockExpr(node)
-    when :NULL_LITERAL
-      result = nullLiteral(node)
-    when :UNIT_LITERAL
-      result = unitLiteral(node)
-    when :BOOLEAN_LITERAL
-      result = booleanLiteral(node)
-    when :INTEGER_LITERAL
-      result = integerLiteral(node)
-    when :FLOAT_LITERAL
-      result = floatLiteral(node)
-    when :IMAGINARY_LITERAL
-      result = imaginaryLiteral(node)
-    when :STRING_LITERAL
-      result = stringLiteral(node)
-    when :EXPRESSION
-      result = expression(node)
-    else
-      puts "Something else!"
-    end
+    result =
+      case node.kind
+        when :ASSIGNMENT_EXPR then assignmentExpr(node)
+        when :BINARY_EXPR then binaryExpr(node)
+        when :UNARY_EXPR then unaryExpr(node)
+        when :IF_EXPR then ifExpr(node)
+        when :FUNCTION_CALL then functionCall(node)
+        when :NAME then name(node)
+        when :BLOCK_EXPR then blockExpr(node)
+        when :NULL_LITERAL then nullLiteral(node)
+        when :UNIT_LITERAL then unitLiteral(node)
+        when :BOOLEAN_LITERAL then booleanLiteral(node)
+        when :INTEGER_LITERAL then integerLiteral(node)
+        when :FLOAT_LITERAL then floatLiteral(node)
+        when :IMAGINARY_LITERAL then imaginaryLiteral(node)
+        when :STRING_LITERAL then stringLiteral(node)
+        when :ARRAY_LITERAL then arrayLiteral(node)
+        when :EXPRESSION then expression(node)
+      else
+        puts "interp (expr): Something else!"
+      end
     result
   end
 
@@ -700,6 +690,12 @@ class Interpreter
   def stringLiteral (node)
     @logger.debug("stringLiteral")
     TauObject.new($String, node.text)
+  end
+
+  def arrayLiteral (node)
+    @logger.debug("arrayLiteral")
+    # temporary dummy array
+    TauObject.new($Array, [1, 2, 3])
   end
 
 end # class
