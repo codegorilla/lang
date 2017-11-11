@@ -592,34 +592,23 @@ class Interpreter
     functionObj = expr(node.leftChild)
     
     # evaluate the right side, e.g. argument list
-    # the goal is to bind each argument to its associated parameter
-    # the scope would need to be accessible from here
-    # the scope is attached to the node associated with the function object
-    # do something here!
-    scopeNeeded = functionObj.value.getAttribute("scope")
-    # puts scopeNeeded.symbols.table
-    argumentsNode = node.rightChild
-    count = argumentsNode.count
-    # puts count
+    # As part of the calling sequence, these arguments must be passed in to
+    # function1.
     # At some point need to enforce numArgs == numParams
     # for now don't worry about it
-    # evaluate first argument
-    arg1 = argumentsNode.child(0)
-    arg1Obj = expression(arg1)
-    # puts arg1Obj.value
-    # The first parameter needs to be bound to the first argument
-    # That is done in the frame, which has not yet been constructed
-    # So, as part of the calling sequence, these arguments must be passed in to
-    # function1.
+    args = []
+    argumentsNode = node.rightChild
+    argumentsNode.children.each do |n|
+      argObj = expression(n)
+      args.push(argObj)
+    end
 
     # The function call should cause a jump to the location of the code
-    # followed by a return to here
     jumpNode = functionObj.value
-    #puts "The value is #{jumpNode}."
-    result = function1(jumpNode, arg1Obj)
+    result = function1(jumpNode, args)
   end
 
-  def function1 (node, arg)
+  def function1 (node, args)
     @logger.debug("function1")
     # Fetch the scope attribute stored in the node
     # In Parr's book, the function actually has a scope outside of the block
@@ -628,24 +617,22 @@ class Interpreter
     saveScope = @scope
     @scope = node.getAttribute("scope")
 
-    # Test what is in the scope
-    #puts @scope.symbols.table
-
     # Push new frame
     # For blocks, the dynamic and static links are the same
     # For functions, they are NOT the same, so this needs to be fixed.
     f = Frame.new(@fp, @fp)
     @fp = f
 
-    # for each parameter, bind it to the corresponding argument
-    parametersNode = node.child(0)
-    paramNode = parametersNode.child(0)
-    idNode = paramNode.child
-    # get the index from the scope
-    index = @scope.lookup(idNode.text)
-    @fp.store(index, arg)
+    # bind parameters to arguments
+    parametersNode = node.leftChild
+    parametersNode.count.times do |i|
+      parameterNode = parametersNode.child(i)
+      idNode = parameterNode.child
+      index = @scope.lookup(idNode.text)
+      @fp.store(index, args[i])
+    end
 
-    result = blockExpr(node.child(1))
+    result = blockExpr(node.rightChild)
 
     # pop frame and restore scope
     @fp = @fp.dynamicLink

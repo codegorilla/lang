@@ -77,7 +77,7 @@ class Parser
         n.addChild(declaration)
       when 'break', 'continue', 'do', ';', 'for', 'print', 'return', 'while'
         n.addChild(statement)
-      when 'if', :ID, :NULL, :UNIT, :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, :STRING, '(', '[', '{'
+      when 'if', :ID, :NULL, :UNIT, :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, :STRING, '(', '[', '{', 'lambda'
         n.addChild(statement)
       when 'EOF'
         done = true
@@ -564,6 +564,7 @@ class Parser
     case nextToken.kind
       when 'if' then ifExpr
       when :ID then nameExpr
+      when 'lambda' then lambdaExpr
       when '{' then blockExpr
       when '(' then parenthesizedExpr
       else literal
@@ -775,6 +776,31 @@ class Parser
       end
     end
     match(')')
+    n
+  end
+
+  def lambdaExpr ()
+    @logger.debug("lambdaExpr")
+    n = Node.new(:LAMBDA_EXPR)
+    match('lambda')
+    match('(')
+    if nextToken.kind == :ID
+      n.addChild(parameters)
+    else
+      # Add empty parameters node
+      n.addChild(Node.new(:PARAMETERS))
+    end
+    match(')')
+    match('=>')
+
+    if nextToken.kind == '{'
+      n.addChild(blockExpr)
+    else
+      # Manually insert a block node
+      p = Node.new(:BLOCK_EXPR)
+      p.addChild(blockElement)
+      n.addChild(p)
+    end
     n
   end
 

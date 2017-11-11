@@ -2,7 +2,7 @@ require './Token'
 
 class KeywordTable
 
-  # Some pre-defined dummy tokens to clone fronm?
+  # Some pre-defined dummy tokens to clone from?
   BREAK = Token.new('break', "break")
   CLASS = Token.new('class', "class")
   CONTINUE = Token.new('continue', "continue")
@@ -14,6 +14,7 @@ class KeywordTable
   FOR = Token.new('for', "for")
   IF = Token.new('if', "if")
   IMPORT = Token.new('import', "import")
+  LAMBDA = Token.new('lambda', "lambda")
   NEW = Token.new('new', "new")
   NULL = Token.new(:NULL, "null")
   PRINT = Token.new('print', "print")
@@ -49,6 +50,7 @@ class KeywordTable
       'for' => FOR,
       'if' => IF,
       'import' => IMPORT,
+      'lambda' => LAMBDA,
       'new' => NEW,
       'null' => NULL,
       'print' => PRINT,

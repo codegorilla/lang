@@ -65,6 +65,8 @@ class Lexer
   L_SHIFT = '<<'
   R_SHIFT = '>>'
 
+  ARROW = '=>'
+
   # How does this EOF relate to the token EOF?
   EOF = 'EOF'
   ERROR = 'ERROR'
@@ -236,6 +238,10 @@ class Lexer
             consume
             @logger.debug("(Ln #{line}, Col #{column-2}): Found '=='")
             token = makeToken(EQUAL, EQUAL)
+          elsif nextChar == '>'
+            consume
+            @logger.debug("(Ln #{line}, Col #{column-2}): Found '=>'")
+            token = makeToken(ARROW, ARROW)
           else
             @logger.debug("(Ln #{line}, Col #{column-1}): Found '='")
             token = makeToken(EQUALS, EQUALS)
@@ -454,8 +460,8 @@ class Lexer
           # Check if it is a keyword first
           t = @kt.lookup(text)
           token = if t
-          @logger.debug("(Ln #{line}, Col #{start-1}): Found keyword '#{t.text}'")
-          makeToken(t.kind, t.text)
+            @logger.debug("(Ln #{line}, Col #{start-1}): Found keyword '#{t.text}'")
+            makeToken(t.kind, t.text)
           else
             @logger.debug("(Ln #{line}, Col #{start-1}): Found identifier '#{text}'")
             makeToken(:ID, text)
