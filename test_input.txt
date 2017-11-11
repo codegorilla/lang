@@ -1,7 +1,13 @@
 // Test file
 
-var s = [1, 2, 3, 4, 5];
+var s = [1, 2.1, 3, 4, 5];
+//var s = [];
 print s;
+
+var t0 = "hello";
+var t1 = " world!";
+
+print t0 + t1;
 
 var a = 1;
 

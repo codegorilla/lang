@@ -694,8 +694,20 @@ class Interpreter
 
   def arrayLiteral (node)
     @logger.debug("arrayLiteral")
+    # Need to evaluate each element to produce an array of objects
+    if node.count == 1
+      arrayElements(node.child)
+    end
     # temporary dummy array
-    TauObject.new($Array, [1, 2, 3])
+    TauObject.new($Array, [])
+  end
+
+  def arrayElements (node)
+    node.children.each do |n|
+      # Left off here 10 Nov 2017 working on arrays
+      obj = expression(n)
+      puts obj.value
+    end
   end
 
 end # class
