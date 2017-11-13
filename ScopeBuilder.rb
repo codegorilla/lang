@@ -122,6 +122,11 @@ class ScopeBuilder
 
   def printStmt (node)
     @logger.debug("printStmt")
+    printExpr(node.child)
+  end
+
+  def printExpr (node)
+    @logger.debug("printExpr")
     expression(node.child)
   end
 

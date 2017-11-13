@@ -94,3 +94,12 @@ end
 def chain ()
   @chain
 end
+
+filename = ARGV[0]
+
+if filename
+  main(filename)
+else
+  main
+end
+

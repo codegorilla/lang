@@ -191,9 +191,16 @@ class Interpreter
 
   def printStmt (node)
     @logger.debug("printStmt")
+    printExpr(node.child)
+    # Testing idea of statements evaluating to unit -- drop this return at
+    # some point because "statements" shouldn't evaluate to anything
+    $unit
+  end
+
+  def printExpr (node)
+    @logger.debug("printExpr")
     result = expression(node.child)
     puts result.value
-    # Testing idea of statements evaluating to unit
     $unit
   end
 

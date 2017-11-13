@@ -298,9 +298,16 @@ class Parser
   def printStmt ()
     @logger.debug("printStmt")
     n = Node.new(:PRINT_STMT)
+    n.addChild(printExpr)
+    match(';')
+    n
+  end
+
+  def printExpr ()
+    @logger.debug("printExpr")
+    n = Node.new(:PRINT_EXPR)
     match('print')
     n.addChild(expression)
-    match(';')
     n
   end
 
