@@ -171,59 +171,12 @@ class Interpreter
 
   # Statements
 
-  def breakStmt (node)
-    @logger.debug("breakStmt")
-    # Strategy (not sure if this will work)
-    # Only valid inside a blockExpr, and more specifically a loop
-    # Set some kind of flag that gets read before proceeding to next blockElement
-    # If the flag is set, then "return" from the blockExpr immediately
-    # This does seem to work after all!
-    @breakFlag = true
-  end
-
   def expressionStmt (node)
     @logger.debug("expressionStmt")
     # At global level this should assign to implicit variable 'ans'
     # At local level the result can be thrown away
     # Since the result is thrown away, then optimizer can eliminate the code
     result = expression(node.child)
-  end
-
-  def printStmt (node)
-    @logger.debug("printStmt")
-    printExpr(node.child)
-    # Testing idea of statements evaluating to unit -- drop this return at
-    # some point because "statements" shouldn't evaluate to anything
-    $unit
-  end
-
-  def printExpr (node)
-    @logger.debug("printExpr")
-    result = expression(node.child)
-    puts result.value
-    $unit
-  end
-
-  def returnStmt (node)
-    @logger.debug("returnStmt")
-    # TODO: Needs implementation
-    puts "RETURN STATEMENT NEEDS IMPLEMENTATION"
-  end
-
-  def whileStmt (node)
-    @logger.debug("whileStmt")
-    condition = expression(node.leftChild)
-    # Condition could be of any type, need to convert it to a Bool
-    # If it is already known to be a Bool, then might be able to optimize
-    result = $Bool.getMember('equ').call($true, condition)
-    while result.value == true
-      breakCheck = blockExpr(node.rightChild)
-      # Very ugly, but this is just a test
-      if breakCheck == nil then break end
-      # Re-evaluate condition
-      condition = expression(node.leftChild)
-      result = $Bool.getMember('equ').call($true, condition)
-    end
   end
 
   # Expressions
@@ -239,6 +192,10 @@ class Interpreter
     @logger.debug("expr")
     result =
       case node.kind
+        when :BREAK_EXPR then breakExpr(node)
+        when :PRINT_EXPR then printExpr(node)
+        when :RETURN_EXPR then returnExpr(node)
+        when :WHILE_EXPR then whileExpr(node)
         when :ASSIGNMENT_EXPR then assignmentExpr(node)
         when :BINARY_EXPR then binaryExpr(node)
         when :UNARY_EXPR then unaryExpr(node)
@@ -259,6 +216,45 @@ class Interpreter
         puts "interp (expr): Something else!"
       end
     result
+  end
+
+  def breakExpr (node)
+    @logger.debug("breakExpr")
+    # Strategy (not sure if this will work)
+    # Only valid inside a blockExpr, and more specifically a loop
+    # Set some kind of flag that gets read before proceeding to next blockElement
+    # If the flag is set, then "return" from the blockExpr immediately
+    # This does seem to work after all!
+    @breakFlag = true
+  end
+
+  def printExpr (node)
+    @logger.debug("printExpr")
+    result = expression(node.child)
+    puts result.value
+    $unit
+  end
+
+  def returnExpr (node)
+    @logger.debug("returnExpr")
+    # TODO: Needs implementation
+    puts "RETURN STATEMENT NEEDS IMPLEMENTATION"
+  end
+
+  def whileExpr (node)
+    @logger.debug("whileExpr")
+    condition = expression(node.leftChild)
+    # Condition could be of any type, need to convert it to a Bool
+    # If it is already known to be a Bool, then might be able to optimize
+    result = $Bool.getMember('equ').call($true, condition)
+    while result.value == true
+      breakCheck = blockExpr(node.rightChild)
+      # Very ugly, but this is just a test
+      if breakCheck == nil then break end
+      # Re-evaluate condition
+      condition = expression(node.leftChild)
+      result = $Bool.getMember('equ').call($true, condition)
+    end
   end
 
   def assignmentExpr(node)

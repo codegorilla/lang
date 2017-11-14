@@ -9,24 +9,24 @@ var t1 = " world!";
 
 print t0 + t1;
 
-var a = 1;
+//var a = 1;
 
-var b = 81;
-print b;
+//var b = 81;
+//print b;
 
-def celsiusToFarenheit (x) = {
-  x * 1.8 + 32;
-};
+//def celsiusToFarenheit (x) = {
+//  x * 1.8 + 32;
+//};
 
-val x = celsiusToFarenheit(34);
-print x;
+//val x = celsiusToFarenheit(34);
+//print x;
 
-def add2 (x, y) = {
-  x + y;
-};
+//def add2 (x, y) = {
+//  x + y;
+//};
 
-val k = add2(300, 65);
-print k;
+//val k = add2(300, 65);
+//print k;
 
 // lambda function
 // var fn = lambda (x) => x + 1;;

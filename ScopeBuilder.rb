@@ -43,9 +43,6 @@ class ScopeBuilder
       when :VARIABLE_DECL then variableDecl(n)
       when :FUNCTION_DECL then functionDecl(n)
       when :EXPRESSION_STMT then expressionStmt(n)
-      when :PRINT_STMT then printStmt(n)
-      when :RETURN_STMT then returnStmt(n)
-      when :WHILE_STMT then whileStmt(n)
       end
     end
     node.setAttribute("scope", @scope)
@@ -120,34 +117,6 @@ class ScopeBuilder
     expression(node.child)
   end
 
-  def printStmt (node)
-    @logger.debug("printStmt")
-    printExpr(node.child)
-  end
-
-  def printExpr (node)
-    @logger.debug("printExpr")
-    expression(node.child)
-  end
-
-  def returnStmt (node)
-    @logger.debug("returnStmt")
-    expression(node.child)
-  end
-
-  def whileStmt (node)
-    @logger.debug("whileStmt")
-    expression(node.leftChild)
-    n = node.rightChild
-    # This should always be a block, so we should be able to
-    # get rid of the if-statement
-    if n.kind == :BLOCK_EXPR
-      blockExpr(n)
-    else
-      blockElement(n)
-    end
-  end
-
   # ********** Expressions **********
 
   def expression (node)
@@ -159,6 +128,10 @@ class ScopeBuilder
   def expr (node)
     @logger.debug('expr')
     case node.kind
+    when :PRINT_EXPR then printExpr(node)
+    when :RETURN_EXPR then returnExpr(node)
+    when :WHILE_EXPR then whileExpr(node)
+    
     when :FUNCTION_CALL then functionCall(node)
     when :ARRAY_ACCESS then arrayAccess(node)
     when :OBJECT_ACCESS then objectAccess(node)
@@ -169,6 +142,29 @@ class ScopeBuilder
     when :BLOCK_EXPR then blockExpr(node)
     when :NAME then name(node)
     when :EXPRESSION then expression(node)
+    end
+  end
+
+  def printExpr (node)
+    @logger.debug("printExpr")
+    expression(node.child)
+  end
+
+  def returnExpr (node)
+    @logger.debug("returnExpr")
+    expression(node.child)
+  end
+
+  def whileExpr (node)
+    @logger.debug("whileExpr")
+    expression(node.leftChild)
+    n = node.rightChild
+    # This should always be a block, so we should be able to
+    # get rid of the if-statement
+    if n.kind == :BLOCK_EXPR
+      blockExpr(n)
+    else
+      blockElement(n)
     end
   end
 

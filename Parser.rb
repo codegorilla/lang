@@ -206,50 +206,11 @@ class Parser
   # ********** Statements **********
 
   def statement ()
-    case nextToken.kind
-    when 'break' then breakStmt
-    when 'continue' then continueStmt
-    when 'do' then doStmt
-    when ';' then emptyStmt
-    when 'for' then forStmt
-    when 'print' then printStmt
-    when 'return' then returnStmt
-    when 'while' then whileStmt
+    if nextToken.kind == ';' then
+      emptyStmt
     else
       expressionStmt
     end
-  end
-
-  def breakStmt ()
-    @logger.debug("breakStmt")
-    n = Node.new(:BREAK_STMT)
-    match('break')
-    match(';')
-    n
-  end
-
-  def continueStmt ()
-    @logger.debug("continueStmt")
-    n = Node.new(:CONTINUE_STMT)
-    match('continue')
-    match(';')
-    n
-  end
-
-  def doStmt ()
-    @logger.debug("doStmt")
-    n = Node.new(:DO_STMT)
-    match('do')
-    match('(')
-    n.addChild(expression)
-    match(')')
-    if nextToken.kind == '{'
-      n.addChild(blockExpr)
-    else
-      # probably need to manually add a block node
-      n.addChild(statement)
-    end
-    n
   end
 
   def emptyStmt ()
@@ -258,74 +219,6 @@ class Parser
     # I don't think so, unless all statements need to evaluate to something
     n = Node.new(:EMPTY_STMT)
     match(';')
-    n
-  end
-  
-  def forStmt ()
-    @logger.debug("forStmt")
-    n = Node.new(:FOR_STMT)
-    match('for')
-    match('(')
-    # Need to parse "(i in 0..10)" format
-    n.addChild(expression)
-    match(')')
-    if nextToken.kind == '{'
-      n.addChild(blockExpr)
-    else
-      n.addChild(statement)
-    end
-    n
-  end
-
-  def returnStmt ()
-    @logger.debug("returnStmt")
-    n = Node.new(:RETURN_STMT)
-    match('return')
-    if nextToken.kind == ';'
-      # Return unit implicitly
-      # Might want to add debug logging here
-      p = Node.new(:EXPRESSION)
-      q = Node.new(:UNIT_LITERAL)
-      p.addChild(q)
-      n.addChild(p)
-    else
-      n.addChild(expression)
-    end
-    match(';')
-    n
-  end
-
-  def printStmt ()
-    @logger.debug("printStmt")
-    n = Node.new(:PRINT_STMT)
-    n.addChild(printExpr)
-    match(';')
-    n
-  end
-
-  def printExpr ()
-    @logger.debug("printExpr")
-    n = Node.new(:PRINT_EXPR)
-    match('print')
-    n.addChild(expression)
-    n
-  end
-
-  def whileStmt ()
-    @logger.debug("whileStmt")
-    n = Node.new(:WHILE_STMT)
-    match('while')
-    match('(')
-    n.addChild(expression)
-    match(')')
-    if nextToken.kind == '{'
-      n.addChild(blockExpr)
-    else
-      # Manually insert a block node
-      p = Node.new(:BLOCK_EXPR)
-      p.addChild(blockElement)
-      n.addChild(p)
-    end
     n
   end
 
@@ -342,10 +235,112 @@ class Parser
   def expression ()
     @logger.debug("expression")
     n = Node.new(:EXPRESSION)
-    n.addChild(assignmentExpr)
+    p =
+      case nextToken.kind
+      when 'break' then breakExpr
+      when 'continue' then continueExpr
+      when 'do' then doExpr
+      when 'for' then forExpr
+      when 'print' then printExpr
+      when 'return' then returnExpr
+      when 'while' then whileExpr
+      else
+        assignmentExpr
+      end
+    n.addChild(p)
     n
   end
-  
+
+  def breakExpr ()
+    @logger.debug("breakExpr")
+    n = Node.new(:BREAK_EXPR)
+    match('break')
+    n
+  end
+
+  def continueExpr ()
+    @logger.debug("continueExpr")
+    n = Node.new(:CONTINUE_EXPR)
+    match('continue')
+    n
+  end
+
+  def doExpr ()
+    @logger.debug("doExpr")
+    n = Node.new(:DO_EXPR)
+    match('do')
+    match('(')
+    n.addChild(expression)
+    match(')')
+    if nextToken.kind == '{'
+      n.addChild(blockExpr)
+    else
+      # probably need to manually add a block node
+      n.addChild(statement)
+    end
+    n
+  end
+
+  def forExpr ()
+    @logger.debug("forExpr")
+    n = Node.new(:FOR_EXPR)
+    match('for')
+    match('(')
+    # Need to parse "(i in 0..10)" format
+    n.addChild(expression)
+    match(')')
+    if nextToken.kind == '{'
+      n.addChild(blockExpr)
+    else
+      n.addChild(statement)
+    end
+    n
+  end
+
+  def printExpr ()
+    @logger.debug("printExpr")
+    n = Node.new(:PRINT_EXPR)
+    match('print')
+    n.addChild(expression)
+    n
+  end
+
+  def returnExpr ()
+    @logger.debug("returnExpr")
+    n = Node.new(:RETURN_EXPR)
+    match('return')
+    if nextToken.kind == ';'
+      # Return unit implicitly
+      # Might want to add debug logging here
+      p = Node.new(:EXPRESSION)
+      q = Node.new(:UNIT_LITERAL)
+      p.addChild(q)
+      n.addChild(p)
+    else
+      n.addChild(expression)
+    end
+    match(';')
+    n
+  end
+
+  def whileExpr ()
+    @logger.debug("whileExpr")
+    n = Node.new(:WHILE_EXPR)
+    match('while')
+    match('(')
+    n.addChild(expression)
+    match(')')
+    if nextToken.kind == '{'
+      n.addChild(blockExpr)
+    else
+      # Manually insert a block node
+      p = Node.new(:BLOCK_EXPR)
+      p.addChild(blockElement)
+      n.addChild(p)
+    end
+    n
+  end
+
   def assignmentExpr ()
     # Might need to limit this to lvalues
     # This is written to be right-associative
