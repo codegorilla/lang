@@ -92,7 +92,7 @@ class Parser
     n    
   end
 
-  # ********** Declarations **********
+  # DECLARATIONS
 
   def declaration ()
     case nextToken.kind
@@ -185,7 +185,7 @@ class Parser
     n.addChild(classBody)
     n
   end
-  
+
   def classBody ()
     @logger.debug("classBody")
     n = Node.new(:CLASS_BODY)
@@ -203,35 +203,24 @@ class Parser
     n
   end
 
-  # ********** Statements **********
+  # STATEMENTS
 
   def statement ()
+    @logger.debug("statement")
+    n = Node.new(:STATEMENT)
     if nextToken.kind == ';' then
-      emptyStmt
+      # Equivalent to '();', otherwise known as an empty statement or "no-op"
+      p = Node.new(:EXPRESSION)
+      p.addChild(Node.new(:UNIT))
+      n.addChild(p)
     else
-      expressionStmt
+      n.addChild(expression)
     end
-  end
-
-  def emptyStmt ()
-    @logger.debug("emptyStmt")
-    # ultimately, should this evaluate to ()? e.g. equivalent to ();
-    # I don't think so, unless all statements need to evaluate to something
-    n = Node.new(:EMPTY_STMT)
-    match(';')
     n
   end
 
-  def expressionStmt ()
-    @logger.debug("expressionStmt")
-    n = Node.new(:EXPRESSION_STMT)
-    n.addChild(expression)
-    match(';')
-    n
-  end
+  # EXPRESSIONS
 
-  # ********** Expressions **********
-  
   def expression ()
     @logger.debug("expression")
     n = Node.new(:EXPRESSION)
