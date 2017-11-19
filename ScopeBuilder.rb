@@ -42,11 +42,13 @@ class ScopeBuilder
       when :VALUE_DECL then valueDecl(n)
       when :VARIABLE_DECL then variableDecl(n)
       when :FUNCTION_DECL then functionDecl(n)
-      when :EXPRESSION_STMT then expressionStmt(n)
+      when :STATEMENT then statement(n)
       end
     end
     node.setAttribute("scope", @scope)
   end
+
+  # DECLARATIONS
 
   def valueDecl (node)
     @logger.debug("valueDecl")
@@ -62,6 +64,7 @@ class ScopeBuilder
   end
 
   def identifier (node)
+    @logger.debug("identifier")
     name = node.text
     if @scope.lookup(name) == nil
       @scope.define(name)
@@ -110,14 +113,14 @@ class ScopeBuilder
     @scope.define(identifierNode.text)
   end
 
-  # ********** Statements **********
+  # STATEMENTS
 
-  def expressionStmt (node)
-    @logger.debug("expressionStmt")
+  def statement (node)
+    @logger.debug("statement")
     expression(node.child)
   end
 
-  # ********** Expressions **********
+  # EXPRESSIONS
 
   def expression (node)
     @logger.debug('expression')
@@ -195,9 +198,9 @@ class ScopeBuilder
     case node.kind
     when :VALUE_DECL then valueDecl(node)
     when :VARIABLE_DECL then variableDecl(node)
-    when :EXPRESSION_STMT then expressionStmt(node)
-    when :IF_STMT then ifStmt(node)
-    when :RETURN_STMT then returnStmt(node)
+    when :STATEMENT then statement(node)
+    #when :IF_STMT then ifStmt(node)
+    #when :RETURN_EXPR then returnStmt(node)
     end
   end
 

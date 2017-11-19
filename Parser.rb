@@ -25,6 +25,7 @@ class Parser
     if t.kind == kind
       @tokens.consume
     else
+      puts "error recovery mode!"
       # Error recovery strategy for failures to match:
       # First try single-token deletion
       # If that doesn't work, then declare a mismatch and panic
@@ -151,9 +152,13 @@ class Parser
     if nextToken.kind == '{'
       n.addChild(blockExpr)
     else
-      # Manually insert a block node
+      # Manually insert a block node?
+      # Can't this just be a plain expression?
+      # LEFT OFF 18 NOV 2017 @ 11:21pm
       p = Node.new(:BLOCK_EXPR)
-      p.addChild(blockElement)
+      q = Node.new(:STATEMENT)
+      q.addChild(expression)
+      p.addChild(q)
       n.addChild(p)
     end
     n
@@ -209,12 +214,15 @@ class Parser
     @logger.debug("statement")
     n = Node.new(:STATEMENT)
     if nextToken.kind == ';' then
-      # Equivalent to '();', otherwise known as an empty statement or "no-op"
+      # Empty statement is a "no-op", equivalent to '();'
+      puts "FOUND A NO-OP! *******************************"
+      consume
       p = Node.new(:EXPRESSION)
-      p.addChild(Node.new(:UNIT))
+      p.addChild(Node::UNIT_LITERAL)
       n.addChild(p)
     else
       n.addChild(expression)
+      match(';')
     end
     n
   end
@@ -225,17 +233,17 @@ class Parser
     @logger.debug("expression")
     n = Node.new(:EXPRESSION)
     p =
-      case nextToken.kind
-      when 'break' then breakExpr
-      when 'continue' then continueExpr
-      when 'do' then doExpr
-      when 'for' then forExpr
-      when 'print' then printExpr
-      when 'return' then returnExpr
-      when 'while' then whileExpr
-      else
-        assignmentExpr
-      end
+    case nextToken.kind
+    when 'break' then breakExpr
+    when 'continue' then continueExpr
+    when 'do' then doExpr
+    when 'for' then forExpr
+    when 'print' then printExpr
+    when 'return' then returnExpr
+    when 'while' then whileExpr
+    else
+      assignmentExpr
+    end
     n.addChild(p)
     n
   end
@@ -308,7 +316,6 @@ class Parser
     else
       n.addChild(expression)
     end
-    match(';')
     n
   end
 

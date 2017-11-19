@@ -75,32 +75,21 @@ class Interpreter
       # This should *always* be a program node so throw exception if it is not
     end
 
-    # might do away with if statements and just have expressions
-    # the empty statement will most likely be optimized away before hitting
-    # the interpeter
     node.count.times do |i|
       n = node.child(i)
       case n.kind
-        when :VALUE_DECL then valueDecl(n)
-        when :VARIABLE_DECL then variableDecl(n)
-        when :FUNCTION_DECL then functionDecl(n)
-        when :CLASS_DECL then classDecl(n)
-        # This probably doesn't need to be here because break is only valid inside of loops
-        # Can make sure there are no breaks outside of loops during semantic analysis phase
-        when :BREAK_STMT then breakStmt(n)
-        when :EMPTY_STMT then ;
-        when :EXPRESSION_STMT then expressionStmt(n)
-        when :PRINT_STMT then printStmt(n)
-        when :RETURN_STMT then returnStmt(n)
-        when :WHILE_STMT then whileStmt(n)
+      when :VALUE_DECL then valueDecl(n)
+      when :VARIABLE_DECL then variableDecl(n)
+      when :FUNCTION_DECL then functionDecl(n)
+      when :CLASS_DECL then classDecl(n)
+      when :STATEMENT then statement(n)
       else
-        puts "THERE HAS BEEN A MAJOR ERROR"
-        exit
+        raise "Runtime error in program()"
       end
     end
   end
 
-  # Declarations
+  # DECLARATIONS
 
   def valueDecl (node)
     @logger.debug("valueDecl")
@@ -169,17 +158,31 @@ class Interpreter
   # x = Math.cos # attempts to call cos with 0 arguments
   # x = Math.cos(t) # calls cos with 1 argument
 
-  # Statements
+  # STATEMENTS
 
-  def expressionStmt (node)
-    @logger.debug("expressionStmt")
+  def statement (node)
+    @logger.debug("statement")
     # At global level this should assign to implicit variable 'ans'
     # At local level the result can be thrown away
     # Since the result is thrown away, then optimizer can eliminate the code
-    result = expression(node.child)
+    #result = nil
+    n = node.child
+    result =
+    case n.kind
+    # Break is only valid inside loops
+    # Check for breaks outside of loops during semantic analysis phase
+    when :BREAK_EXPR then breakExpr(n)
+    when :PRINT_EXPR then printExpr(n)
+    when :RETURN_EXPR then returnExpr(n)
+    when :WHILE_EXPR then whileExpr(n)
+    else
+      expression(n)
+    end
+    # statement isn't really supposed to have a result
+    result
   end
 
-  # Expressions
+  # EXRESSIONS
 
   def expression (node)
     @logger.debug("expression")
@@ -231,7 +234,7 @@ class Interpreter
   def printExpr (node)
     @logger.debug("printExpr")
     result = expression(node.child)
-    puts result.value
+    puts "printing: #{result.value}: #{result.class}"
     $unit
   end
 
@@ -536,9 +539,8 @@ class Interpreter
     # Yes this is ugly, but this is just a test
     if @breakFlag == true then return nil end
 
-    # Block evaluates to the value of the last exprStmt evaluated
-    # If the last element was a declaration or statement (other than exprStmt)
-    # then return unit.
+    # Block evaluates to the value of the last expression evaluated
+    # If the last element was a declaration then return unit.
 
     # Can blocks be cleaned up to end in an expression instead of exprStmt?
     "HELLO THIS IS THE RESULT OF A BLOCK!"
@@ -548,19 +550,24 @@ class Interpreter
 
   def blockElement (node)
     @logger.debug("blockElement")
+    result =
     case node.kind
     when :VALUE_DECL then valueDecl(node)
     when :VARIABLE_DECL then variableDecl(node)
     when :FUNCTION_DECL then functionDecl(node)
     when :CLASS_DECL then classDecl(node)
-    when :BREAK_STMT then breakStmt(node)
-    when :EXPRESSION_STMT then expressionStmt(node)
-    when :PRINT_STMT then printStmt(node)
-    when :WHILE_STMT then whileStmt(node)
+    when :STATEMENT then statement(node)
+    
+    # Not sure if these should be here anymore
+    when :BREAK_EXPR then breakExpr(node)
+    when :PRINT_EXPR then printExpr(node)
+    when :WHILE_EXPR then whileExpr(node)
     else
       puts "THERE HAS BEEN A MAJOR ERROR"
       exit
     end
+    puts "result of blockElement is #{result.class}"
+    result
   end
 
   def ifExpr (node)
@@ -599,6 +606,8 @@ class Interpreter
     # The function call should cause a jump to the location of the code
     jumpNode = functionObj.value
     result = function1(jumpNode, args)
+    puts "result of funcall is #{result}: #{result.class}"
+    result
   end
 
   def function1 (node, args)
@@ -626,7 +635,8 @@ class Interpreter
     end
 
     result = blockExpr(node.rightChild)
-
+    puts "result of blockExpr is #{result}: #{result.class}"
+    
     # pop frame and restore scope
     @fp = @fp.dynamicLink
     @scope = saveScope
