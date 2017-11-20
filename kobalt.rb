@@ -42,7 +42,7 @@ def main (filename = 'test_input.txt')
   # Build AST
   logger.info("Building abstract syntax tree...")
   @parser = Parser.new(@tokens)
-  @parser.setLogLevel(Logger::DEBUG)
+  @parser.setLogLevel(Logger::WARN)
   @root = @parser.start
   puts @parser.problems.errors
   puts @parser.problems.warnings
@@ -52,7 +52,7 @@ def main (filename = 'test_input.txt')
   # It just annotates the AST with scopes and symbol table data.
   logger.info("Building scopes...")
   @sb = ScopeBuilder.new(@root)
-  @sb.setLogLevel(Logger::DEBUG)
+  @sb.setLogLevel(Logger::WARN)
   @sb.start
   puts @sb.problems.errors
   puts @sb.problems.warnings

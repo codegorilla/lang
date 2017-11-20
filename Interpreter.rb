@@ -234,7 +234,8 @@ class Interpreter
   def printExpr (node)
     @logger.debug("printExpr")
     result = expression(node.child)
-    puts "printing: #{result.value}: #{result.class}"
+    #puts result.value
+    puts "#{result.class}"
     $unit
   end
 
@@ -607,7 +608,6 @@ class Interpreter
     # The function call should cause a jump to the location of the code
     jumpNode = functionObj.value
     result = function1(jumpNode, args)
-    puts "result of funcall is #{result}: #{result.class}"
     result
   end
 
@@ -641,13 +641,6 @@ class Interpreter
     when :EXPRESSION then expression(n)
     when :BLOCK_EXPR then blockExpr(n)
     end
-
-    # FIX: This might not be a blockExpr!
-    #puts "the type of node.rightChild is #{node.rightChild.kind}"
-
-    #result = expression(node.rightChild)
-    #result = blockExpr(node.rightChild)
-    #puts "result of blockExpr is #{result}: #{result.class}"
     
     # pop frame and restore scope
     @fp = @fp.dynamicLink
@@ -728,12 +721,19 @@ class Interpreter
   end
 
   def arrayElements (node)
+    @logger.debug("arrayElements")
     node.children.each do |n|
-      # Left off here 10 Nov 2017 working on arrays
-      obj = expression(n)
-      puts obj.value
+      resObj = arrayElement(n)
+      puts resObj.value
     end
   end
+
+  def arrayElement (node)
+    @logger.debug("arrayElement")
+    # Maybe this is not needed -- just expression is enough
+    resObj = expression(node)
+  end
+
 
 end # class
 
