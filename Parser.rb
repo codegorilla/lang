@@ -152,14 +152,15 @@ class Parser
     if nextToken.kind == '{'
       n.addChild(blockExpr)
     else
-      # Manually insert a block node?
       # Can't this just be a plain expression?
-      # LEFT OFF 18 NOV 2017 @ 11:21pm
-      p = Node.new(:BLOCK_EXPR)
-      q = Node.new(:STATEMENT)
-      q.addChild(expression)
-      p.addChild(q)
-      n.addChild(p)
+      n.addChild(expression)
+      match(';')
+      # Manually insert a block node?
+      #p = Node.new(:BLOCK_EXPR)
+      #q = Node.new(:STATEMENT)
+      #q.addChild(expression)
+      #p.addChild(q)
+      #n.addChild(p)
     end
     n
   end

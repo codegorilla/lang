@@ -134,9 +134,9 @@ class Interpreter
 
     # Create a function object and return it
     # Later on, lambda expressions will also create function objects
-    # The value inside a function object should be a block of instructions to
-    # execute whenever the function is called, i.e. it needs to be an AST node!
-    # In a VM, it would probably be a basic block.
+    # The value inside a function object should be an expression to evaluate
+    # whenever the function is called, i.e. it needs to be an AST node!
+    # In a VM, it would probably be a basic block or superblock.
     result = TauObject.new($Function, node)
   end
 
@@ -564,6 +564,7 @@ class Interpreter
     when :WHILE_EXPR then whileExpr(node)
     else
       puts "THERE HAS BEEN A MAJOR ERROR"
+      puts "node kind is #{node.kind}"
       exit
     end
     puts "result of blockElement is #{result.class}"
@@ -634,8 +635,19 @@ class Interpreter
       @fp.store(index, args[i])
     end
 
-    result = blockExpr(node.rightChild)
-    puts "result of blockExpr is #{result}: #{result.class}"
+    n = node.rightChild
+    result =
+    case n.kind
+    when :EXPRESSION then expression(n)
+    when :BLOCK_EXPR then blockExpr(n)
+    end
+
+    # FIX: This might not be a blockExpr!
+    #puts "the type of node.rightChild is #{node.rightChild.kind}"
+
+    #result = expression(node.rightChild)
+    #result = blockExpr(node.rightChild)
+    #puts "result of blockExpr is #{result}: #{result.class}"
     
     # pop frame and restore scope
     @fp = @fp.dynamicLink

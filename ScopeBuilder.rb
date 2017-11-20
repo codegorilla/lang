@@ -93,7 +93,14 @@ class ScopeBuilder
     # parent scope for the enclosed block's scope
     parameters(node.child(0))
 
-    blockExpr(node.child(1))
+    # Changed 19NOV2017 - either blockExpr or expression
+    if node.child(1).kind == :BLOCK_EXPR
+      blockExpr(node.child(1))
+    else
+      # Might not need to run this path. blockExpr would already be handled.
+      expression(node.child(1))
+    end
+
     # Pop the scope
     @scope = @scope.link
   end

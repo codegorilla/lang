@@ -14,14 +14,16 @@
 //var b = 81;
 //print b;
 
-def celsiusToFarenheit (x) = 101;
+def celsiusToFarenheit (x) = x * 1.8 + 32;
 
 //{
 //  x * 1.8 + 32;
 //}
 
-val x1 = celsiusToFarenheit(34);
+val x1 = celsiusToFarenheit(0);
 print x1;
+val x2 = celsiusToFarenheit(100);
+print x2;
 
 //def add2 (x, y) = {
 //  x + y;
