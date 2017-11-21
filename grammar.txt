@@ -35,3 +35,9 @@ assignmentExpr:
 blockExpr:
   '{' blockElement* '}'
 
+arrayLiteral:
+  '[' arrayElements? ']'
+
+arrayElements:
+  expression (',' expression)*
+

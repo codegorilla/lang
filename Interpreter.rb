@@ -233,9 +233,22 @@ class Interpreter
 
   def printExpr (node)
     @logger.debug("printExpr")
-    result = expression(node.child)
-    #puts result.value
-    puts "#{result.class}"
+    resultObj = expression(node.child)
+    case resultObj.type
+    when $Array then
+      count = resultObj.value.count
+      x = '['
+      for i in 0..(count-2)
+        x << resultObj.value[i].value.to_s
+        x << ', '
+      end
+      x << resultObj.value[count-1].value.to_s
+      x << ']'
+      puts x
+    else
+      puts resultObj.value
+    end
+    #puts resultObj.value # "#{result.class}"
     $unit
   end
 
@@ -714,24 +727,21 @@ class Interpreter
     @logger.debug("arrayLiteral")
     # Need to evaluate each element to produce an array of objects
     if node.count == 1
-      arrayElements(node.child)
+      array = arrayElements(node.child)
     end
+
     # temporary dummy array
-    TauObject.new($Array, [])
+    TauObject.new($Array, array)
   end
 
   def arrayElements (node)
     @logger.debug("arrayElements")
+    array = []
     node.children.each do |n|
-      resObj = arrayElement(n)
-      puts resObj.value
+      resultObj = expression(n)
+      array.push(resultObj)
     end
-  end
-
-  def arrayElement (node)
-    @logger.debug("arrayElement")
-    # Maybe this is not needed -- just expression is enough
-    resObj = expression(node)
+    array
   end
 
 

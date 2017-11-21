@@ -890,12 +890,12 @@ class Parser
   def arrayElements ()
     @logger.debug("arrayElements")
     n = Node.new(:ARRAY_ELEMENTS)
-    n.addChild(arrayElement)
+    n.addChild(expression)
     while nextToken.kind == ','
       consume
       # Check for optional trailing comma
       if nextToken.kind != ']'
-        n.addChild(arrayElement)
+        n.addChild(expression)
       end
     end
     n
@@ -903,6 +903,7 @@ class Parser
 
   def arrayElement ()
     @logger.debug("arrayElement")
+    # Might not be required -- just use expression
     n = expression
     n
   end
