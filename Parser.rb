@@ -152,15 +152,8 @@ class Parser
     if nextToken.kind == '{'
       n.addChild(blockExpr)
     else
-      # Can't this just be a plain expression?
       n.addChild(expression)
       match(';')
-      # Manually insert a block node?
-      #p = Node.new(:BLOCK_EXPR)
-      #q = Node.new(:STATEMENT)
-      #q.addChild(expression)
-      #p.addChild(q)
-      #n.addChild(p)
     end
     n
   end
@@ -223,7 +216,15 @@ class Parser
       n.addChild(p)
     else
       n.addChild(expression)
-      match(';')
+      # I think this is an example of a syntactic predicate
+      # Test for last token here
+      pos = @tokens.index
+      tok = @tokens.buffer[pos - 1]
+      puts "last token was #{tok.text}!"
+      puts "next token is #{nextToken.text}!"
+      if tok.text != '}'
+        match(';')
+      end
     end
     n
   end
@@ -328,12 +329,11 @@ class Parser
     n.addChild(expression)
     match(')')
     if nextToken.kind == '{'
-      n.addChild(blockExpr)
-    else
-      # Manually insert a block node
-      p = Node.new(:BLOCK_EXPR)
-      p.addChild(blockElement)
+      p = Node.new(:EXPRESSION)
+      p.addChild(blockExpr)
       n.addChild(p)
+    else
+      n.addChild(expression)
     end
     n
   end
@@ -898,13 +898,6 @@ class Parser
         n.addChild(expression)
       end
     end
-    n
-  end
-
-  def arrayElement ()
-    @logger.debug("arrayElement")
-    # Might not be required -- just use expression
-    n = expression
     n
   end
 

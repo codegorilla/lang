@@ -174,7 +174,7 @@ class ScopeBuilder
     if n.kind == :BLOCK_EXPR
       blockExpr(n)
     else
-      blockElement(n)
+      expression(n)
     end
   end
 

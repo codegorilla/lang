@@ -265,7 +265,7 @@ class Interpreter
     # If it is already known to be a Bool, then might be able to optimize
     result = $Bool.getMember('equ').call($true, condition)
     while result.value == true
-      breakCheck = blockExpr(node.rightChild)
+      breakCheck = expression(node.rightChild)
       # Very ugly, but this is just a test
       if breakCheck == nil then break end
       # Re-evaluate condition
