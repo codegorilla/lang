@@ -216,15 +216,17 @@ class Parser
       n.addChild(p)
     else
       n.addChild(expression)
+      match(';')
       # I think this is an example of a syntactic predicate
+      # This was just for testing -- I don't think we want to do this
       # Test for last token here
-      pos = @tokens.index
-      tok = @tokens.buffer[pos - 1]
-      puts "last token was #{tok.text}!"
-      puts "next token is #{nextToken.text}!"
-      if tok.text != '}'
-        match(';')
-      end
+      # pos = @tokens.index
+      # tok = @tokens.buffer[pos - 1]
+      # puts "last token was #{tok.text}!"
+      # puts "next token is #{nextToken.text}!"
+      # if tok.text != '}'
+      #   match(';')
+      # end
     end
     n
   end
@@ -328,13 +330,7 @@ class Parser
     match('(')
     n.addChild(expression)
     match(')')
-    if nextToken.kind == '{'
-      p = Node.new(:EXPRESSION)
-      p.addChild(blockExpr)
-      n.addChild(p)
-    else
-      n.addChild(expression)
-    end
+    n.addChild(expression)
     n
   end
 

@@ -168,14 +168,16 @@ class ScopeBuilder
   def whileExpr (node)
     @logger.debug("whileExpr")
     expression(node.leftChild)
-    n = node.rightChild
+    expression(node.rightChild)
+    # UPDATE: We don't want a special case -- it is always an expression; even
+    # blocks are just expressions so this works out well
     # This should always be a block, so we should be able to
     # get rid of the if-statement
-    if n.kind == :BLOCK_EXPR
-      blockExpr(n)
-    else
-      expression(n)
-    end
+    # if n.kind == :BLOCK_EXPR
+    #   blockExpr(n)
+    # else
+    #   expression(n)
+    # end
   end
 
   def ifExpr (node)

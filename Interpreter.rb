@@ -229,6 +229,7 @@ class Interpreter
     # If the flag is set, then "return" from the blockExpr immediately
     # This does seem to work after all!
     @breakFlag = true
+    # Break expressions never actually return, they have a type of Nothing
   end
 
   def printExpr (node)
@@ -272,6 +273,7 @@ class Interpreter
       condition = expression(node.leftChild)
       result = $Bool.getMember('equ').call($true, condition)
     end
+    $unit
   end
 
   def assignmentExpr(node)

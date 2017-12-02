@@ -25,6 +25,9 @@ expression:
   returnExpr
   whileExpr
 
+whileStmt:
+  'while' '(' expression ')' (blockExpr => <expr blockExpr> | expression ';')
+
 whileExpr:
   'while' '(' expression ')' (blockExpr => <expr blockExpr> | expression)
 
@@ -42,4 +45,25 @@ arrayLiteral:
 
 arrayElements:
   expression (',' expression)*
+
+hashLiteral:
+  '{' hashElements? '}'
+
+x = [:]
+
+x = {:}
+
+x = [ "one": 1, "two": 2 ]
+
+x = Map({
+  one: 1,
+  two: 2
+});
+
+x = Map(
+  "one" -> 1,
+  "two" -> 2
+);
+
+x = Map();
 
