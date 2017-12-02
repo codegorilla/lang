@@ -181,17 +181,21 @@ class Parser
     n = Node.new(:CLASS_DECL)
     match('class')
     n.addChild(identifier)
-    n.addChild(classBody)
+    if nextToken.kind == 'extends'
+      match('extends')
+      n.addChild(identifier)
+    end
+    n.addChild(template)
     n
   end
 
-  def classBody ()
-    @logger.debug("classBody")
-    n = Node.new(:CLASS_BODY)
+  def template ()
+    @logger.debug("template")
+    n = Node.new(:TEMPLATE)
     match('{')
     match('}')
   end
-
+  
   def identifier ()
     @logger.debug("identifier")
     t = nextToken

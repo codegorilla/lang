@@ -3,6 +3,14 @@
 
 var x = 10;
 
+def myfun (x) = x + 1;
+
+print myfun(5);
+
+class Cow extends Animal {
+}
+
+
 do {
   x = 50;
 } while (x < 10);

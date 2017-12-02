@@ -11,16 +11,32 @@ declaration:
   functionDecl
   classDecl
 
+valueDecl:
+  'val' identifier '=' expression ';'
+
+variableDecl:
+  'var' identifier '=' expression ';'
+
 # Might eventually change functionDecl body to just be expresion
 
 functionDecl:
   'def' identifier '(' parameters? ')' = (blockExpr | expression ';')
 
 parameters:
-  parameter (',' parameter)*
+  parameter { ',' parameter }
 
 parameter:
   identifier
+
+classDecl:
+  'class' identifier [ 'extends' identifier ] template
+
+template:
+  '{' templateElement* '}'
+
+templateElement:
+  declaration
+
 
 STATEMENTS
 ==========

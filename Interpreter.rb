@@ -152,6 +152,10 @@ class Interpreter
     # Each one of these needs to be processed
   end
   
+  def classDecl (node)
+    @logger.debug("classDecl")
+  end
+
   # Theory of operation for functions vs. methods:
   # x = cos # returns function object
   # y = cos(t) # returns result of function call
