@@ -270,15 +270,11 @@ class Parser
     @logger.debug("doExpr")
     n = Node.new(:DO_EXPR)
     match('do')
+    n.addChild(expression)
+    match('while')
     match('(')
     n.addChild(expression)
     match(')')
-    if nextToken.kind == '{'
-      n.addChild(blockExpr)
-    else
-      # probably need to manually add a block node
-      n.addChild(statement)
-    end
     n
   end
 
@@ -748,8 +744,10 @@ class Parser
     # Not sure class declarations should be valid inside blocks --
     # maybe only inside class bodies (i.e. templates)
     case nextToken.kind
-      when 'val', 'var', 'def', 'class' then declaration
-      else statement
+    when 'val', 'var', 'def', 'class'
+      declaration
+    else
+      statement
     end
   end
   

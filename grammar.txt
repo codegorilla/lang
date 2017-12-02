@@ -1,9 +1,17 @@
+NYX GRAMMAR
+===========
+
+
+DECLARATIONS
+============
 
 declaration:
   valueDecl
   variableDecl
   functionDecl
   classDecl
+
+# Might eventually change functionDecl body to just be expresion
 
 functionDecl:
   'def' identifier '(' parameters? ')' = (blockExpr | expression ';')
@@ -14,27 +22,59 @@ parameters:
 parameter:
   identifier
 
-# Use a syntactic predicate here to avoid ';' if last token was '}'
+STATEMENTS
+==========
 
 statement:
   expression? ';'
 
+
+EXPRESSIONS
+===========
+
 expression:
   assignmentExpr
+  breakExpr
+  doExpr
   printExpr
   returnExpr
   whileExpr
 
-whileStmt:
-  'while' '(' expression ')' (blockExpr => <expr blockExpr> | expression ';')
+assignmentExpr:
+  logicalOrExpr ('=' assignmentExpr)?
+
+logicalOrExpr:
+  logicalAndExpr ('||' logicalAndExpr)?
+
+logicalAndExpr:
+  bitwiseXorExpr ('&&' bitwiseXorExpr)?
+
+bitwiseXorExpr:
+  bitwiseOrExpr ('^' bitwiseOrExpr)?
+
+bitwiseOrExpr:
+  bitwiseAndExpr ('|' bitwiseAndExpr)?
+
+bitwiseOrExpr:
+  equalityExpr ('&' equalityExpr)?
+
+equalityExpr:
+  ...
+
+breakExpr:
+  'break'
+
+doExpr:
+  'do' expression 'while' '(' expression ')'
+
+printExpr:
+  'print' expression
+
+returnExpr:
+  'return' expression
 
 whileExpr:
-  'while' '(' expression ')' (blockExpr => <expr blockExpr> | expression)
-
-
-assignmentExpr:
-  blockExpr
-  ifExpr
+  'while' '(' expression ')' expression
 
 
 blockExpr:
@@ -48,6 +88,9 @@ arrayElements:
 
 hashLiteral:
   '{' hashElements? '}'
+
+
+
 
 x = [:]
 

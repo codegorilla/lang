@@ -196,6 +196,7 @@ class Interpreter
     result =
       case node.kind
         when :BREAK_EXPR then breakExpr(node)
+        when :DO_EXPR then doExpr(node)
         when :PRINT_EXPR then printExpr(node)
         when :RETURN_EXPR then returnExpr(node)
         when :WHILE_EXPR then whileExpr(node)
@@ -230,6 +231,28 @@ class Interpreter
     # This does seem to work after all!
     @breakFlag = true
     # Break expressions never actually return, they have a type of Nothing
+  end
+
+  def doExpr (node)
+    @logger.debug("doExpr")
+    # Run through loop one time first
+    breakCheck = expression(node.leftChild)
+    # Very ugly, but this is just a test
+    if breakCheck == nil then return $unit end
+    # Now check the condition
+    condition = expression(node.rightChild)
+    # Condition could be of any type, need to convert it to a Bool
+    # If it is already known to be a Bool, then might be able to optimize
+    result = $Bool.getMember('equ').call($true, condition)
+    while result.value == true
+      breakCheck = expression(node.leftChild)
+      # Very ugly, but this is just a test
+      if breakCheck == nil then break end
+      # Re-evaluate condition
+      condition = expression(node.rightChild)
+      result = $Bool.getMember('equ').call($true, condition)
+    end
+    $unit
   end
 
   def printExpr (node)
@@ -573,17 +596,15 @@ class Interpreter
     when :FUNCTION_DECL then functionDecl(node)
     when :CLASS_DECL then classDecl(node)
     when :STATEMENT then statement(node)
-    
-    # Not sure if these should be here anymore
-    when :BREAK_EXPR then breakExpr(node)
-    when :PRINT_EXPR then printExpr(node)
-    when :WHILE_EXPR then whileExpr(node)
     else
       puts "THERE HAS BEEN A MAJOR ERROR"
       puts "node kind is #{node.kind}"
       exit
     end
-    puts "result of blockElement is #{result.class}"
+    # Not sure what this result is for
+    # Declarations and statements don't have results
+    # That said, the result of the last evaluated expression needs to be
+    # returned, so maybe that is what this is
     result
   end
 

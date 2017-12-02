@@ -138,10 +138,10 @@ class ScopeBuilder
   def expr (node)
     @logger.debug('expr')
     case node.kind
+    when :DO_EXPR then doExpr(node)
     when :PRINT_EXPR then printExpr(node)
     when :RETURN_EXPR then returnExpr(node)
     when :WHILE_EXPR then whileExpr(node)
-    
     when :FUNCTION_CALL then functionCall(node)
     when :ARRAY_ACCESS then arrayAccess(node)
     when :OBJECT_ACCESS then objectAccess(node)
@@ -153,6 +153,12 @@ class ScopeBuilder
     when :NAME then name(node)
     when :EXPRESSION then expression(node)
     end
+  end
+
+  def doExpr (node)
+    @logger.debug("doExpr")
+    expression(node.rightChild)
+    expression(node.leftChild)
   end
 
   def printExpr (node)
@@ -169,15 +175,6 @@ class ScopeBuilder
     @logger.debug("whileExpr")
     expression(node.leftChild)
     expression(node.rightChild)
-    # UPDATE: We don't want a special case -- it is always an expression; even
-    # blocks are just expressions so this works out well
-    # This should always be a block, so we should be able to
-    # get rid of the if-statement
-    # if n.kind == :BLOCK_EXPR
-    #   blockExpr(n)
-    # else
-    #   expression(n)
-    # end
   end
 
   def ifExpr (node)
@@ -208,8 +205,6 @@ class ScopeBuilder
     when :VALUE_DECL then valueDecl(node)
     when :VARIABLE_DECL then variableDecl(node)
     when :STATEMENT then statement(node)
-    #when :IF_STMT then ifStmt(node)
-    #when :RETURN_EXPR then returnStmt(node)
     end
   end
 
