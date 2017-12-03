@@ -126,3 +126,9 @@ x = Map(
 
 x = Map();
 
+1.to(10)
+1.til(10)
+
+for (x in range(1, 10)) {
+
+}

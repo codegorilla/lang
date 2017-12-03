@@ -139,6 +139,7 @@ class ScopeBuilder
     @logger.debug('expr')
     case node.kind
     when :DO_EXPR then doExpr(node)
+    when :FOR_EXPR then forExpr(node)
     when :PRINT_EXPR then printExpr(node)
     when :RETURN_EXPR then returnExpr(node)
     when :WHILE_EXPR then whileExpr(node)
@@ -161,6 +162,13 @@ class ScopeBuilder
     expression(node.leftChild)
   end
 
+  def forExpr (node)
+    @logger.debug("forExpr")
+    expression(node.child(1))
+    expression(node.child(2))
+    expression(node.child(3))
+  end
+  
   def printExpr (node)
     @logger.debug("printExpr")
     expression(node.child)

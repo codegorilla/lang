@@ -286,15 +286,15 @@ class Parser
     @logger.debug("forExpr")
     n = Node.new(:FOR_EXPR)
     match('for')
-    match('(')
     # Need to parse "(i in 0..10)" format
+    match('(')
+    n.addChild(identifier)
+    match('=')
+    n.addChild(expression)
+    match('to')
     n.addChild(expression)
     match(')')
-    if nextToken.kind == '{'
-      n.addChild(blockExpr)
-    else
-      n.addChild(statement)
-    end
+    n.addChild(expression)
     n
   end
 

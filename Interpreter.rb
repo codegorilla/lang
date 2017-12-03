@@ -201,6 +201,7 @@ class Interpreter
       case node.kind
         when :BREAK_EXPR then breakExpr(node)
         when :DO_EXPR then doExpr(node)
+        when :FOR_EXPR then forExpr(node)
         when :PRINT_EXPR then printExpr(node)
         when :RETURN_EXPR then returnExpr(node)
         when :WHILE_EXPR then whileExpr(node)
@@ -255,6 +256,22 @@ class Interpreter
       # Re-evaluate condition
       condition = expression(node.rightChild)
       result = $Bool.getMember('equ').call($true, condition)
+    end
+    $unit
+  end
+
+  def forExpr (node)
+    identifierNode = node.child(0)
+    index = @scope.lookup(identifierNode.text)
+
+    startExpr = expression(node.child(1))
+    endExpr = expression(node.child(2))
+    for i in startExpr.value .. endExpr.value
+      # identifier needs to take on value of i
+      # create new object out of i each time
+      x = TauObject.new($Int, i)
+      @fp.store(index, x)
+      expression(node.child(3))
     end
     $unit
   end

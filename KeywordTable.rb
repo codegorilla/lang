@@ -21,6 +21,7 @@ class KeywordTable
   RETURN = Token.new('return', "return")
   SUPER = Token.new('super', "super")
   THIS = Token.new('this', "this")
+  TO = Token.new('to', "to")
   TRUE = Token.new(:BOOLEAN, "true")
   VAL = Token.new('val', "val")
   VAR = Token.new('var', "var")
@@ -57,6 +58,7 @@ class KeywordTable
       'return' => RETURN,
       'super' => SUPER,
       'this' => THIS,
+      'to' => TO,
       'true' => TRUE,
       'val' => VAL,
       'var' => VAR,
