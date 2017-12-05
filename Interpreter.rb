@@ -81,6 +81,7 @@ class Interpreter
       when :VALUE_DECL then valueDecl(n)
       when :VARIABLE_DECL then variableDecl(n)
       when :FUNCTION_DECL then functionDecl(n)
+      when :OBJECT_DECL then objectDecl(n)
       when :CLASS_DECL then classDecl(n)
       when :STATEMENT then statement(n)
       else
@@ -152,6 +153,11 @@ class Interpreter
     # Each one of these needs to be processed
   end
   
+  def objectDecl (node)
+    @logger.debug("object")
+
+  end
+
   def classDecl (node)
     @logger.debug("classDecl")
   end
@@ -171,18 +177,18 @@ class Interpreter
     # Since the result is thrown away, then optimizer can eliminate the code
     #result = nil
     n = node.child
-    result =
-    case n.kind
+    #result =
+    #case n.kind
     # Break is only valid inside loops
-    # Check for breaks outside of loops during semantic analysis phase
-    when :BREAK_EXPR then breakExpr(n)
-    when :PRINT_EXPR then printExpr(n)
-    when :RETURN_EXPR then returnExpr(n)
-    when :WHILE_EXPR then whileExpr(n)
-    else
-      expression(n)
-    end
+    #when :BREAK_EXPR then breakExpr(n)
+    #when :PRINT_EXPR then printExpr(n)
+    #when :RETURN_EXPR then returnExpr(n)
+    #when :WHILE_EXPR then whileExpr(n)
+    #else
+    #  expression(n)
+    #end
     # statement isn't really supposed to have a result
+    result = expression(n)
     result
   end
 
@@ -199,6 +205,7 @@ class Interpreter
     @logger.debug("expr")
     result =
       case node.kind
+        # Check for breaks outside of loops during semantic analysis phase
         when :BREAK_EXPR then breakExpr(node)
         when :DO_EXPR then doExpr(node)
         when :FOR_EXPR then forExpr(node)

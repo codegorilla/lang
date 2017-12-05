@@ -42,6 +42,7 @@ class ScopeBuilder
       when :VALUE_DECL then valueDecl(n)
       when :VARIABLE_DECL then variableDecl(n)
       when :FUNCTION_DECL then functionDecl(n)
+      when :OBJECT_DECL then objectDecl(n)
       when :STATEMENT then statement(n)
       end
     end
@@ -61,17 +62,6 @@ class ScopeBuilder
     @logger.debug("variableDecl")
     identifier(node.leftChild)
     expression(node.rightChild)
-  end
-
-  def identifier (node)
-    @logger.debug("identifier")
-    name = node.text
-    if @scope.lookup(name) == nil
-      @scope.define(name)
-    else
-      # Same variable declared multiple times within scope is error.
-      @plog.error("Multiple declarations of symbol '#{name}'.", node.line)
-    end
   end
 
   def functionDecl (node)
@@ -118,6 +108,28 @@ class ScopeBuilder
     # no need to look it up first, unless to detect if someone does
     #def f (x, x)...
     @scope.define(identifierNode.text)
+  end
+
+  def objectDecl (node)
+    @logger.debug("objectDecl")
+    identifierNode = node.child
+    @scope.define(identifierNode.text)
+    # LEFT OFF HERE 04 DEC 2017
+    # Push a new scope
+    #@scope = Scope.new(@scope)
+    #node.setAttribute("scope", @scope)
+    # TODO: We need to descend into body for another scope
+  end
+
+  def identifier (node)
+    @logger.debug("identifier")
+    name = node.text
+    if @scope.lookup(name) == nil
+      @scope.define(name)
+    else
+      # Same variable declared multiple times within scope is error.
+      @plog.error("Multiple declarations of symbol '#{name}'.", node.line)
+    end
   end
 
   # STATEMENTS

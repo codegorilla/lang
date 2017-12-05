@@ -1,10 +1,10 @@
 // Test file
 
-val n = 16;
+val n = 4;
 
 var z = 0;
 
-for (z = 8 to n-1) {
+for (z = 0 to n-1) {
   print z;
 };
 
@@ -14,8 +14,12 @@ def myfun (x) = x + 1;
 
 print myfun(5);
 
-class Cow extends Animal {}
+object Dog {
+  var x = 1;
+}
 
+
+class Cow extends Animal {}
 
 do {
   x = 50;

@@ -17,6 +17,7 @@ class KeywordTable
   LAMBDA = Token.new('lambda', "lambda")
   NEW = Token.new('new', "new")
   NULL = Token.new(:NULL, "null")
+  OBJECT = Token.new('object', "object")
   PRINT = Token.new('print', "print")
   RETURN = Token.new('return', "return")
   SUPER = Token.new('super', "super")
@@ -54,6 +55,7 @@ class KeywordTable
       'lambda' => LAMBDA,
       'new' => NEW,
       'null' => NULL,
+      'object' => OBJECT,
       'print' => PRINT,
       'return' => RETURN,
       'super' => SUPER,
