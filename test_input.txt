@@ -14,10 +14,17 @@ def myfun (x) = x + 1;
 
 print myfun(5);
 
-object Dog {
-  var x = 1;
+object math {
+  var pi = 3.14;  
 }
 
+object Dog {
+  var x = 2 * math.pi;
+}
+
+print Dog;
+
+print Dog.x;
 
 class Cow extends Animal {}
 

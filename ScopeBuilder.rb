@@ -51,6 +51,13 @@ class ScopeBuilder
 
   # DECLARATIONS
 
+  def declaration (node)
+    @logger.debug("declaration")
+    case node.kind
+    when :VALUE_DECL then valueDecl(node)
+    end
+  end
+
   def valueDecl (node)
     @logger.debug("valueDecl")
     # There should be some way to mark the variable as final
@@ -112,13 +119,22 @@ class ScopeBuilder
 
   def objectDecl (node)
     @logger.debug("objectDecl")
-    identifierNode = node.child
+    identifierNode = node.child(0)
     @scope.define(identifierNode.text)
-    # LEFT OFF HERE 04 DEC 2017
+    body(node.child(1))
+  end
+
+  def body (node)
+    @logger.debug("body")
     # Push a new scope
-    #@scope = Scope.new(@scope)
-    #node.setAttribute("scope", @scope)
-    # TODO: We need to descend into body for another scope
+    @scope = Scope.new(@scope)
+    node.setAttribute("scope", @scope)
+    for i in 0..node.count-1
+      n = node.child(i)
+      declaration(n)
+    end
+    # Pop the scope
+    @scope = @scope.link
   end
 
   def identifier (node)
@@ -248,8 +264,8 @@ class ScopeBuilder
     # got rid of identifier method because it is not needed for symbol definition?
     name(lhs)
     expression(rhs)
-    inst = Instruction.new(:SUBSCRIPT)
-    add(inst)
+    #inst = Instruction.new(:SUBSCRIPT)
+    #add(inst)
   end
 
   def objectAccess (node)
@@ -257,8 +273,8 @@ class ScopeBuilder
     rhs = node.rightChild
     name(lhs)
     name(rhs)
-    inst = Instruction.new(:GET)
-    add(inst)
+    #inst = Instruction.new(:GET)
+    #add(inst)
   end
 
   def logicalOrExpr (node)

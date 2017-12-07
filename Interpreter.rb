@@ -154,8 +154,40 @@ class Interpreter
   end
   
   def objectDecl (node)
-    @logger.debug("object")
+    @logger.debug("objectDecl")
+    # Create body and assign it to proper slot in current frame
+    identifierNode = node.leftChild
+    index = @scope.lookup(identifierNode.text)
+    @fp.store(index, body(node.rightChild))
+  end
 
+  def body (node)
+    @logger.debug("body")
+    # Create the object
+    result = TauObject.new($Object, '<Object>')
+    # Need to diverge from standard declarations because we need to store in
+    # the object's hash table rather than frame's table of local variables
+    # For now just assume that only one declaration is in the object
+
+    # Possible option for descending into node is to pass in node, rather than
+    # node.child. This is needed because storing (name, value) pair into object
+    # hash instead of locals table requires calling a method on the object
+    n = node.child
+    identifierNode = n.leftChild
+    name = identifierNode.text
+    value = expression(n.rightChild)
+    result.setMember(name, value)
+    #memberDeclaration(node.child)
+    result
+  end
+
+  def memberDeclaration (node)
+    @logger.debug("memberDeclaration")
+    # Assume it is a variable declaration
+    identifierNode = node.leftChild
+    # No need to lookup index; store directly by name
+    index = @scope.lookup(identifierNode.text)
+    @fp.store(index, expression(node.rightChild))
   end
 
   def classDecl (node)
@@ -218,6 +250,7 @@ class Interpreter
         when :IF_EXPR then ifExpr(node)
         when :FUNCTION_CALL then functionCall(node)
         when :NAME then name(node)
+        when :OBJECT_ACCESS then objectAccess(node)
         when :BLOCK_EXPR then blockExpr(node)
         when :NULL_LITERAL then nullLiteral(node)
         when :UNIT_LITERAL then unitLiteral(node)
@@ -733,6 +766,18 @@ class Interpreter
       # This needs to print a stack trace for lx, not ruby
       raise "variable '#{node.text}' undefined."
     end
+  end
+
+  def objectAccess (node)
+    @logger.debug("objectAccess")
+    # left side is object
+    # right side is value stored in object
+    # step 1. get the object out of locals table
+    obj = name(node.leftChild)
+    # step 2. get the name of the member
+    memberName = node.rightChild.text
+    # step 3. look up the value using the name
+    res = obj.getMember(memberName)
   end
 
   # ********** Literals **********

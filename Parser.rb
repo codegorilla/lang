@@ -194,6 +194,7 @@ class Parser
       n.addChild(declaration)
     end
     match('}')
+    n
   end
 
   def classDecl ()
@@ -725,6 +726,7 @@ class Parser
 
   def arrayAccess (node)
     @logger.debug("arrayAccess")
+    # Perhaps this should just be called subscript
     n = Node.new(:ARRAY_ACCESS)
     n.addChild(node)
     match('[')
@@ -735,6 +737,7 @@ class Parser
 
   def objectAccess (node)
     @logger.debug("objectAccess")
+    # Perhaps this should just be called access
     n = Node.new(:OBJECT_ACCESS)
     n.addChild(node)
     match('.')
