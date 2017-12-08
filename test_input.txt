@@ -26,6 +26,15 @@ print Dog;
 
 print Dog.x;
 
+object Cat {
+  def add (x, y) = x + y;
+}
+
+print Cat;
+
+print Cat.add(128, 64);
+
+
 class Cow extends Animal {}
 
 do {

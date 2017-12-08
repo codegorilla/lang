@@ -55,6 +55,7 @@ class ScopeBuilder
     @logger.debug("declaration")
     case node.kind
     when :VALUE_DECL then valueDecl(node)
+    when :FUNCTION_DECL then functionDecl(node)
     end
   end
 

@@ -164,30 +164,37 @@ class Interpreter
   def body (node)
     @logger.debug("body")
     # Create the object
-    result = TauObject.new($Object, '<Object>')
+    #result = TauObject.new($Object, '<Object>')
     # Need to diverge from standard declarations because we need to store in
     # the object's hash table rather than frame's table of local variables
-    # For now just assume that only one declaration is in the object
 
-    # Possible option for descending into node is to pass in node, rather than
+    # For now just assume that only one declaration is in the object
+    # Next step is to consider multiple declarations in one object
+    # Left off here 07 DEC 2017
+    
+    # When descending into member declaration pass in node, rather than
     # node.child. This is needed because storing (name, value) pair into object
     # hash instead of locals table requires calling a method on the object
-    n = node.child
-    identifierNode = n.leftChild
-    name = identifierNode.text
-    value = expression(n.rightChild)
-    result.setMember(name, value)
-    #memberDeclaration(node.child)
+    result = memberDeclaration(node)
     result
   end
 
   def memberDeclaration (node)
     @logger.debug("memberDeclaration")
-    # Assume it is a variable declaration
-    identifierNode = node.leftChild
+    # Create the object
+    result = TauObject.new($Object, '<Object>')
+    n = node.child
     # No need to lookup index; store directly by name
-    index = @scope.lookup(identifierNode.text)
-    @fp.store(index, expression(node.rightChild))
+    identifierNode = n.leftChild
+    name = identifierNode.text
+    # Figure out what kind of declaration it is
+    value =
+      case n.kind
+      when :VARIABLE_DECL then expression(n.rightChild)
+      when :FUNCTION_DECL then function(n.rightChild)
+      end
+    result.setMember(name, value)
+    result
   end
 
   def classDecl (node)
