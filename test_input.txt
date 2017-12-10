@@ -1,56 +1,75 @@
 // Test file
 
-val n = 4;
+//val n = 4;
 
-var z = 0;
+//var z = 0;
 
-for (z = 0 to n-1) {
-  print z;
-};
+//for (z = 0 to n-1) {
+//  print z;
+//};
 
-var x = 10;
+var r = 115;
+var q = 120;
 
-def myfun (x) = x + 1;
+//def myfun (x) = x + 1;
 
-print myfun(5);
+//print myfun(5);
 
 object math {
-  var pi = 3.14;  
+  var pi = 3.14;
 }
 
 object Dog {
-  var x = 2 * math.pi;
+  var x = 1024;
+  var y = 2 * math.pi;
+  var z = 2 * this.x;
+
+  def myfun (x) = x + r + this.y;
+  var a = 1;
 }
 
 print Dog;
-
 print Dog.x;
+print Dog.y;
+print Dog.z;
 
-object Cat {
-  def add (x, y) = x + y;
-}
-
-print Cat;
-
-print Cat.add(128, 64);
+print Dog.myfun(32);
 
 
-class Cow extends Animal {}
+//object Cat {
+//  val t = 248;
+//  def add (x, y) = x + y;
+//  def sub (x, y) = x - y;
+//}
 
-do {
-  x = 50;
-} while (x < 10);
+//print Cat;
 
-print x;
+//print Cat.t;
+
+//print Cat.add(128, 64);
+
+//print Cat.sub(32, 8);
+
+//print 1000;
+
+//class Cow {}
 
 
-var y = 10;
 
-while (y < 10) {
-  y = 50;
-};
+//do {
+//  x = 50;
+//} while (x < 10);
 
-print y;
+//print x;
+
+
+//var y = 10;
+
+//while (y < 10) {
+//  y = 50;
+//};
+
+//print y;
 
 
 

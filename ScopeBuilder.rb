@@ -55,6 +55,7 @@ class ScopeBuilder
     @logger.debug("declaration")
     case node.kind
     when :VALUE_DECL then valueDecl(node)
+    when :VARIABLE_DECL then variableDecl(node)
     when :FUNCTION_DECL then functionDecl(node)
     end
   end
@@ -127,15 +128,16 @@ class ScopeBuilder
 
   def body (node)
     @logger.debug("body")
-    # Push a new scope
-    @scope = Scope.new(@scope)
-    node.setAttribute("scope", @scope)
+    # Push a new scope?
+    #@scope = Scope.new(@scope)
+    #node.setAttribute("scope", @scope)
+    
     for i in 0..node.count-1
       n = node.child(i)
       declaration(n)
     end
     # Pop the scope
-    @scope = @scope.link
+    #@scope = @scope.link
   end
 
   def identifier (node)

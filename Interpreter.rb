@@ -164,37 +164,45 @@ class Interpreter
   def body (node)
     @logger.debug("body")
     # Create the object
-    #result = TauObject.new($Object, '<Object>')
+    obj = TauObject.new($Object, '<Object>')
+
+    # One idea is to push a new "scope" here. The problem is that our resolver
+    # routine is written assuming scopes follow function frames, not objects
+    # so for now don't push this scope, and rely on 'this' pointer instead.
+    #saveScope = @scope
+    #@scope = node.getAttribute("scope")
+
+    # Set the special 'this' pointer
+    # might need a stack of these to permit nesting of object definitions
+    @thisPtr = obj
+
     # Need to diverge from standard declarations because we need to store in
     # the object's hash table rather than frame's table of local variables
+    for i in 0..node.count-1 do
+      memberDeclaration(node.child(i), obj)
+    end
 
-    # For now just assume that only one declaration is in the object
-    # Next step is to consider multiple declarations in one object
-    # Left off here 07 DEC 2017
-    
-    # When descending into member declaration pass in node, rather than
-    # node.child. This is needed because storing (name, value) pair into object
-    # hash instead of locals table requires calling a method on the object
-    result = memberDeclaration(node)
+    # Restore previous scope (if it was pushed)
+    #@scope = saveScope
+
+    result = obj
     result
   end
 
-  def memberDeclaration (node)
+  def memberDeclaration (node, obj)
     @logger.debug("memberDeclaration")
-    # Create the object
-    result = TauObject.new($Object, '<Object>')
-    n = node.child
     # No need to lookup index; store directly by name
-    identifierNode = n.leftChild
+    identifierNode = node.leftChild
     name = identifierNode.text
     # Figure out what kind of declaration it is
     value =
-      case n.kind
-      when :VARIABLE_DECL then expression(n.rightChild)
-      when :FUNCTION_DECL then function(n.rightChild)
+      case node.kind
+      when :VALUE_DECL then expression(node.rightChild)
+      when :VARIABLE_DECL then expression(node.rightChild)
+      when :FUNCTION_DECL then function(node.rightChild)
       end
-    result.setMember(name, value)
-    result
+    obj.setMember(name, value)
+    nil
   end
 
   def classDecl (node)
@@ -259,6 +267,7 @@ class Interpreter
         when :NAME then name(node)
         when :OBJECT_ACCESS then objectAccess(node)
         when :BLOCK_EXPR then blockExpr(node)
+        when :THIS then thisExpr(node)
         when :NULL_LITERAL then nullLiteral(node)
         when :UNIT_LITERAL then unitLiteral(node)
         when :BOOLEAN_LITERAL then booleanLiteral(node)
@@ -779,12 +788,25 @@ class Interpreter
     @logger.debug("objectAccess")
     # left side is object
     # right side is value stored in object
-    # step 1. get the object out of locals table
-    obj = name(node.leftChild)
+    # step 1. get the object
+    leftNode = node.leftChild
+    if leftNode.kind == :THIS
+      # ...from 'this' pointer
+      obj = @thisPtr
+    else
+      # ...out of locals table
+      obj = name(node.leftChild)
+    end
     # step 2. get the name of the member
     memberName = node.rightChild.text
     # step 3. look up the value using the name
     res = obj.getMember(memberName)
+  end
+
+  def thisExpr (node)
+    @logger.debug("thisExpr")
+    # This should always point to the current object
+    @thisPtr
   end
 
   # ********** Literals **********

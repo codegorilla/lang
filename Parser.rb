@@ -580,6 +580,7 @@ class Parser
     case nextToken.kind
       when 'if' then ifExpr
       when :ID then nameExpr
+      when 'this' then thisExpr
       when 'lambda' then lambdaExpr
       when '{' then blockExpr
       when '(' then parenthesizedExpr
@@ -747,6 +748,8 @@ class Parser
 
   def name ()
     @logger.debug("name")
+    # Check how this is still used
+    # Cache nextToken so that line and text can be retrieved later
     t = nextToken
     match(:ID)
     n = Node.new(:NAME)
@@ -820,6 +823,17 @@ class Parser
       p = Node.new(:BLOCK_EXPR)
       p.addChild(blockElement)
       n.addChild(p)
+    end
+    n
+  end
+
+  def thisExpr ()
+    @logger.debug("thisExpr")
+    match('this')
+    n = Node.new(:THIS)
+    if nextToken.kind == '.' then
+      p = objectAccess(n)
+      n = p
     end
     n
   end
