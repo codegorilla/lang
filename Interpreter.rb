@@ -169,8 +169,9 @@ class Interpreter
     # One idea is to push a new "scope" here. The problem is that our resolver
     # routine is written assuming scopes follow function frames, not objects
     # so for now don't push this scope, and rely on 'this' pointer instead.
-    #saveScope = @scope
-    #@scope = node.getAttribute("scope")
+    # Test using scopes again - 10 Dec 2017
+    saveScope = @scope
+    @scope = node.getAttribute("scope")
 
     # Set the special 'this' pointer
     # might need a stack of these to permit nesting of object definitions
@@ -183,7 +184,7 @@ class Interpreter
     end
 
     # Restore previous scope (if it was pushed)
-    #@scope = saveScope
+    @scope = saveScope
 
     result = obj
     result
@@ -207,6 +208,16 @@ class Interpreter
 
   def classDecl (node)
     @logger.debug("classDecl")
+    # Create the class object
+    identifierNode = node.leftChild
+    index = @scope.lookup(identifierNode.text)
+    @fp.store(index, template(node.rightChild))
+  end
+
+  def template (node)
+    @logger.debug("template")
+    obj = TauObject.new($Object, '<Class>')
+    obj
   end
 
   # Theory of operation for functions vs. methods:
@@ -267,6 +278,7 @@ class Interpreter
         when :NAME then name(node)
         when :OBJECT_ACCESS then objectAccess(node)
         when :BLOCK_EXPR then blockExpr(node)
+        when :LAMBDA_EXPR then lambdaExpr(node)
         when :THIS then thisExpr(node)
         when :NULL_LITERAL then nullLiteral(node)
         when :UNIT_LITERAL then unitLiteral(node)
@@ -685,6 +697,13 @@ class Interpreter
     result
   end
 
+  def lambdaExpr (node)
+    @logger.debug("lambdaExpr")
+    # Isn't this just like a function?
+    result = function(node)
+    result
+  end
+
   def ifExpr (node)
     @logger.debug("ifExpr")
     condition = expression(node.child(0))
@@ -768,6 +787,8 @@ class Interpreter
     scope = @scope
     fp = @fp
     index = scope.lookup(node.text)
+    puts "node text is #{node.text}"
+    pp @scope.symbols.table
     # Logic to traverse higher scopes
     while !index && scope.link != nil
       scope = scope.link
@@ -776,7 +797,15 @@ class Interpreter
       index = scope.lookup(node.text)
     end
     if index != nil
-      result = fp.load(index)
+      # This might be a problem: assuming that we are loading a name from a
+      # frame. What if we are loading it from an object?
+      # Probably need to mark scopes as either procedural or object-based
+      # and load based on the result of a check
+      if @scope.objectFlag == true then
+        result = @thisPtr.getMember(node.text)
+      else
+        result = fp.load(index)
+      end
       result
     else
       # This needs to print a stack trace for lx, not ruby

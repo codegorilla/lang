@@ -202,10 +202,10 @@ class Parser
     n = Node.new(:CLASS_DECL)
     match('class')
     n.addChild(identifier)
-    if nextToken.kind == 'extends'
-      match('extends')
-      n.addChild(identifier)
-    end
+    # if nextToken.kind == 'extends'
+    #   match('extends')
+    #   n.addChild(identifier)
+    # end
     n.addChild(template)
     n
   end
@@ -214,7 +214,11 @@ class Parser
     @logger.debug("template")
     n = Node.new(:TEMPLATE)
     match('{')
+    while nextToken.kind != '}'
+      n.addChild(declaration)
+    end
     match('}')
+    n
   end
   
   def identifier ()
@@ -815,14 +819,10 @@ class Parser
     end
     match(')')
     match('=>')
-
     if nextToken.kind == '{'
       n.addChild(blockExpr)
     else
-      # Manually insert a block node
-      p = Node.new(:BLOCK_EXPR)
-      p.addChild(blockElement)
-      n.addChild(p)
+      n.addChild(expression)
     end
     n
   end

@@ -1,0 +1,34 @@
+// Mockup of classes
+
+<SCOPE_0>
+
+class A {
+  var x = 1;
+  var y = 2;
+  var p = 3;
+  def test (q) = p + q;
+  def add (z) = x + y + z + test(2);
+}
+
+a = A.new();
+a.add(5);
+
+// Translates to...
+
+A = mkObject();
+
+A.new = fun ( ) => {
+  obj = mkObject();
+  obj.x = 1;
+  obj.y = 2;
+  A.init(obj);
+  obj
+}
+
+A.init = fun (this) => { }
+A.test = fun (this, q) => { this.p + q; }
+A.add = fun (this, z) => { this.x + this.y + z + A.test(this, 2); }
+
+a = A.new();
+A.add(a, 5);
+

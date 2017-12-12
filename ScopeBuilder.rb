@@ -43,6 +43,7 @@ class ScopeBuilder
       when :VARIABLE_DECL then variableDecl(n)
       when :FUNCTION_DECL then functionDecl(n)
       when :OBJECT_DECL then objectDecl(n)
+      when :CLASS_DECL then classDecl(n)
       when :STATEMENT then statement(n)
       end
     end
@@ -129,15 +130,40 @@ class ScopeBuilder
   def body (node)
     @logger.debug("body")
     # Push a new scope?
-    #@scope = Scope.new(@scope)
-    #node.setAttribute("scope", @scope)
+    # If we push a scope, then it will serve as an outer scope for functions
+    # but our run-time always tries to load from a locals table, which is a
+    # problem. If we don't push a scope, then all members get defined in the
+    # parent scope of the object, which is also not what we want.
+    @scope = Scope.new(@scope)
+    @scope.setObjectFlag(true)
+    node.setAttribute("scope", @scope)
     
+    # I think this is not required at all for variable and value declarations
+    # For function declarations, again, not required, except to link up with
+    # outer scopes
     for i in 0..node.count-1
       n = node.child(i)
       declaration(n)
     end
     # Pop the scope
-    #@scope = @scope.link
+    @scope = @scope.link
+  end
+
+  def classDecl (node)
+    @logger.debug("classDecl")
+    identifierNode = node.child(0)
+    @scope.define(identifierNode.text)
+    template(node.child(1))
+  end
+
+  def template (node)
+    @logger.debug("template")
+    # It is possible that special declaration methods will be required, but
+    # this is fine for now. No scope push is required. See mockup.
+    for i in 0..node.count-1
+      n = node.child(i)
+      declaration(n)
+    end
   end
 
   def identifier (node)
@@ -182,6 +208,7 @@ class ScopeBuilder
     when :BINARY_EXPR then binaryExpr(node)
     when :IF_EXPR then ifExpr(node)
     when :BLOCK_EXPR then blockExpr(node)
+    when :LAMBDA_EXPR then lambdaExpr(node)
     when :NAME then name(node)
     when :EXPRESSION then expression(node)
     end
@@ -245,6 +272,12 @@ class ScopeBuilder
     when :VARIABLE_DECL then variableDecl(node)
     when :STATEMENT then statement(node)
     end
+  end
+
+  def lambdaExpr (node)
+    @logger.debug("lambdaExpr")
+    # Isn't this the same thing as a function?
+    function(node)
   end
 
   def functionCall (node)

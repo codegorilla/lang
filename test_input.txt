@@ -1,5 +1,23 @@
 // Test file
 
+class A {
+  var x = 1;
+  var y = 2;
+}
+
+print A;
+
+def myfun(x, y) = {
+  x + y;
+}
+
+print myfun(4, 8);
+
+var myfun1 = lambda (x, y) => x + y;
+
+print myfun1(16, 32);
+
+
 //val n = 4;
 
 //var z = 0;
@@ -8,33 +26,51 @@
 //  print z;
 //};
 
-var r = 115;
-var q = 120;
+//var r = 115;
+//var q = 120;
 
 //def myfun (x) = x + 1;
 
 //print myfun(5);
 
-object math {
-  var pi = 3.14;
-}
+//object math {
+//  var pi = 3.14;
+//  def myfun (k) = { k + 1 + this.pi; }
+//}
 
-object Dog {
-  var x = 1024;
-  var y = 2 * math.pi;
-  var z = 2 * this.x;
+//var t = math.myfun(2);
+//print t;
 
-  def myfun (x) = x + r + this.y;
-  var a = 1;
-}
+//object Dog {
+//  var x = 1024;
+//  var y = 2 * math.pi;
+//  var z = 2 * this.x;
 
-print Dog;
-print Dog.x;
-print Dog.y;
-print Dog.z;
+//  def myfun (x) = x + r + this.y;
+//  var a = 1;
+//}
 
-print Dog.myfun(32);
+//print Dog;
+//print Dog.x;
+//print Dog.y;
+//print Dog.z;
 
+//print Dog.myfun(32);
+
+//object Number {
+//  def add (self, x) = self.value + x.value1;
+//}
+
+//object num1 {
+//  var value = 14;
+//}
+
+//object num2 {
+//  var value = 8;
+//}
+
+//var t = Number.add(num1, num2);
+//print t;
 
 //object Cat {
 //  val t = 248;
