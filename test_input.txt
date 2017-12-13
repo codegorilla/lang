@@ -1,21 +1,29 @@
 // Test file
 
-class A {
-  var x = 1;
-  var y = 2;
-}
+var x = 12;
 
-print A;
+print x;
 
-def myfun(x, y) = {
-  x + y;
-}
+x.y = 15;
 
-print myfun(4, 8);
+print x.y;
 
-var myfun1 = lambda (x, y) => x + y;
+//class A {
+//  var x = 1;
+//  var y = 2;
+//}
 
-print myfun1(16, 32);
+//print A;
+
+//def myfun(x, y) = {
+//  x + y;
+//}
+
+//print myfun(4, 8);
+
+//var myfun1 = lambda (x, y) => x + y;
+
+//print myfun1(16, 32);
 
 
 //val n = 4;

@@ -392,6 +392,27 @@ class Interpreter
     @logger.debug("assignmentExpr")
     # This works because assignment is right associative
     # Might need to revisit once names become more complex (e.g. x.f[0])
+
+    # If the left node is a name then a store goes directly into a locals or
+    # globals table
+
+    # If the left node is a '.' (or something else) then a store equates to a
+    # set member operation
+
+    n = node.leftChild
+    if (n.kind == :OBJECT_ACCESS)
+      puts "we have an object access"
+      # Fetch the object
+      #fetchLvalue(n)
+      nameNode = n.leftChild
+      res = expr(nameNode)
+      # If this is an assignment then we don't want to get the member, we want
+      # to store into the member
+      memberNode = n.rightChild
+      res.setMember(memberNode.text, expr(node.rightChild))
+      return res
+    end
+
     nameNode = node.leftChild
     b = expr(node.rightChild)
     op = node.text
@@ -417,7 +438,7 @@ class Interpreter
           raise "Undefined variable '#{nameNode.text}'"
         end
       when '+='
-        # Compute id + b
+        # Compute t0 = name + b
         a = expr(nameNode)
         classObj = a.type
         if classObj == nil
