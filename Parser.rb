@@ -365,14 +365,22 @@ class Parser
     # A -> b | b op A
     n = logicalOrExpr
     t = nextToken
-    if t.kind == '='  ||
-       t.kind == '+=' ||
-       t.kind == '-=' ||
-       t.kind == '*=' ||
-       t.kind == '/=' then
-      match(t.kind)
+    if t.kind == '=' then
+      match('=')
       @logger.debug("assignmentExpr")
       p = Node.new(:ASSIGNMENT_EXPR)
+      # Not sure if setText is needed here
+      p.setText(t.text)
+      p.addChild(n)
+      p.addChild(assignmentExpr)
+      n = p
+    elsif t.kind == '+=' ||
+          t.kind == '-=' ||
+          t.kind == '*=' ||
+          t.kind == '/=' then
+      match(t.kind)
+      @logger.debug("compoundAssignmentExpr")
+      p = Node.new(:COMPOUND_ASSIGNMENT_EXPR)
       p.setText(t.text)
       p.addChild(n)
       p.addChild(assignmentExpr)

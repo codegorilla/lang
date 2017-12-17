@@ -1,12 +1,22 @@
 // Test file
 
-var x = 12;
+var x = 1;
+
+x = 12;
 
 print x;
 
-x.y = 15;
+x.a = 15;
+x.b = 23;
 
-print x.y;
+print x.a;
+print x.b;
+
+x.a.m = 10;
+
+var t = x.a.m;
+
+print t;
 
 //class A {
 //  var x = 1;

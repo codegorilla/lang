@@ -271,6 +271,7 @@ class Interpreter
         when :RETURN_EXPR then returnExpr(node)
         when :WHILE_EXPR then whileExpr(node)
         when :ASSIGNMENT_EXPR then assignmentExpr(node)
+        when :COMPOUND_ASSIGNMENT_EXPR then compoundAssignmentExpr(node)
         when :BINARY_EXPR then binaryExpr(node)
         when :UNARY_EXPR then unaryExpr(node)
         when :IF_EXPR then ifExpr(node)
@@ -399,130 +400,138 @@ class Interpreter
     # If the left node is a '.' (or something else) then a store equates to a
     # set member operation
 
+    e = expr(node.rightChild)
     n = node.leftChild
-    if (n.kind == :OBJECT_ACCESS)
-      puts "we have an object access"
-      # Fetch the object
-      #fetchLvalue(n)
-      nameNode = n.leftChild
-      res = expr(nameNode)
-      # If this is an assignment then we don't want to get the member, we want
-      # to store into the member
-      memberNode = n.rightChild
-      res.setMember(memberNode.text, expr(node.rightChild))
-      return res
+    case n.kind
+    when :OBJECT_ACCESS then assignObject(n, e)
+    when :ARRAY_ACCESS then assignArray(n, e)
+    when :NAME then assignName(n, e)
     end
+    $unit
+  end
 
+  def assignObject (node, e)
+    @logger.debug("assignObject")
+    n = node.leftChild
+    receiver =
+      case n.kind
+      when :OBJECT_ACCESS then loadObject(n)
+      when :NAME then loadName(n)
+      end
+    receiver.setMember(node.rightChild.text, e)
+    nil
+  end
+
+  def loadObject (node)
+    @logger.debug("loadObject")
+    n = node.leftChild
+    receiver =
+      case n.kind
+      when :OBJECT_ACCESS then loadObject(n)
+      when :NAME then loadName(n)
+      end
+    receiver.getMember(node.rightChild.text)
+  end
+
+  def loadName (node)
+    @logger.debug("loadName")
+    # Load name (with intent to possibly store expr into a member or sub-member)
+    index = fetchNameIndex(node)
+    if index != nil
+      result = @fp.load(index)
+    else
+      raise "Undefined variable '#{node.text}'"
+    end
+    result
+  end
+
+  def assignName (node, e)
+    @logger.debug("assignName")
+    index = fetchNameIndex(node)
+    if index != nil
+      #result = fp.load(index)
+      @fp.store(index, e)
+    else
+      raise "Undefined variable '#{node.text}'"
+    end
+    nil
+  end
+
+  def fetchNameIndex (node)
+    @logger.debug("fetchNameIndex")
+    # need to see if the variable is defined in this block
+    # if not, then it is in a higher lexical scope
+    # can this be done at compile time?
+    fp = @fp
+    scope = @scope
+    index = scope.lookup(node.text)
+
+    # probably want while scope != global
+    while !index && scope.link != nil do
+      fp = fp.staticLink
+      scope = scope.link
+      index = scope.lookup(node.text)
+    end
+    index
+  end
+
+  # def fetchLvalue (node)
+  #   if node.kind == :OBJECT_ACCESS then
+  #     obj = fetchLvalue(node.leftChild)
+  #     memberNode = node.rightChild
+  #     result = obj.getMember(memberNode.text)
+  #   else
+  #     # Load the name from locals or globals table
+  #     fp = @fp
+  #     scope = @scope
+  #     index = scope.lookup(node.text)
+  #     if index != nil
+  #       obj = fp.load(index)
+  #       memberNode = node.rightChild
+  #       result = obj.getMember(memberNode.text)
+  #     end
+  #   end
+  #   result
+  # end
+
+
+  def compoundAssignmentExpr (node)
+    @logger.debug("compoundAssignmentExpr")
     nameNode = node.leftChild
     b = expr(node.rightChild)
     op = node.text
-    d = case op
-      when '='
-        # need to see if the variable is defined in this block
-        # if not, then it is in a higher lexical scope
-        # can this be done at compile time?
-        fp = @fp
-        scope = @scope
-        index = scope.lookup(nameNode.text)
-    
-        # probably want while scope != global
-        while !index && scope.link != nil
-          fp = fp.staticLink
-          scope = scope.link
-          index = scope.lookup(nameNode.text)
-        end
-        if index != nil
-          result = fp.load(index)
-          fp.store(index, b)
-        else
-          raise "Undefined variable '#{nameNode.text}'"
-        end
-      when '+='
-        # Compute t0 = name + b
-        a = expr(nameNode)
-        classObj = a.type
-        if classObj == nil
-          # Throw exception
-        end
-        c = classObj.getMember('add').call(a, b)
-        fp = @fp
-        scope = @scope
-        index = scope.lookup(nameNode.text)
-    
-        # probably want while scope != global
-        #while !index
-        if !index
-          fp = fp.staticLink
-          scope = scope.link
-          index = scope.lookup(nameNode.text)
-        end
-        result = fp.load(index)
-        fp.store(index, c)
-      when '-='
-        # Compute id - b
-        a = expr(nameNode)
-        classObj = a.type
-        if classObj == nil
-          # Throw exception
-        end
-        c = classObj.getMember('sub').call(a, b)
-        fp = @fp
-        scope = @scope
-        index = scope.lookup(nameNode.text)
-    
-        # probably want while scope != global
-        #while !index
-        if !index
-          fp = fp.staticLink
-          scope = scope.link
-          index = scope.lookup(nameNode.text)
-        end
-        result = fp.load(index)
-        fp.store(index, c)
-      when '*='
-        # Compute id * b
-        a = expr(nameNode)
-        classObj = a.type
-        if classObj == nil
-          # Throw exception
-        end
-        c = classObj.getMember('mul').call(a, b)
-        fp = @fp
-        scope = @scope
-        index = scope.lookup(nameNode.text)
-    
-        # probably want while scope != global
-        #while !index
-        if !index
-          fp = fp.staticLink
-          scope = scope.link
-          index = scope.lookup(nameNode.text)
-        end
-        result = fp.load(index)
-        fp.store(index, c)
-      when '/='
-        # Compute id / b
-        a = expr(nameNode)
-        classObj = a.type
-        if classObj == nil
-          # Throw exception
-        end
-        c = classObj.getMember('div').call(a, b)
-        fp = @fp
-        scope = @scope
-        index = scope.lookup(nameNode.text)
-    
-        # probably want while scope != global
-        #while !index
-        if !index
-          fp = fp.staticLink
-          scope = scope.link
-          index = scope.lookup(nameNode.text)
-        end
-        result = fp.load(index)
-        fp.store(index, c)
+
+    methodName =
+      case op
+      when '+=' then 'add'
+      when '-=' then 'sub'
+      when '*=' then 'mul'
+      when '/=' then 'div'
+      end
+
+    # Compute t0 = name + b
+    a = expr(nameNode)
+    classObj = a.type
+    if classObj == nil
+      # Throw exception
     end
-    result = d
+
+    c = classObj.getMember(methodName).call(a, b)
+    fp = @fp
+    scope = @scope
+    index = scope.lookup(nameNode.text)
+
+    # probably want while scope != global
+    #while !index
+    if !index
+      fp = fp.staticLink
+      scope = scope.link
+      index = scope.lookup(nameNode.text)
+    end
+    
+    result = fp.load(index)
+    fp.store(index, c)
+
     result
   end
 
@@ -808,8 +817,6 @@ class Interpreter
     scope = @scope
     fp = @fp
     index = scope.lookup(node.text)
-    puts "node text is #{node.text}"
-    pp @scope.symbols.table
     # Logic to traverse higher scopes
     while !index && scope.link != nil
       scope = scope.link
@@ -840,17 +847,22 @@ class Interpreter
     # right side is value stored in object
     # step 1. get the object
     leftNode = node.leftChild
-    if leftNode.kind == :THIS
+    if leftNode.kind == :THIS then
       # ...from 'this' pointer
       obj = @thisPtr
-    else
+    elsif leftNode.kind == :OBJECT_ACCESS then
+      obj = objectAccess(leftNode)
+    elsif leftNode.kind == :NAME then
       # ...out of locals table
       obj = name(node.leftChild)
+    else
+      raise "THIS CAN'T HAPPEN"
     end
     # step 2. get the name of the member
     memberName = node.rightChild.text
     # step 3. look up the value using the name
-    res = obj.getMember(memberName)
+    result = obj.getMember(memberName)
+    result
   end
 
   def thisExpr (node)
