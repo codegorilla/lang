@@ -211,6 +211,7 @@ class ScopeBuilder
     when :LAMBDA_EXPR then lambdaExpr(node)
     when :NAME then name(node)
     when :EXPRESSION then expression(node)
+    when :ASSIGNMENT_EXPR then assignmentExpr(node)
     end
   end
 
@@ -241,6 +242,12 @@ class ScopeBuilder
     @logger.debug("whileExpr")
     expression(node.leftChild)
     expression(node.rightChild)
+  end
+
+  def assignmentExpr (node)
+    puts "Added on 17DEC2017 to fix lambdas - experimental, needs verification!"
+    expr(node.leftChild)
+    expr(node.rightChild)
   end
 
   def ifExpr (node)

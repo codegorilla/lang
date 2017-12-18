@@ -217,7 +217,24 @@ class Interpreter
   def template (node)
     @logger.debug("template")
     obj = TauObject.new($Object, '<Class>')
+    # For each declaration inside, do something
+    # e.g. var x = 1;
+    # translatest to obj.x = 1;
+    node.children.each do |n|
+      memberDecl(n, obj)
+    end
     obj
+  end
+
+  def memberDecl (node, obj)
+    case node.kind
+    when :VARIABLE_DECL then
+      puts "vardecl"
+      identifierNode = node.leftChild
+      obj.setMember(identifierNode.text, expression(node.rightChild))
+    when :FUNCTION_DECL then
+      puts "methoddecl"
+    end
   end
 
   # Theory of operation for functions vs. methods:
@@ -449,7 +466,6 @@ class Interpreter
     @logger.debug("assignName")
     index = fetchNameIndex(node)
     if index != nil
-      #result = fp.load(index)
       @fp.store(index, e)
     else
       raise "Undefined variable '#{node.text}'"
@@ -474,26 +490,6 @@ class Interpreter
     end
     index
   end
-
-  # def fetchLvalue (node)
-  #   if node.kind == :OBJECT_ACCESS then
-  #     obj = fetchLvalue(node.leftChild)
-  #     memberNode = node.rightChild
-  #     result = obj.getMember(memberNode.text)
-  #   else
-  #     # Load the name from locals or globals table
-  #     fp = @fp
-  #     scope = @scope
-  #     index = scope.lookup(node.text)
-  #     if index != nil
-  #       obj = fp.load(index)
-  #       memberNode = node.rightChild
-  #       result = obj.getMember(memberNode.text)
-  #     end
-  #   end
-  #   result
-  # end
-
 
   def compoundAssignmentExpr (node)
     @logger.debug("compoundAssignmentExpr")
