@@ -1,12 +1,12 @@
 // Test file
 
 
-var myfun1 = lambda (x, y) => x + y;
-print myfun1(8, 32);
+//var myfun1 = lambda (x, y) => x + y;
+//print myfun1(8, 32);
 
-var myfun2 = null;
-myfun2 = lambda (x, y) => x + y;
-print myfun2(4, 6);
+//var myfun2 = null;
+//myfun2 = lambda (x, y) => x + y;
+//print myfun2(4, 6);
 
 
 //var x = 1;
@@ -27,45 +27,60 @@ print myfun2(4, 6);
 
 //print t;
 
-//class A {
-//  var a = 14;
-//  var b = 21;
-//  var c = 3.14;
-//  def fn (x) = { x + 1; }
-//}
+class Comp {
+  var real = 3;
+  var imag = 4;
+  var init = lambda (x, y) => x * y;
+  def fn (x) = { x + 1; }
+}
 
-//print A;
-//print A.a;
-//print A.b;
-//print A.c;
+print Comp;
+print Comp.real;
+print Comp.imag;
+print Comp.init(30, 41);
 
-//def myfun(x, y) = {
-//  x + y;
-//}
 
-//print myfun(4, 8);
+// Define class
+var Complex = 0;
+Complex.make = lambda (re, im) => {
+  var instance = 0;
+  instance.real = re;
+  instance.imag = im;
+  instance;
+};
 
-//A.t = 1;
-//A.myfun = myfun;
+Complex.mag = lambda (self) => {
+  var result = (self.real * self.real + self.imag * self.imag) / 5;
+  result;
+};
 
-//print A.myfun(3, 2);
+Complex.add = lambda (self) => {
+  print self.real;
+  print self.imag;
+  self.real = 1;
+  //self.real = self.real + other.real;
+  //self.imag = self.imag + other.imag;
+};
 
-//var fun1 = lambda (x, y) => x + y + 2;
-//print fun1(3, 4);
 
-//var fun2 = null;
-//fun2 = lambda (x, y) => x + y + 2;
-//fun2 = fun1;
-//print fun2(3, 4);
+// Create object
+var z = Complex.make(3, 4);
+print z.real;
+print z.imag;
 
-//A.fun1 = func;
-//A.fun1 = lambda (x, y) => x + y + 2;
+// Create another object
+var zp = Complex.make(2, 1);
+print zp.real;
+print zp.imag;
 
-//print A.fun1(10, 100);
+Complex.add(z, zp);
+//print z.real;
+//print z.imag;
 
-//var myfun1 = lambda (x, y) => x + y;
+//print Complex.mag(z);
 
-//print myfun1(16, 32);
+//z.mag();
+
 
 
 //val n = 4;
