@@ -27,18 +27,17 @@
 
 //print t;
 
-class Comp {
-  var real = 3;
-  var imag = 4;
-  var init = lambda (x, y) => x * y;
-  def fn (x) = { x + 1; }
-}
+//class Comp {
+//  var real = 3;
+//  var imag = 4;
+//  var init = lambda (x, y) => x * y;
+//  def fn (x) = { x + 1; }
+//}
 
-print Comp;
-print Comp.real;
-print Comp.imag;
-print Comp.init(30, 41);
-
+//print Comp;
+//print Comp.real;
+//print Comp.imag;
+//print Comp.init(30, 41);
 
 // Define class
 var Complex = 0;
@@ -54,33 +53,28 @@ Complex.mag = lambda (self) => {
   result;
 };
 
-Complex.add = lambda (self) => {
-  print self.real;
-  print self.imag;
-  self.real = 1;
-  //self.real = self.real + other.real;
-  //self.imag = self.imag + other.imag;
+Complex.add = lambda (x, y) => {
+  x.real = x.real + y.real;
+  x.imag = x.imag + y.imag;
 };
-
 
 // Create object
 var z = Complex.make(3, 4);
 print z.real;
 print z.imag;
 
+print Complex.mag(z);
+//print z.mag();
+
 // Create another object
-var zp = Complex.make(2, 1);
+var zp = Complex.make(2.5, 1.25);
 print zp.real;
 print zp.imag;
 
+// Add in place
 Complex.add(z, zp);
-//print z.real;
-//print z.imag;
-
-//print Complex.mag(z);
-
-//z.mag();
-
+print z.real;
+print z.imag;
 
 
 //val n = 4;

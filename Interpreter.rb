@@ -453,31 +453,6 @@ class Interpreter
   def loadName (node)
     @logger.debug("loadName")
     # Load name (with intent to possibly store expr into a member or sub-member)
-    index = fetchNameIndex(node)
-    if index != nil
-      result = @fp.load(index)
-    else
-      raise "Undefined variable '#{node.text}'"
-    end
-    result
-  end
-
-  def assignName (node, e)
-    @logger.debug("assignName")
-    index = fetchNameIndex(node)
-    if index != nil
-      @fp.store(index, e)
-    else
-      raise "Undefined variable '#{node.text}'"
-    end
-    nil
-  end
-
-  def fetchNameIndex (node)
-    @logger.debug("fetchNameIndex")
-    # need to see if the variable is defined in this block
-    # if not, then it is in a higher lexical scope
-    # can this be done at compile time?
     fp = @fp
     scope = @scope
     index = scope.lookup(node.text)
@@ -488,7 +463,34 @@ class Interpreter
       scope = scope.link
       index = scope.lookup(node.text)
     end
-    index
+
+    if index != nil then
+      result = fp.load(index)
+    else
+      raise "Undefined variable '#{node.text}'"
+    end
+    result
+  end
+
+  def assignName (node, e)
+    @logger.debug("assignName")
+    fp = @fp
+    scope = @scope
+    index = scope.lookup(node.text)
+
+    # probably want while scope != global
+    while !index && scope.link != nil do
+      fp = fp.staticLink
+      scope = scope.link
+      index = scope.lookup(node.text)
+    end
+
+    if index != nil
+      fp.store(index, e)
+    else
+      raise "Undefined variable '#{node.text}'"
+    end
+    nil
   end
 
   def compoundAssignmentExpr (node)
