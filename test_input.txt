@@ -40,16 +40,24 @@
 //print Comp.init(30, 41);
 
 // Define class
-var Complex = 0;
+var Complex = 12;
 Complex.make = lambda (re, im) => {
-  var instance = 0;
+  var instance = 14;
+  instance.type = Complex;
   instance.real = re;
   instance.imag = im;
   instance;
 };
 
+Complex.rake = 180;
+
 Complex.mag = lambda (self) => {
-  var result = (self.real * self.real + self.imag * self.imag) / 5;
+  var result = self.real * self.real;
+  result;
+};
+
+Complex.double = lambda (self) => {
+  var result = 2 * self.real;
   result;
 };
 
@@ -63,19 +71,31 @@ var z = Complex.make(3, 4);
 print z.real;
 print z.imag;
 
-print Complex.mag(z);
-//print z.mag();
-
 // Create another object
-var zp = Complex.make(2.5, 1.25);
+var zp = Complex.make(2, 8);
 print zp.real;
 print zp.imag;
 
 // Add in place
-Complex.add(z, zp);
+//Complex.add(z, zp);
+z.add(zp);
 print z.real;
 print z.imag;
 
+// Again, using z.type
+// z.add(zp) -> z.type.add(z, zp);
+//z.type.add(z, zp);
+//print z.real;
+//print z.imag;
+
+print z.mag( );
+print z.double( );
+
+// Need to test z.add(zp);
+// z.add(zp) should be the same as Complex.add(z, zp)
+// search z for 'add' member
+// if not found, then search z.type for 'add' member
+// If found, then call z.type.add with parameters z and zp
 
 //val n = 4;
 

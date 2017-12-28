@@ -28,6 +28,7 @@ class TauObject
   end
 
   def getMember (name)
+    # Might need to change this to look towards class
     @members[name]
   end
 

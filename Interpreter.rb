@@ -376,6 +376,8 @@ class Interpreter
       x << resultObj.value[count-1].value.to_s
       x << ']'
       puts x
+    when $Function then
+      puts "<function>"
     else
       puts resultObj.value
     end
@@ -751,8 +753,16 @@ class Interpreter
     @logger.debug("functionCall")
     # evaluate the left side
     # this should result in a Function object, for which a call can be made
+    # it could also be a Method object. Method objects might have special
+    # behaviors to facilitate OO programming. For now, just work on functions.
     functionObj = expr(node.leftChild)
     
+    # check the silly test that was added in objectAccess
+    silly = node.leftChild.getAttribute('hula')
+    # if silly != nil
+    #   puts silly.value
+    # end
+
     # evaluate the right side, e.g. argument list
     # As part of the calling sequence, these arguments must be passed in to
     # function1.
@@ -763,6 +773,20 @@ class Interpreter
     argumentsNode.children.each do |n|
       argObj = expression(n)
       args.push(argObj)
+    end
+
+    # If it was a method call, then the LHS of the OBJECT_ACCESS node needs
+    # to be pushed onto the args array. One way to do this is to attach it to
+    # the functionObj node as a way of passing information back up the AST.
+    if silly != nil && silly.value == 14 then
+      puts "appending an argument!"
+      args.push(silly)
+    end
+    
+    puts "num of args is #{args.count}"
+    if args.count == 2 then
+      puts "value is #{args[0].value}"
+      puts "value is #{args[1].value}"
     end
 
     # The function call should cause a jump to the location of the code
@@ -853,6 +877,10 @@ class Interpreter
     elsif leftNode.kind == :NAME then
       # ...out of locals table
       obj = name(node.leftChild)
+      # As part of method call, this needs to be attached to the node so that
+      # it can be passed back up the tree
+      # For now just do a silly test
+      node.setAttribute('hula', obj)
     else
       raise "THIS CAN'T HAPPEN"
     end
@@ -860,6 +888,11 @@ class Interpreter
     memberName = node.rightChild.text
     # step 3. look up the value using the name
     result = obj.getMember(memberName)
+    if result == nil then
+      # member was not found -- look in class object
+      klass = obj.getMember('type')
+      result = klass.getMember(memberName)
+    end
     result
   end
 
