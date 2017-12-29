@@ -262,16 +262,10 @@ class Lexer
 
         when '('
           consume
-          if nextChar == ')'
-            consume
-            @logger.debug("(Ln #{line}, Col #{column-2}): Found '()'")
-            token = makeToken(:UNIT, "()")
-          else
-            @logger.debug("(Ln #{line}, Col #{column-1}): Found '('")
-            token = makeToken(L_PAREN, L_PAREN)
-          end
+          @logger.debug("(Ln #{line}, Col #{column-1}): Found '('")
+          token = makeToken(L_PAREN, L_PAREN)
           done = true
-          
+
         when ')'
           consume
           @logger.debug("(Ln #{line}, Col #{column-1}): Found ')'")

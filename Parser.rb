@@ -78,7 +78,7 @@ class Parser
         n.addChild(declaration)
       when 'break', 'continue', 'do', ';', 'for', 'print', 'return', 'while'
         n.addChild(statement)
-      when 'if', :ID, :NULL, :UNIT, :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, :STRING, '(', '[', '{', 'lambda'
+      when 'if', :ID, :NULL, :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, :STRING, '(', '[', '{', 'lambda'
         n.addChild(statement)
       when 'EOF'
         done = true
@@ -266,17 +266,17 @@ class Parser
     @logger.debug("expression")
     n = Node.new(:EXPRESSION)
     p =
-    case nextToken.kind
-    when 'break' then breakExpr
-    when 'continue' then continueExpr
-    when 'do' then doExpr
-    when 'for' then forExpr
-    when 'print' then printExpr
-    when 'return' then returnExpr
-    when 'while' then whileExpr
-    else
-      assignmentExpr
-    end
+      case nextToken.kind
+      when 'break' then breakExpr
+      when 'continue' then continueExpr
+      when 'do' then doExpr
+      when 'for' then forExpr
+      when 'print' then printExpr
+      when 'return' then returnExpr
+      when 'while' then whileExpr
+      else
+        assignmentExpr
+      end
     n.addChild(p)
     n
   end
@@ -339,6 +339,7 @@ class Parser
       # Return unit implicitly
       # Might want to add debug logging here
       p = Node.new(:EXPRESSION)
+      # Can probably use Node::UNIT_LITERAL
       q = Node.new(:UNIT_LITERAL)
       p.addChild(q)
       n.addChild(p)
@@ -629,7 +630,7 @@ class Parser
       p = Node.new(:BLOCK_EXPR)
       p.addChild(statement)
       n.addChild(p)
-    when 'if', :ID, :NULL, :UNIT, :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, '(', '[', '{'
+    when 'if', :ID, :NULL, :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, '(', '[', '{'
       n.addChild(expression)
     end
 
@@ -656,7 +657,7 @@ class Parser
       # Manually insert a block node
       n = Node.new(:BLOCK_EXPR)
       n.addChild(statement)
-    when 'if', :ID, :NULL, :UNIT, :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, '(', '[', '{'
+    when 'if', :ID, :NULL, :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, '(', '[', '{'
       n = expression
     end
     n
@@ -796,21 +797,28 @@ class Parser
   def parenthesizedExpr ()
     @logger.debug("parenthesizedExpr")
     # This could either be a tuple or a plain expression enclosed in parenthesis
-    match('(')
-    n = expression
-    if nextToken.kind == ','
-      p = Node.new(:TUPLE_LITERAL)
-      p.addChild(n)
-      n = p
-    end
-    while nextToken.kind == ','
+    match('(')    
+    if nextToken.kind == ')' then
+      # Found unit literal
       consume
-      # Check for optional trailing comma
-      if nextToken.kind != ')'
-        n.addChild(expression)
+      n = Node::UNIT_LITERAL
+    else
+      # expression or tuple
+      n = expression
+      if nextToken.kind == ','
+        p = Node.new(:TUPLE_LITERAL)
+        p.addChild(n)
+        n = p
       end
+      while nextToken.kind == ','
+        consume
+        # Check for optional trailing comma
+        if nextToken.kind != ')'
+          n.addChild(expression)
+        end
+      end
+      match(')')
     end
-    match(')')
     n
   end
 
@@ -852,7 +860,6 @@ class Parser
     @logger.debug("literal")
     case nextToken.kind
     when :NULL then nullLiteral
-    when :UNIT then unitLiteral
     when :BOOLEAN then booleanLiteral
     when :INTEGER then integerLiteral
     when :FLOAT then floatLiteral
@@ -872,13 +879,6 @@ class Parser
     n
   end
 
-  def unitLiteral ()
-    @logger.debug("unitLiteral")
-    n = Node::UNIT_LITERAL
-    match(:UNIT)
-    n
-  end
-  
   def booleanLiteral ()
     @logger.debug("booleanLiteral")
     n = Node.new(:BOOLEAN_LITERAL)

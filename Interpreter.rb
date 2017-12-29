@@ -769,24 +769,19 @@ class Interpreter
     # At some point need to enforce numArgs == numParams
     # for now don't worry about it
     args = []
+
+    # If it was a method call, then the LHS of the OBJECT_ACCESS node needs
+    # to be pushed onto the args array as the first element. One way to do this
+    # is to attach it to the functionObj node as a way of passing information
+    # back up the AST.
+    if silly != nil && silly.value == 14 then
+      args.push(silly)
+    end
+
     argumentsNode = node.rightChild
     argumentsNode.children.each do |n|
       argObj = expression(n)
       args.push(argObj)
-    end
-
-    # If it was a method call, then the LHS of the OBJECT_ACCESS node needs
-    # to be pushed onto the args array. One way to do this is to attach it to
-    # the functionObj node as a way of passing information back up the AST.
-    if silly != nil && silly.value == 14 then
-      puts "appending an argument!"
-      args.push(silly)
-    end
-    
-    puts "num of args is #{args.count}"
-    if args.count == 2 then
-      puts "value is #{args[0].value}"
-      puts "value is #{args[1].value}"
     end
 
     # The function call should cause a jump to the location of the code

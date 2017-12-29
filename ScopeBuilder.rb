@@ -245,7 +245,6 @@ class ScopeBuilder
   end
 
   def assignmentExpr (node)
-    puts "Added on 17DEC2017 to fix lambdas - experimental, needs verification!"
     expr(node.leftChild)
     expr(node.rightChild)
   end

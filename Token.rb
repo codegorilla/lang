@@ -8,7 +8,6 @@ class Token
   end
 
   EOF = Token.new(:EOF)
-  #UNIT = Token.new(:UNIT, "()")
   UNKNOWN = Token.new(:UNKNOWN)
 
   def setText (text)
