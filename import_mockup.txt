@@ -1,0 +1,50 @@
+
+
+file $COBALT_PATH/cobalt/math/array.co:
+
+class Matrix {}
+class Sparse {}
+class Tensor {}
+
+file $COBALT_PATH/cobalt/math/random.co:
+
+class Random {}
+
+file $COBALT_PATH/cobalt/math/package.co:
+
+import cobalt.math.array._;
+import cobalt.math.random._;
+
+----
+
+directory structure:
+
+$COBALT_PATH/
+  cobalt/
+    math/
+      package.co
+      array.co
+      random.co
+
+----
+
+file myfile:
+
+import cobalt.math.array;
+val m = new array.Matrix();
+val s = new array.Sparse();
+val t = new array.Tensor();
+
+import cobalt.math.array._;
+val m = new Matrix();
+val s = new Sparse();
+val t = new Tensor();
+
+import cobalt.math.random;
+val rx = new random.Random.new();
+
+import cobalt.math.random._;
+val r = new Random();
+
+import cobalt.math._;
+
