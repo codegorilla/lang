@@ -60,11 +60,6 @@ class Interpreter
   end
 
   def start ()
-
-    # Temporary tet for global variables
-    g = @globals['x1']
-    if g then puts g.value end
-    
     program(@root)
   end
 
@@ -863,25 +858,26 @@ class Interpreter
       index = scope.lookup(node.text)
     end
 
-    # Test:  Try to find the variable in the global hash
     if scope.link == nil
-      puts @globals[node.text].value
-    end
-  
-    if index != nil
-      # This might be a problem: assuming that we are loading a name from a
-      # frame. What if we are loading it from an object?
-      # Probably need to mark scopes as either procedural or object-based
-      # and load based on the result of a check
-      if @scope.objectFlag == true then
-        result = @thisPtr.getMember(node.text)
-      else
-        result = fp.load(index)
-      end
+    # If we are at global scope then try to find the variable in the global hash
+      result = @globals[node.text]
       result
     else
-      # This needs to print a stack trace for lx, not ruby
-      raise "variable '#{node.text}' undefined."
+      if index != nil
+        # This might be a problem: assuming that we are loading a name from a
+        # frame. What if we are loading it from an object?
+        # Probably need to mark scopes as either procedural or object-based
+        # and load based on the result of a check
+        if @scope.objectFlag == true then
+          result = @thisPtr.getMember(node.text)
+        else
+          result = fp.load(index)
+        end
+        result
+      else
+        # This needs to print a stack trace for lx, not ruby
+        raise "variable '#{node.text}' undefined."
+      end
     end
   end
 

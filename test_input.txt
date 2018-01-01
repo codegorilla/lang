@@ -10,7 +10,15 @@ import math;
 //myfun2 = lambda (x, y) => x + y;
 //print myfun2(4, 6);
 
-print x1;
+var rf = tf + x1;
+
+print rf;
+
+print x2;
+
+print y2;
+
+print m11 - m12;
 
 //var x = 1;
 
