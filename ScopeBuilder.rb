@@ -12,6 +12,13 @@ class ScopeBuilder
     # Maintain a stack of scopes
     @scope = nil
 
+    # Maintain an import dependency list so that we know what compilation units
+    # that this particular chunk relies on.
+    # This combines with other dependency lists to create a dependency graph
+    # For now it is just a list of names, but eventually, need to build a graph
+    # data structure.
+    @imports = []
+
     @label = 0
   end
   
@@ -22,6 +29,10 @@ class ScopeBuilder
   # Temporary for troubleshooting
   def GET_SCOPE()
     @scope
+  end
+
+  def imports ()
+    @imports
   end
 
   def problems ()
@@ -48,6 +59,7 @@ class ScopeBuilder
       end
     end
     node.setAttribute("scope", @scope)
+    node.setAttribute("imports", @imports)
   end
 
   # DECLARATIONS
@@ -197,6 +209,7 @@ class ScopeBuilder
     case node.kind
     when :DO_EXPR then doExpr(node)
     when :FOR_EXPR then forExpr(node)
+    when :IMPORT_EXPR then importExpr(node)
     when :PRINT_EXPR then printExpr(node)
     when :RETURN_EXPR then returnExpr(node)
     when :WHILE_EXPR then whileExpr(node)
@@ -228,6 +241,16 @@ class ScopeBuilder
     expression(node.child(3))
   end
   
+  def importExpr (node)
+    @logger.debug("importExpr")
+    importName(node.child)
+  end
+
+  def importName (node)
+    @logger.debug("importName")
+    @imports.push(node.text + ".co")
+  end
+
   def printExpr (node)
     @logger.debug("printExpr")
     expression(node.child)

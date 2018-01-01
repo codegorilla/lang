@@ -62,10 +62,49 @@ def main (filename = 'test_input.txt')
     @parser.problems.errorCount +
     @sb.problems.errorCount
 
+  # Before we can evaluate this chunk, we need to compile its dependencies and
+  # execute them first.
+  pp @sb.imports
+
+  # At this point, the resources with many stages can be released and re-used
+  # for compilation of dependencies. This may be able to be parallelized at some
+  # point
+  filename = @sb.imports[0]
+  puts filename
+  @input = InputStream.new(filename)
+  @lexer = Lexer.new(@input)
+  @lexer.setLogLevel(Logger::WARN)
+  @tokens = TokenStream.new(@lexer)
+  @parser = Parser.new(@tokens)
+  @root1 = @parser.start
+  @sb = ScopeBuilder.new(@root1)
+  @sb.setLogLevel(Logger::WARN)
+  @sb.start
+  
+  # Gobal variables are stored into a table in the top (global) frame of the
+  # compilation unit. They really need to be stored in a hash table. An
+  # alternative is to allow access to the global frames of external compilation
+  # units.  But this may require code modification in a linker phase.
+  # An alternative is that all imports will import into a namespace, and
+  # access to external names can be via those namespaces. This is similar to
+  # python.  For example "import random;" creates an object called "random".
+  # Access to its members can be done like so: "var t = random.var1;".
+
+  # A temporary test of a global variable table that is accessible across
+  # compilation units
+  globalHash = {}
+  
+  @eval = Interpreter.new(@root1, globalHash)
+  @eval.setLogLevel(Logger::WARN)
+  @eval.start
+
+
   if errorCount == 0 then
     # Interpret
+    # Eventually, this will be called the evaluation phase
+    # Because, really the entire program is an interpreter, not just this stage
     logger.info("Interpreting...")
-    @int = Interpreter.new(@root)
+    @int = Interpreter.new(@root, globalHash)
     @int.setLogLevel(Logger::WARN)
     @int.start
   end

@@ -1,5 +1,7 @@
 // Test file
 
+import random;
+import math;
 
 //var myfun1 = lambda (x, y) => x + y;
 //print myfun1(8, 32);
@@ -8,6 +10,7 @@
 //myfun2 = lambda (x, y) => x + y;
 //print myfun2(4, 6);
 
+print x1;
 
 //var x = 1;
 

@@ -1,7 +1,9 @@
 class Interpreter
 
-  def initialize (root)
+  def initialize (root, globals)
     @root = root
+
+    @globals = globals
 
     @logger = Logger.new(STDOUT)
     @logger.level = Logger::WARN
@@ -58,6 +60,11 @@ class Interpreter
   end
 
   def start ()
+
+    # Temporary tet for global variables
+    g = @globals['x1']
+    if g then puts g.value end
+    
     program(@root)
   end
 
@@ -106,7 +113,15 @@ class Interpreter
     # Store the expression result into the locals table
     identifierNode = node.leftChild
     index = @scope.lookup(identifierNode.text)
-    @fp.store(index, expression(node.rightChild))
+    obj = expression(node.rightChild)
+    @fp.store(index, obj)
+
+    # Check to see if this is the global scope
+    # Store the object into the global hash if it is
+    if @scope.link == nil
+      #puts "I am at global scope!"
+      @globals[identifierNode.text] = obj
+    end
   end
 
   def functionDecl (node)
@@ -284,6 +299,7 @@ class Interpreter
         when :BREAK_EXPR then breakExpr(node)
         when :DO_EXPR then doExpr(node)
         when :FOR_EXPR then forExpr(node)
+        when :IMPORT_EXPR then importExpr(node)
         when :PRINT_EXPR then printExpr(node)
         when :RETURN_EXPR then returnExpr(node)
         when :WHILE_EXPR then whileExpr(node)
@@ -359,6 +375,10 @@ class Interpreter
       @fp.store(index, x)
       expression(node.child(3))
     end
+    $unit
+  end
+
+  def importExpr (node)
     $unit
   end
 
@@ -837,10 +857,17 @@ class Interpreter
     # Logic to traverse higher scopes
     while !index && scope.link != nil
       scope = scope.link
+
       # Not sure that the fp needs to always move
       fp = fp.staticLink
       index = scope.lookup(node.text)
     end
+
+    # Test:  Try to find the variable in the global hash
+    if scope.link == nil
+      puts @globals[node.text].value
+    end
+  
     if index != nil
       # This might be a problem: assuming that we are loading a name from a
       # frame. What if we are loading it from an object?

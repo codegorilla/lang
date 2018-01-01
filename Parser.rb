@@ -5,6 +5,17 @@ class Parser
   def initialize (tokens)
     @tokens = tokens
 
+    # MOVING THIS SECTION TO LATER STAGE - MAYBE SCOPEBUILDER
+    # PARSER SHOULD ONLY BE RESPONSIBLE FOR PARSING
+    # Part of dependency graph
+    # Parser creates an AST for the compilation unit
+    # Design: Each AST has a dependency graph attached to its root node.
+    # This might change later.
+    # Design: Make a list of imports. Each time an import is encountered, add
+    # it to the import list.
+    # At the end of the parse, annotate the root node of the AST with the list.
+    #@imports = []
+
     @logger = Logger.new(STDOUT)
     @logger.level = Logger::WARN
     @logger.info("Initialized parser.")
@@ -76,7 +87,7 @@ class Parser
       case t.kind
       when 'val', 'var', 'def', 'class', 'object'
         n.addChild(declaration)
-      when 'break', 'continue', 'do', ';', 'for', 'print', 'return', 'while'
+      when 'break', 'continue', 'do', ';', 'for', 'import', 'print', 'return', 'while'
         n.addChild(statement)
       when 'if', :ID, :NULL, :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, :STRING, '(', '[', '{', 'lambda'
         n.addChild(statement)
@@ -271,6 +282,7 @@ class Parser
       when 'continue' then continueExpr
       when 'do' then doExpr
       when 'for' then forExpr
+      when 'import' then importExpr
       when 'print' then printExpr
       when 'return' then returnExpr
       when 'while' then whileExpr
@@ -320,6 +332,24 @@ class Parser
     n.addChild(expression)
     match(')')
     n.addChild(expression)
+    n
+  end
+
+  def importExpr ()
+    @logger.debug("importExpr")
+    n = Node.new(:IMPORT_EXPR)
+    match('import')
+    n.addChild(importName)
+    n
+  end
+
+  def importName ()
+    @logger.debug("importName")
+    t = nextToken
+    match(:ID)
+    n = Node.new(:IMPORT_NAME)
+    n.setLine(t.line)
+    n.setText(t.text)
     n
   end
 
