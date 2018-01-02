@@ -2,6 +2,7 @@
 
 import random;
 import math;
+import complex;
 
 //var myfun1 = lambda (x, y) => x + y;
 //print myfun1(8, 32);
@@ -19,6 +20,8 @@ print x2;
 print y2;
 
 print m11 - m12;
+
+print sqrt(25);
 
 //var x = 1;
 
@@ -51,32 +54,6 @@ print m11 - m12;
 //print Comp.init(30, 41);
 
 // Define class
-var Complex = 12;
-Complex.make = lambda (re, im) => {
-  var instance = 14;
-  instance.type = Complex;
-  instance.real = re;
-  instance.imag = im;
-  instance;
-};
-
-Complex.square =
-  lambda (self) => self.real * self.real;
-
-Complex.mag = lambda (self) => {
-  var result = self.real * self.real;
-  result;
-};
-
-Complex.double = lambda (self) => {
-  var result = 2 * self.real;
-  result;
-};
-
-Complex.add = lambda (x, y) => {
-  x.real = x.real + y.real;
-  x.imag = x.imag + y.imag;
-};
 
 // Create object
 var z = Complex.make(3, 4);

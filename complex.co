@@ -1,0 +1,30 @@
+// Complex class definition
+
+var Complex = 12;
+
+Complex.make = lambda (re, im) => {
+  var instance = 14;
+  instance.type = Complex;
+  instance.real = re;
+  instance.imag = im;
+  instance;
+};
+
+Complex.square =
+  lambda (self) => self.real * self.real;
+
+Complex.mag = lambda (self) => {
+  var result = self.real * self.real;
+  result;
+};
+
+Complex.double = lambda (self) => {
+  var result = 2 * self.real;
+  result;
+};
+
+Complex.add = lambda (x, y) => {
+  x.real = x.real + y.real;
+  x.imag = x.imag + y.imag;
+};
+

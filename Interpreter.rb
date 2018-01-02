@@ -148,6 +148,9 @@ class Interpreter
     # The value inside a function object should be an expression to evaluate
     # whenever the function is called, i.e. it needs to be an AST node!
     # In a VM, it would probably be a basic block or superblock.
+
+    # It might also be a native code block if defined in the underlying
+    # implementation language, which could be C or Ruby.
     result = TauObject.new($Function, node)
   end
 
@@ -799,10 +802,24 @@ class Interpreter
       args.push(argObj)
     end
 
-    # The function call should cause a jump to the location of the code
-    jumpNode = functionObj.value
-    result = function1(jumpNode, args)
-    result
+    # Testing native functions
+    if functionObj.value.class == Array
+      # This needs to be processed as a native function
+      arg0 = args[0]
+      #arg1 = args[1]
+      puts arg0.value
+      #puts arg1.value
+      nativeFunction = functionObj.value[1]
+      puts nativeFunction.call(arg0.value)
+      #puts nativeFunction.call(arg0.value, arg1.value)
+      $unit
+      # End test of native functions
+    else
+      # The function call should cause a jump to the location of the code
+      jumpNode = functionObj.value
+      result = function1(jumpNode, args)
+      result
+    end
   end
 
   def function1 (node, args)

@@ -82,6 +82,8 @@ def processFile (filename, globalHash, logger)
   # Process imports before evaluating
   processImports(sb.imports, globalHash, logger)
 
+  processQuicktest(globalHash)
+
   errorCount =
     lexer.problems.errorCount +
     parser.problems.errorCount +
@@ -113,6 +115,31 @@ def processImports (imports, globalHash, logger)
   imports.each do |i|
     processFile(i, globalHash, logger)
   end
+end
+
+def processQuicktest (globalHash)
+  require "./quicktest"
+  # This needs to make a native function object available in the namespace
+  # When you look up a name, it will resolve to the native function object
+  # Which should just be a regular function with a native code object inside
+  # rather than an AST node.
+
+  # For a quick test, add something to the global namespace
+  s = Common.slower
+  puts s.value.class
+  globalHash['quick'] = s
+  globalHash['sqrt'] = Common.sqrt
+
+  # This was a success. The next step is to allow loading of native modules.
+  # So an entire module will be written in Ruby (or C later on) and then loaded
+  # using a standard 'import' statement.
+  # The interpreter will determine that the module is a native module, and will
+  # load it properly as a native module instead of a standard .co file.
+  # An example of usage is that when the native module is loaded in, it will
+  # create some global variables and bind values to them -- most importantly,
+  # native functions.
+  # The first stab at a native module will be the math module, which will
+  # contain some trigonometric and trancendental functions, among others.
 end
 
 filename = ARGV[0]
