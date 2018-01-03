@@ -802,18 +802,13 @@ class Interpreter
       args.push(argObj)
     end
 
-    # Testing native functions
-    if functionObj.value.class == Array
-      # This needs to be processed as a native function
-      arg0 = args[0]
-      #arg1 = args[1]
-      puts arg0.value
-      #puts arg1.value
-      nativeFunction = functionObj.value[1]
-      puts nativeFunction.call(arg0.value)
-      #puts nativeFunction.call(arg0.value, arg1.value)
-      $unit
-      # End test of native functions
+    if functionObj.type == $NativeFunction
+      # Process as a native function
+      params = functionObj.value[0]
+      code = functionObj.value[1]
+      result = code.call(args)
+      #puts "Value is: #{r.value} of type #{r.type}"
+      result
     else
       # The function call should cause a jump to the location of the code
       jumpNode = functionObj.value

@@ -125,10 +125,9 @@ def processQuicktest (globalHash)
   # rather than an AST node.
 
   # For a quick test, add something to the global namespace
-  s = Common.slower
-  puts s.value.class
-  globalHash['quick'] = s
+  globalHash['add'] = Common.add
   globalHash['sqrt'] = Common.sqrt
+  globalHash['sin'] = Common.sin
 
   # This was a success. The next step is to allow loading of native modules.
   # So an entire module will be written in Ruby (or C later on) and then loaded
@@ -139,7 +138,7 @@ def processQuicktest (globalHash)
   # create some global variables and bind values to them -- most importantly,
   # native functions.
   # The first stab at a native module will be the math module, which will
-  # contain some trigonometric and trancendental functions, among others.
+  # contain some trigonometric and transcendental functions, among others.
 end
 
 filename = ARGV[0]

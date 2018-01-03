@@ -18,6 +18,8 @@ $Array = TauObject.new($Class)
 # $Function1, $Function2, etc...
 $Function = TauObject.new($Class, "<FunctionClass>")
 
+$NativeFunction = TauObject.new($Class, "<NativeFunctionClass>")
+
 # Singletons
 $true = TauObject.new($Bool, true)
 $false = TauObject.new($Bool, false)

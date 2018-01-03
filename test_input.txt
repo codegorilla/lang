@@ -14,14 +14,13 @@ import complex;
 var rf = tf + x1;
 
 print rf;
-
 print x2;
-
 print y2;
-
 print m11 - m12;
 
+print add(90, 5.1);
 print sqrt(25);
+print sin(3.141593*30/180) + 1;
 
 //var x = 1;
 
