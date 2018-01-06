@@ -1,5 +1,4 @@
-var x2 = 450;
+// Stub file to load native math library
 
-var y2 = 28 + tf;
+loadlib("./math");
 
-//print x2;

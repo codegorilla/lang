@@ -248,7 +248,7 @@ class ScopeBuilder
 
   def importName (node)
     @logger.debug("importName")
-    @imports.push(node.text + ".co")
+    @imports.push(node.text)
   end
 
   def printExpr (node)
