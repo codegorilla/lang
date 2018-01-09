@@ -1,19 +1,17 @@
 
 
-file $COBALT_PATH/cobalt/math/array.co:
+file $COBALT_PATH/cobalt/util/Matrix.co:
 
-class Matrix {}
-class Sparse {}
-class Tensor {}
+class Matrix { ... }
 
-file $COBALT_PATH/cobalt/math/random.co:
+file $COBALT_PATH/cobalt/util/Sparse.co:
 
-class Random {}
+class Sparse { ... }
 
-file $COBALT_PATH/cobalt/math/package.co:
+file $COBALT_PATH/cobalt/util/package.co:
 
-import cobalt.math.array._;
-import cobalt.math.random._;
+import cobalt.util.Matrix._;
+import cobalt.util.Sparse._;
 
 ----
 
@@ -21,30 +19,36 @@ directory structure:
 
 $COBALT_PATH/
   cobalt/
-    math/
+    util/
       package.co
-      array.co
-      random.co
+      Matrix.co
+      Sparse.co
 
 ----
 
 file myfile:
 
-import cobalt.math.array;
-val m = new array.Matrix();
-val s = new array.Sparse();
-val t = new array.Tensor();
+// math is a module
+// "module math;" declaration is present inside "math.co"
 
-import cobalt.math.array._;
+// Imports everything in math file under math namespace
+import cobalt.util.math;
+val x = math.sin(30);
+
+// Imports everything in math file into global namespace
+import cobalt.util.math._;
+val x = sin(30);
+
+// Matrix is just a class definition file
+// no "module" declaration is present in file "Matrix.co"
+
+// Imports everything in Matrix file into global namespace
+import cobalt.util.Matrix;
+val m = new Matrix();
+
+import cobalt.util.Matrix._;
 val m = new Matrix();
 val s = new Sparse();
 val t = new Tensor();
 
-import cobalt.math.random;
-val rx = new random.Random.new();
-
-import cobalt.math.random._;
-val r = new Random();
-
-import cobalt.math._;
 

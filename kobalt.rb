@@ -61,12 +61,32 @@ def main (filename = 'test_input')
   params = ['filename']
   code = lambda do |params|
     filename = params[0].value
+    moduleName = params[1].value
     require filename
-    Common.init(globalHash)
+    classRef = Kernel.const_get(moduleName)
+    classRef.init(globalHash)
     $unit
   end
   native_loadlib = TauObject.new($NativeFunction, [params, code])
   globalHash['loadlib'] = native_loadlib
+
+  # Quick test - function to create objects
+  params = []
+  code = lambda do |params|
+    # Ignore params
+    TauObject.new()
+  end
+  mkObject = TauObject.new($NativeFunction, [params, code])
+  globalHash['mkObject'] = mkObject
+
+  # Quick test - function to create classes
+  params = []
+  code = lambda do |params|
+    # Ignore params
+    TauObject.new($Class)
+  end
+  mkClass = TauObject.new($NativeFunction, [params, code])
+  globalHash['mkClass'] = mkClass
 
 
   # Process the specified file

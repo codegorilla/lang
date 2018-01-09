@@ -1,0 +1,22 @@
+// List class definition
+
+//var List = mkObject();
+var List = mkClass();
+
+
+List.make = lambda (x) => {
+  var instance = mkObject();
+  instance.type = List;
+  instance.head = x;
+  instance.tail = null;
+  instance;
+};
+
+List.prepend = lambda (self, x) => {
+    var instance = mkObject();
+    instance.type = List;
+    instance.head = x;
+    instance.tail = self;
+    instance;
+};
+

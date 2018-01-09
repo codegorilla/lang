@@ -83,8 +83,9 @@ class Interpreter
       when :VALUE_DECL then valueDecl(n)
       when :VARIABLE_DECL then variableDecl(n)
       when :FUNCTION_DECL then functionDecl(n)
-      when :OBJECT_DECL then objectDecl(n)
       when :CLASS_DECL then classDecl(n)
+      when :OBJECT_DECL then objectDecl(n)
+      when :MODULE_DECL then moduleDecl(n)
       when :STATEMENT then statement(n)
       else
         raise "Runtime error in program()"
@@ -250,6 +251,10 @@ class Interpreter
     end
   end
 
+  def moduleDecl (node)
+    @logger.debug("moduleDecl")
+  end
+
   # Theory of operation for functions vs. methods:
   # x = cos # returns function object
   # y = cos(t) # returns result of function call
@@ -396,6 +401,8 @@ class Interpreter
       puts x
     when $Function then
       puts "<function>"
+    when $Class then
+      puts "<class>"
     else
       puts resultObj.value
     end

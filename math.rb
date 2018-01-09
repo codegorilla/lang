@@ -4,16 +4,16 @@
 
 # Might need to require some API module
 
-module Common
+module MathModule
 
-  def Common.init (globalHash)
-    globalHash['atan2'] = Common.atan2
-    globalHash['cos']   = Common.cos
-    globalHash['log']   = Common.log
-    globalHash['log10'] = Common.log10
-    globalHash['sin']   = Common.sin
-    globalHash['sqrt']  = Common.sqrt
-    globalHash['tan']   = Common.tan
+  def MathModule.init (globalHash)
+    globalHash['atan2'] = MathModule.atan2
+    globalHash['cos']   = MathModule.cos
+    globalHash['log']   = MathModule.log
+    globalHash['log10'] = MathModule.log10
+    globalHash['sin']   = MathModule.sin
+    globalHash['sqrt']  = MathModule.sqrt
+    globalHash['tan']   = MathModule.tan
   end
 
   # A function object normally contains an AST node, whose children are a list
@@ -27,7 +27,7 @@ module Common
   # The parameters get passed in as cobalt objects and have to be "un-boxed".
   # They need to be re-boxed for passing back to the cobalt evaluator.
 
-  def Common.atan2 ()
+  def MathModule.atan2 ()
     params = ['y', 'x']
     code = lambda do |params|
       y = params[0].value
@@ -37,7 +37,7 @@ module Common
     result = TauObject.new($NativeFunction, [params, code])
   end
 
-  def Common.cos ()
+  def MathModule.cos ()
     params = ['x']
     code = lambda do |params|
       x = params[0].value
@@ -46,7 +46,7 @@ module Common
     result = TauObject.new($NativeFunction, [params, code])
   end
 
-  def Common.log ()
+  def MathModule.log ()
     params = ['x']
     code = lambda do |params|
       x = params[0].value
@@ -55,7 +55,7 @@ module Common
     result = TauObject.new($NativeFunction, [params, code])
   end
 
-  def Common.log10 ()
+  def MathModule.log10 ()
     params = ['x']
     code = lambda do |params|
       x = params[0].value
@@ -64,7 +64,7 @@ module Common
     result = TauObject.new($NativeFunction, [params, code])
   end
 
-  def Common.sin ()
+  def MathModule.sin ()
     params = ['x']
     code = lambda do |params|
       x = params[0].value
@@ -73,7 +73,7 @@ module Common
     result = TauObject.new($NativeFunction, [params, code])
   end
 
-  def Common.sqrt ()
+  def MathModule.sqrt ()
     params = ['x']
     code = lambda do |params|
       x = params[0].value
@@ -82,7 +82,7 @@ module Common
     result = TauObject.new($NativeFunction, [params, code])
   end
 
-  def Common.tan ()
+  def MathModule.tan ()
     params = ['x']
     code = lambda do |params|
       x = params[0].value

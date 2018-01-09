@@ -1,4 +1,4 @@
 // Stub file to load native math library
 
-loadlib("./math");
+loadlib("./math", "MathModule");
 

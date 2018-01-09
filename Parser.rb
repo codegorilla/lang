@@ -85,7 +85,7 @@ class Parser
     while !done do
       t = nextToken
       case t.kind
-      when 'val', 'var', 'def', 'class', 'object'
+      when 'val', 'var', 'def', 'class', 'object', 'module'
         n.addChild(declaration)
       when 'break', 'continue', 'do', ';', 'for', 'import', 'print', 'return', 'while'
         n.addChild(statement)
@@ -111,8 +111,9 @@ class Parser
     when 'val' then valueDecl
     when 'var' then variableDecl
     when 'def' then functionDecl
-    when 'object' then objectDecl
     when 'class' then classDecl
+    when 'object' then objectDecl
+    when 'module' then moduleDecl
     else
       raise "Parse error in declaration(): Can this ever happen?"
     end
@@ -232,6 +233,15 @@ class Parser
     n
   end
   
+  def moduleDecl ()
+    @logger.debug("module")
+    n = Node.new(:MODULE_DECL)
+    match('module')
+    n.addChild(identifier)
+    match(';')
+    n
+  end
+
   def identifier ()
     @logger.debug("identifier")
     t = nextToken

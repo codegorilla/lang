@@ -15,6 +15,7 @@ class KeywordTable
   IF = Token.new('if', "if")
   IMPORT = Token.new('import', "import")
   LAMBDA = Token.new('lambda', "lambda")
+  MODULE = Token.new('module', "module")
   NEW = Token.new('new', "new")
   NULL = Token.new(:NULL, "null")
   OBJECT = Token.new('object', "object")
@@ -27,15 +28,17 @@ class KeywordTable
   VAL = Token.new('val', "val")
   VAR = Token.new('var', "var")
   WHILE = Token.new('while', "while")
-
+  
   # Other future keywords?
+  # AS
   # CASE
   # CONST
   # IS
   # MATCH
-  # MODULE
   # MY
   # SWITCH
+  # UNTIL
+  # WHEN
   # WITH
   # YIELD
 
@@ -53,6 +56,7 @@ class KeywordTable
       'if' => IF,
       'import' => IMPORT,
       'lambda' => LAMBDA,
+      'module' => MODULE,
       'new' => NEW,
       'null' => NULL,
       'object' => OBJECT,

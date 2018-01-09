@@ -3,6 +3,9 @@
 import random;
 import math;
 import complex;
+import List;
+
+module main;
 
 //var myfun1 = lambda (x, y) => x + y;
 //print myfun1(8, 32);
@@ -21,7 +24,13 @@ print sin(3.141593*45/180) + 1;
 print tan(3.141593*45/180);
 print atan2(1, 4);
 print log(2.71818);
-print log10(100);
+print log10(1000);
+
+var li = List.make(1);
+li.prepend(2);
+
+print List;
+print li;
 
 //var x = 1;
 
