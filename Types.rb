@@ -2,11 +2,9 @@
 $Object = TauObject.new
 
 # Need some kind of type registry instead of global variables
-$Class = TauObject.new
-$Any = TauObject.new($Class, "AnyClass")
-$Null = TauObject.new($Class, "NullClass")
-$Unit = TauObject.new($Class)
-$Exception = TauObject.new($Class)
+
+# Provide (type, value) as parameters
+
 $Bool = TauObject.new($Class)
 $Int = TauObject.new($Class)
 $Float = TauObject.new($Class)

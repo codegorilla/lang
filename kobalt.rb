@@ -37,6 +37,9 @@ def main (filename = 'test_input')
   # access to external names can be via those namespaces. This is similar to
   # python.  For example "import random;" creates an object called "random".
   # Access to its members can be done like so: "var t = random.var1;".
+
+  # Question:  Frames don't exist until runtime.  Is that another reason for the
+  # global hash?
   globalHash = {}
 
   # Importing native modules...

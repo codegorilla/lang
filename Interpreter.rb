@@ -1,3 +1,9 @@
+require './builders/ClassBuilder'
+require './builders/AnyBuilder'
+require './builders/NullBuilder'
+require './builders/UnitBuilder'
+require './builders/ExceptionBuilder'
+
 class Interpreter
 
   def initialize (root, globals)
@@ -11,16 +17,31 @@ class Interpreter
 
     # Define built-in objects
 
-    # The CLASS object is the type of all classes
-    @CLASS = TauObject.new
+    # The $Class object is the type of all classes
+    cb = ClassBuilder.new
+    $Class = cb.build
+    @globals['Class'] = $Class
+    
+    # The $Any class is the root of the class hierarchy
+    # All classes inherit from $Any by default
+    # The type of all classes, including $Any, is $Class
+    ab = AnyBuilder.new
+    $Any = ab.build
+    @globals['Any'] = $Any
 
-    # The ANY class is the root of the class hierarchy
-    # All classes inherit from ANY by default
-    # The type of ANY is CLASS
-    @ANY = TauObject.new(@CLASS)
+    nb = NullBuilder.new
+    $Null = nb.build
+    @globals['Null'] = $Null
 
-    @EXCEPTION = TauObject.new(@CLASS)
-    @EXCEPTION.setMember('super', @ANY)
+    ub = UnitBuilder.new
+    $Unit = ub.build
+    @globals['Unit'] = $Unit
+
+    eb = ExceptionBuilder.new
+    $Exception = eb.build
+    @globals['Exception'] = $Exception
+
+    # Left off here -- need to rework remaining types by making builder classes
 
     # The BOOL class represents booleans
     bfact = BoolFactory.new
@@ -401,8 +422,8 @@ class Interpreter
       puts x
     when $Function then
       puts "<function>"
-    when $Class then
-      puts "<class>"
+    #when $Class then
+    #  puts "<class>"
     else
       puts resultObj.value
     end

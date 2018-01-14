@@ -14,6 +14,12 @@ module main;
 //myfun2 = lambda (x, y) => x + y;
 //print myfun2(4, 6);
 
+print Class;
+var rrr = Class.make;
+
+print Null;
+print Unit;
+
 var rf = tf + x1;
 
 print rf;
