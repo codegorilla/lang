@@ -19,6 +19,15 @@ var rrr = Class.make;
 
 print Null;
 print Unit;
+print Int;
+
+var bvt = true;
+var bvf = false;
+var bvx = bvt & bvf;
+
+print bvt;
+print bvf;
+print bvx;
 
 var rf = tf + x1;
 

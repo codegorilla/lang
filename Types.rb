@@ -5,7 +5,8 @@ $Object = TauObject.new
 
 # Provide (type, value) as parameters
 
-$Bool = TauObject.new($Class)
+#$Bool = TauObject.new($Class)
+
 $Int = TauObject.new($Class)
 $Float = TauObject.new($Class)
 
@@ -19,8 +20,8 @@ $Function = TauObject.new($Class, "<FunctionClass>")
 $NativeFunction = TauObject.new($Class, "<NativeFunctionClass>")
 
 # Singletons
-$true = TauObject.new($Bool, true)
-$false = TauObject.new($Bool, false)
+#$true = TauObject.new($Bool, true)
+#$false = TauObject.new($Bool, false)
 
-$unit = TauObject.new($Unit, "()")
+#$unit = TauObject.new($Unit, "()")
 

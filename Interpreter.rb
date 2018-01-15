@@ -3,6 +3,8 @@ require './builders/AnyBuilder'
 require './builders/NullBuilder'
 require './builders/UnitBuilder'
 require './builders/ExceptionBuilder'
+require './builders/BoolBuilder'
+require './builders/IntBuilder'
 
 class Interpreter
 
@@ -19,33 +21,57 @@ class Interpreter
 
     # The $Class object is the type of all classes
     cb = ClassBuilder.new
-    $Class = cb.build
+    $Class = cb.classObj
     @globals['Class'] = $Class
     
     # The $Any class is the root of the class hierarchy
     # All classes inherit from $Any by default
-    # The type of all classes, including $Any, is $Class
     ab = AnyBuilder.new
-    $Any = ab.build
+    $Any = ab.classObj
     @globals['Any'] = $Any
 
     nb = NullBuilder.new
-    $Null = nb.build
+    $Null = nb.classObj
     @globals['Null'] = $Null
-
+    $null = nb.get_null
+    
     ub = UnitBuilder.new
-    $Unit = ub.build
+    $Unit = ub.classObj
     @globals['Unit'] = $Unit
+    $unit = ub.get_unit
 
     eb = ExceptionBuilder.new
-    $Exception = eb.build
+    $Exception = eb.classObj
     @globals['Exception'] = $Exception
 
-    # Left off here -- need to rework remaining types by making builder classes
+    bb = BoolBuilder.new
+    $Bool = bb.classObj
+    @globals['Bool'] = $Bool
+    $true = bb.get_true
+    $false = bb.get_false
 
-    # The BOOL class represents booleans
-    bfact = BoolFactory.new
-    bfact.make
+    ib = IntBuilder.new
+    $Int = ib.classObj
+    @globals['Int'] = $Int
+    
+    # We needed to make the objects above so that the following methods can
+    # reference them while building out their attributes and methods
+    cb.build
+    ab.build
+    nb.build
+    ub.build
+    eb.build
+    bb.build
+    ib.build
+
+    # fb.build
+    # sb.build (string)
+    # ab.build (array)
+    # mb.build (map)
+    # fb.build (function)
+
+
+    # Left off here -- need to rework remaining types by making builder classes
 
     # The INT class represents integers
     ifact = IntFactory.new

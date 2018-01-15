@@ -1,6 +1,8 @@
 class ExceptionBuilder
 
   def initialize ()
+    # Create the Exception class object
+    @classObj = TauObject.new($Class, "<class 'Exception'>")
   end
 
   def make ()
@@ -8,13 +10,13 @@ class ExceptionBuilder
     TauObject.new($Exception)
   end
 
+  def classObj ()
+    @classObj
+  end
+
   def build ()
-    # Create the Exception class object
-    obj = TauObject.new($Class, "<class 'Exception'>")
-    # Set its superclass
-    obj.setMember('super', $Any)
-    obj.setMember('make', method(:make))
-    obj
+    @classObj.setMember('super', $Any)
+    @classObj.setMember('make', method(:make))
   end
 
 end
