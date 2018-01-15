@@ -14,11 +14,7 @@ require './Generator'
 require './Instruction'
 require 'pp'
 require 'logger'
-require './IntFactory'
-require './FloatFactory'
-require './StringFactory'
-require './ArrayFactory'
-require './FunctionFactory'
+
 require './Types'
 require './ProblemLogger'
 

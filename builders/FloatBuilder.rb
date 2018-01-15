@@ -1,7 +1,15 @@
-class FloatFactory
+class FloatBuilder
 
     def initialize ()
-      $Float.setMember('super', $Any)
+      @classObj = TauObject.new($Class, "<class 'Float'>")
+    end
+
+    def make (value)
+      TauObject.new($Float, value)
+    end
+
+    def classObj ()
+      @classObj
     end
 
     def equ (x, y)
@@ -164,16 +172,19 @@ class FloatFactory
       result
     end
 
-    def make ()
-      $Float.setMember('equ', method(:equ))
-      $Float.setMember('neq', method(:neq))
-      $Float.setMember('gt', method(:gt))
-      $Float.setMember('lt', method(:lt))
-      $Float.setMember('ge', method(:ge))
-      $Float.setMember('le', method(:le))
-      $Float.setMember('add', method(:add))
-      $Float.setMember('sub', method(:sub))
-      $Float.setMember('mul', method(:mul))
-      $Float.setMember('div', method(:div))
+    def build ()
+      @classObj.setMember('super', $Any)
+      @classObj.setMember('make', method(:make))
+      @classObj.setMember('equ', method(:equ))
+      @classObj.setMember('neq', method(:neq))
+      @classObj.setMember('gt', method(:gt))
+      @classObj.setMember('lt', method(:lt))
+      @classObj.setMember('ge', method(:ge))
+      @classObj.setMember('le', method(:le))
+      @classObj.setMember('add', method(:add))
+      @classObj.setMember('sub', method(:sub))
+      @classObj.setMember('mul', method(:mul))
+      @classObj.setMember('div', method(:div))
     end
-end
+
+  end

@@ -29,9 +29,14 @@ print bvt;
 print bvf;
 print bvx;
 
+print 1.5 + 2.3;
+
+print "Hello " + "world!";
+
 var rf = tf + x1;
 
 print rf;
+
 print m11 - m12;
 
 print sqrt(25);

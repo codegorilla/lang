@@ -43,6 +43,8 @@ class NullBuilder
   def build ()
     @classObj.setMember('super', $Any)
     @classObj.setMember('make', method(:make))
+    @classObj.setMember('equ', method(:equ))
+    @classObj.setMember('neq', method(:neq))
   end
 
 end

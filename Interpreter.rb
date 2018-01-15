@@ -5,6 +5,10 @@ require './builders/UnitBuilder'
 require './builders/ExceptionBuilder'
 require './builders/BoolBuilder'
 require './builders/IntBuilder'
+require './builders/FloatBuilder'
+require './builders/StringBuilder'
+require './builders/ArrayBuilder'
+require './builders/FunctionBuilder'
 
 class Interpreter
 
@@ -54,6 +58,22 @@ class Interpreter
     $Int = ib.classObj
     @globals['Int'] = $Int
     
+    fb = FloatBuilder.new
+    $Float = fb.classObj
+    @globals['Float'] = $Float
+
+    sb = StringBuilder.new
+    $String = sb.classObj
+    @globals['String'] = $String
+
+    rb = ArrayBuilder.new
+    $Array = rb.classObj
+    @globals['Array'] = $Array
+
+    fnb = FunctionBuilder.new
+    $Function = fnb.classObj
+    @globals['Function'] = $Function
+
     # We needed to make the objects above so that the following methods can
     # reference them while building out their attributes and methods
     cb.build
@@ -63,35 +83,11 @@ class Interpreter
     eb.build
     bb.build
     ib.build
+    fb.build
+    sb.build
+    rb.build
+    fnb.build
 
-    # fb.build
-    # sb.build (string)
-    # ab.build (array)
-    # mb.build (map)
-    # fb.build (function)
-
-
-    # Left off here -- need to rework remaining types by making builder classes
-
-    # The INT class represents integers
-    ifact = IntFactory.new
-    ifact.make
-    
-    # The FLOAT class represents floating point numbers
-    ffact = FloatFactory.new
-    ffact.make
-
-    # The STRING class represents strings
-    sfact = StringFactory.new
-    sfact.make
-
-    # The ARRAY class represents arrays
-    afact = ArrayFactory.new
-    afact.make
-
-    # The FUNCTION class represents functions
-    fnfact = FunctionFactory.new
-    fnfact.make
 
     # Frame pointer
     @fp = nil
