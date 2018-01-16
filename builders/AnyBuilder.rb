@@ -2,12 +2,12 @@ class AnyBuilder
 
   def initialize ()
     # Create the Any class object
-    @classObj = TauObject.new($Class, "<class 'Any'>")
+    @classObj = TauObject.new($Registry['Class'], "<class 'Any'>")
   end
 
   def make ()
     # Make a new object of type Any
-    TauObject.new($Any)
+    TauObject.new(@classObj)
   end
 
   def classObj ()
@@ -16,7 +16,7 @@ class AnyBuilder
 
   def build ()
     # Set its superclass -- should it have one? Is this the same as its type?
-    @classObj.setMember('super', $Any)
+    @classObj.setMember('super', $Registry['Any'])
     @classObj.setMember('make', method(:make))
   end
 

@@ -9,85 +9,32 @@ require './builders/FloatBuilder'
 require './builders/StringBuilder'
 require './builders/ArrayBuilder'
 require './builders/FunctionBuilder'
+require './builders/NativeFunctionBuilder'
 
 class Interpreter
 
-  def initialize (root, globals)
+  def initialize (root)
     @root = root
 
-    @globals = globals
+    @globals = {}
 
     @logger = Logger.new(STDOUT)
     @logger.level = Logger::WARN
     @logger.info("Initialized interpreter.")
 
-    # Define built-in objects
-
-    # The $Class object is the type of all classes
-    cb = ClassBuilder.new
-    $Class = cb.classObj
-    @globals['Class'] = $Class
-    
-    # The $Any class is the root of the class hierarchy
-    # All classes inherit from $Any by default
-    ab = AnyBuilder.new
-    $Any = ab.classObj
-    @globals['Any'] = $Any
-
-    nb = NullBuilder.new
-    $Null = nb.classObj
-    @globals['Null'] = $Null
-    $null = nb.get_null
-    
-    ub = UnitBuilder.new
-    $Unit = ub.classObj
-    @globals['Unit'] = $Unit
-    $unit = ub.get_unit
-
-    eb = ExceptionBuilder.new
-    $Exception = eb.classObj
-    @globals['Exception'] = $Exception
-
-    bb = BoolBuilder.new
-    $Bool = bb.classObj
-    @globals['Bool'] = $Bool
-    $true = bb.get_true
-    $false = bb.get_false
-
-    ib = IntBuilder.new
-    $Int = ib.classObj
-    @globals['Int'] = $Int
-    
-    fb = FloatBuilder.new
-    $Float = fb.classObj
-    @globals['Float'] = $Float
-
-    sb = StringBuilder.new
-    $String = sb.classObj
-    @globals['String'] = $String
-
-    rb = ArrayBuilder.new
-    $Array = rb.classObj
-    @globals['Array'] = $Array
-
-    fnb = FunctionBuilder.new
-    $Function = fnb.classObj
-    @globals['Function'] = $Function
-
-    # We needed to make the objects above so that the following methods can
-    # reference them while building out their attributes and methods
-    cb.build
-    ab.build
-    nb.build
-    ub.build
-    eb.build
-    bb.build
-    ib.build
-    fb.build
-    sb.build
-    rb.build
-    fnb.build
-
+    # Import built-in objects
+    @globals['Class'] = $Registry['Class']
+    @globals['Any'] = $Registry['Any']
+    @globals['Null'] = $Registry['Null']
+    @globals['Unit'] = $Registry['Unit']
+    @globals['Exception'] = $Registry['Exception']
+    @globals['Bool'] = $Registry['Bool']
+    @globals['Int'] = $Registry['Int']
+    @globals['Float'] = $Registry['Float']
+    @globals['String'] = $Registry['String']
+    @globals['Array'] = $Registry['Array']
+    @globals['Function'] = $Registry['Function']
+    @globals['NativeFunction'] = $Registry['NativeFunction']
 
     # Frame pointer
     @fp = nil
@@ -425,6 +372,10 @@ class Interpreter
   end
 
   def importExpr (node)
+    @logger.debug("importExpr")
+    # This needs to load a new file and kick off a new evaluator
+    # Left off here 15 Jan 2018
+    p = Processor.new('x')
     $unit
   end
 

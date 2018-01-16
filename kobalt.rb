@@ -12,15 +12,93 @@ require './TauObject'
 require './Interpreter'
 require './Generator'
 require './Instruction'
+require './ProblemLogger'
+require './Processor'
 require 'pp'
 require 'logger'
-
-require './Types'
-require './ProblemLogger'
 
 def main (filename = 'test_input')
   logger = Logger.new(STDOUT)
   logger.level = Logger::INFO
+
+  # Registry is a global registry for top-level classes and modules
+  # It ensures that top-level classes and modules don't get rebuilt if they are
+  # imported multiple times.
+  $Registry = {}
+
+  # Define and register built-in objects
+  # Registrations occur only for top-level things
+  # This way they don't get rebuilt when something is imported twice
+
+  # The $Class object is the type of all classes
+  cb = ClassBuilder.new
+  $Registry['Class'] = cb.classObj
+  $Class = cb.classObj
+
+  # The $Any class is the root of the class hierarchy
+  # All classes inherit from $Any by default
+  ab = AnyBuilder.new
+  $Registry['Any'] = ab.classObj
+  $Any = ab.classObj
+  
+  nb = NullBuilder.new
+  $Registry['Null'] = nb.classObj
+  $Null = nb.classObj
+  $null = nb.get_null
+
+  ub = UnitBuilder.new
+  $Registry['Unit'] = ub.classObj
+  $Unit = ub.classObj
+  $unit = ub.get_unit
+
+  eb = ExceptionBuilder.new
+  $Registry['Exception'] = eb.classObj
+  $Exception = eb.classObj
+
+  bb = BoolBuilder.new
+  $Registry['Bool'] = bb.classObj
+  $Bool = bb.classObj
+  $true = bb.get_true
+  $false = bb.get_false
+
+  ib = IntBuilder.new
+  $Registry['Int'] = ib.classObj
+  $Int = ib.classObj
+
+  fb = FloatBuilder.new
+  $Registry['Float'] = fb.classObj
+  $Float = fb.classObj
+
+  sb = StringBuilder.new
+  $Registry['String'] = sb.classObj
+  $String = sb.classObj
+
+  rb = ArrayBuilder.new
+  $Registry['Array'] = rb.classObj
+  $Array = rb.classObj
+
+  fnb = FunctionBuilder.new
+  $Registry['Function'] = fnb.classObj
+  $Function = fnb.classObj
+
+  nfnb = NativeFunctionBuilder.new
+  $Registry['NativeFunction'] = nfnb.classObj
+  $NativeFunction = nfnb.classObj
+
+  # We needed to make the objects above so that the following methods can
+  # reference them while building out their attributes and methods
+  cb.build
+  ab.build
+  nb.build
+  ub.build
+  eb.build
+  bb.build
+  ib.build
+  fb.build
+  sb.build
+  rb.build
+  fnb.build
+  nfnb.build
 
   # Global variable store
   # Gobal variables are stored into a table in the top (global) frame of the
@@ -35,7 +113,10 @@ def main (filename = 'test_input')
 
   # Question:  Frames don't exist until runtime.  Is that another reason for the
   # global hash?
-  globalHash = {}
+
+  # Need to get rid of the global hash. Compilation units need to have their own
+  # globals
+  #globalHash = {}
 
   # Importing native modules...
   # This needs to make a native function object available in the namespace
@@ -56,111 +137,51 @@ def main (filename = 'test_input')
 
   # Quick test - set up the loadlib facility.
   # Native function for loading ruby libraries
-  params = ['filename']
-  code = lambda do |params|
-    filename = params[0].value
-    moduleName = params[1].value
-    require filename
-    classRef = Kernel.const_get(moduleName)
-    classRef.init(globalHash)
-    $unit
-  end
-  native_loadlib = TauObject.new($NativeFunction, [params, code])
-  globalHash['loadlib'] = native_loadlib
+  # params = ['filename']
+  # code = lambda do |params|
+  #   filename = params[0].value
+  #   moduleName = params[1].value
+  #   require filename
+  #   classRef = Kernel.const_get(moduleName)
+  #   classRef.init(globalHash)
+  #   $unit
+  # end
+  # native_loadlib = TauObject.new($NativeFunction, [params, code])
+  # globalHash['loadlib'] = native_loadlib
 
-  # Quick test - function to create objects
-  params = []
-  code = lambda do |params|
-    # Ignore params
-    TauObject.new()
-  end
-  mkObject = TauObject.new($NativeFunction, [params, code])
-  globalHash['mkObject'] = mkObject
+  # # Quick test - function to create objects
+  # params = []
+  # code = lambda do |params|
+  #   # Ignore params
+  #   TauObject.new()
+  # end
+  # mkObject = TauObject.new($NativeFunction, [params, code])
+  # globalHash['mkObject'] = mkObject
 
-  # Quick test - function to create classes
-  params = []
-  code = lambda do |params|
-    # Ignore params
-    TauObject.new($Class)
-  end
-  mkClass = TauObject.new($NativeFunction, [params, code])
-  globalHash['mkClass'] = mkClass
+  # # Quick test - function to create classes
+  # params = []
+  # code = lambda do |params|
+  #   # Ignore params
+  #   TauObject.new($Class)
+  # end
+  # mkClass = TauObject.new($NativeFunction, [params, code])
+  # globalHash['mkClass'] = mkClass
+  
+  # This is where some built-ins need to go
+  # It is important that they be created one time only
+  # and then injected into the interpreter once
+  # Otherwise certan objects will have multiple identities (multiple versions)
 
+  # This raises an important question. When a compilation unit is loaded, it has
+  # to be registered.  When a different unit attempts to load a unit that has
+  # already been loaded, the system simply hands it the unit that was already
+  # loaded and registered. This avoids multiple identities.
 
   # Process the specified file
-  processFile(filename, globalHash, logger)
+  p = Processor.new(filename, logger)
+  p.process
 
   nil
-end
-
-def processFile (filename, globalHash, logger)
-  puts "Processing #{filename + ".co"}..."
-
-  # Build input stream
-  logger.info("Building input stream...")
-  input = InputStream.new(filename + ".co")
-
-  # Build token stream
-  logger.info("Building token stream...")
-  lexer = Lexer.new(input)
-  lexer.setLogLevel(Logger::WARN)
-  tokens = TokenStream.new(lexer)
-  puts lexer.problems.errors
-  puts lexer.problems.warnings
-
-  # Build AST
-  logger.info("Building abstract syntax tree...")
-  parser = Parser.new(tokens)
-  parser.setLogLevel(Logger::WARN)
-  root = parser.start
-  puts parser.problems.errors
-  puts parser.problems.warnings
-
-  # Build scopes and symbol tables
-  # This phase does not generate a new data structure per se.
-  # It just annotates the AST with scopes and symbol table data.
-  # It does other kinds of misc. analysis as well, including identifying imports
-  logger.info("Building scopes...")
-  sb = ScopeBuilder.new(root)
-  sb.setLogLevel(Logger::WARN)
-  sb.start
-  puts sb.problems.errors
-  puts sb.problems.warnings
-
-  # Process imports before evaluating
-  processImports(sb.imports, globalHash, logger)
-
-  errorCount =
-    lexer.problems.errorCount +
-    parser.problems.errorCount +
-    sb.problems.errorCount
-
-  if errorCount == 0 then
-    # Evaluate AST
-    logger.info("Evaluating...")
-    # Really the entire program is an interpreter, not just this stage
-    evaluator = Interpreter.new(root, globalHash)
-    evaluator.setLogLevel(Logger::WARN)
-    evaluator.start
-  end
-
-  # Generate IR
-  # This will be implemented later. It will actually come before evaluation.
-  #logger.info("Generating intermediate representation (IR)...")
-  #@gen = Generator.new(@root)
-  #@gen.setLogLevel(Logger::DEBUG)
-  #@chain = @gen.start
-
-end
-
-def processImports (imports, globalHash, logger)
-  # This may be able to be parallelized at some point. If separate compilation
-  # can be maintained then there should be no reason why files cannot be
-  # processed in parallel.
-  # Also, a file with multiple dependents should only have to be processed once.
-  imports.each do |i|
-    processFile(i, globalHash, logger)
-  end
 end
 
 filename = ARGV[0]

@@ -7,7 +7,7 @@ class ClassBuilder
 
   def make ()
     # Make a new object of type Class
-    TauObject.new($Class)
+    TauObject.new(@classObj)
   end
 
   # The type of the 'Class' object is either null or itself.  In other words,
@@ -19,7 +19,7 @@ class ClassBuilder
 
   def build ()
     # Set its superclass -- should it have one? Is this the same as its type?
-    @classObj.setMember('super', $Any)
+    @classObj.setMember('super', $Registry['Any'])
     @classObj.setMember('make', method(:make))
   end
 

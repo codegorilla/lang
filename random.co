@@ -5,3 +5,5 @@ var x1 = 104;
 var tf = 3.14;
 
 //print x1;
+
+print Null;

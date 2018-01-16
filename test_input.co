@@ -1,9 +1,9 @@
 // Test file
 
 import random;
-import math;
-import complex;
-import List;
+//import math;
+//import complex;
+//import List;
 
 module main;
 
@@ -20,6 +20,9 @@ var rrr = Class.make;
 print Null;
 print Unit;
 print Int;
+print Float;
+print Function;
+print NativeFunction;
 
 var bvt = true;
 var bvf = false;
@@ -33,24 +36,24 @@ print 1.5 + 2.3;
 
 print "Hello " + "world!";
 
-var rf = tf + x1;
+//var rf = tf + x1;
 
-print rf;
+//print rf;
 
-print m11 - m12;
+//print m11 - m12;
 
-print sqrt(25);
-print sin(3.141593*45/180) + 1;
-print tan(3.141593*45/180);
-print atan2(1, 4);
-print log(2.71818);
-print log10(1000);
+//print sqrt(25);
+//print sin(3.141593*45/180) + 1;
+//print tan(3.141593*45/180);
+//print atan2(1, 4);
+//print log(2.71818);
+//print log10(1000);
 
-var li = List.make(1);
-li.prepend(2);
+//var li = List.make(1);
+//li.prepend(2);
 
-print List;
-print li;
+//print List;
+//print li;
 
 //var x = 1;
 
@@ -85,24 +88,24 @@ print li;
 // Define class
 
 // Create object
-var z = Complex.make(3, 4);
-print z.real;
-print z.imag;
+//var z = Complex.make(3, 4);
+//print z.real;
+//print z.imag;
 
 // Create another object
-var zp = Complex.make(2, 8);
-print zp.real;
-print zp.imag;
+//var zp = Complex.make(2, 8);
+//print zp.real;
+//print zp.imag;
 
 // Add in place
 // z.add(zp) should be the same as Complex.add(z, zp)
 //Complex.add(z, zp);
-z.add(zp);
-print z.real;
-print z.imag;
+//z.add(zp);
+//print z.real;
+//print z.imag;
 
-print z.mag();
-print z.double();
+//print z.mag();
+//print z.double();
 
 
 //val n = 4;
