@@ -375,8 +375,15 @@ class Interpreter
     @logger.debug("importExpr")
     # This needs to load a new file and kick off a new evaluator
     # Left off here 15 Jan 2018
-    p = Processor.new('x')
+    importName(node.child)
     $unit
+  end
+
+  def importName (node)
+    @logger.debug("importName")
+    filename = node.text
+    p = Processor.new(filename, @logger)
+    p.process
   end
 
   def printExpr (node)

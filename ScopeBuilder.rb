@@ -242,6 +242,8 @@ class ScopeBuilder
   end
   
   def importExpr (node)
+    # Will probably do away with this
+    # Imports should be processed during execution
     @logger.debug("importExpr")
     importName(node.child)
   end
