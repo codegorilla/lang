@@ -1,11 +1,27 @@
 // Test file
 
-import random;
+//import random;
 //import math;
 //import complex;
 //import List;
 
-module main;
+
+//module main;
+
+var xspace = Int.make(102);
+print xspace;
+
+print Namespace;
+var math = Namespace.make();
+print math;
+math.PI = 3.14159;
+var pi = math.PI;
+print 2 * pi;
+
+
+var x = 1;
+x.y = 2;
+print x.y;
 
 //var myfun1 = lambda (x, y) => x + y;
 //print myfun1(8, 32);
@@ -13,6 +29,9 @@ module main;
 //var myfun2 = null;
 //myfun2 = lambda (x, y) => x + y;
 //print myfun2(4, 6);
+
+//print random;
+
 
 print Class;
 var rrr = Class.make;
@@ -23,6 +42,7 @@ print Int;
 print Float;
 print Function;
 print NativeFunction;
+
 
 var bvt = true;
 var bvf = false;

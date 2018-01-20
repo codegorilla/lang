@@ -20,7 +20,7 @@ class IntBuilder
       TauObject.new($Exception, "Type error: unsupported operand types for |: Int and Bool")
     else
       TauObject.new($Exception, "Type error: unsupported operand types for |: Int and <other>")
-  end
+    end
     result
   end
 
@@ -268,7 +268,13 @@ class IntBuilder
 
   def build ()
     @classObj.setMember('super', $Any)
-    @classObj.setMember('make', method(:make))
+
+    params = ['filename']
+    code = lambda { |params| make(params[0].value) }
+    makeFun = TauObject.new($NativeFunction, [params, code])
+    @classObj.setMember('make', makeFun)
+    
+    #@classObj.setMember('make', method(:make))
     @classObj.setMember('bor', method(:bor))
     @classObj.setMember('bxor', method(:bxor))
     @classObj.setMember('band', method(:band))

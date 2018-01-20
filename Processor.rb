@@ -3,6 +3,12 @@ class Processor
   def initialize (filename, logger=nil)
     @filename = filename
     @logger = logger
+
+    @exports = nil
+  end
+
+  def exports ()
+    @exports
   end
 
   def process ()
@@ -55,7 +61,9 @@ class Processor
       evaluator.setLogLevel(Logger::WARN)
       evaluator.start
     end
-  
+    
+    @exports = evaluator.globals
+
     # Generate IR
     # This will be implemented later. It will actually come before evaluation.
     #logger.info("Generating intermediate representation (IR)...")

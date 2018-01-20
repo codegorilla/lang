@@ -14,6 +14,21 @@ require './Generator'
 require './Instruction'
 require './ProblemLogger'
 require './Processor'
+
+require './builders/ClassBuilder'
+require './builders/AnyBuilder'
+require './builders/NullBuilder'
+require './builders/UnitBuilder'
+require './builders/ExceptionBuilder'
+require './builders/BoolBuilder'
+require './builders/IntBuilder'
+require './builders/FloatBuilder'
+require './builders/StringBuilder'
+require './builders/ArrayBuilder'
+require './builders/FunctionBuilder'
+require './builders/NativeFunctionBuilder'
+require './builders/NamespaceBuilder'
+
 require 'pp'
 require 'logger'
 
@@ -85,6 +100,10 @@ def main (filename = 'test_input')
   $Registry['NativeFunction'] = nfnb.classObj
   $NativeFunction = nfnb.classObj
 
+  nsb = NamespaceBuilder.new
+  $Registry['Namespace'] = nsb.classObj
+  $Namespace = nsb.classObj
+
   # We needed to make the objects above so that the following methods can
   # reference them while building out their attributes and methods
   cb.build
@@ -99,6 +118,25 @@ def main (filename = 'test_input')
   rb.build
   fnb.build
   nfnb.build
+  nsb.build
+
+
+  # Built-in objects
+  # These should be placed into an outer 'builtins' scope
+  $builtins = {}
+  $builtins['Class'] = $Registry['Class']
+  $builtins['Any'] = $Registry['Any']
+  $builtins['Null'] = $Registry['Null']
+  $builtins['Unit'] = $Registry['Unit']
+  $builtins['Exception'] = $Registry['Exception']
+  $builtins['Bool'] = $Registry['Bool']
+  $builtins['Int'] = $Registry['Int']
+  $builtins['Float'] = $Registry['Float']
+  $builtins['String'] = $Registry['String']
+  $builtins['Array'] = $Registry['Array']
+  $builtins['Function'] = $Registry['Function']
+  $builtins['NativeFunction'] = $Registry['NativeFunction']
+  $builtins['Namespace'] = $Registry['Namespace']
 
   # Global variable store
   # Gobal variables are stored into a table in the top (global) frame of the

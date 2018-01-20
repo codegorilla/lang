@@ -1,16 +1,3 @@
-require './builders/ClassBuilder'
-require './builders/AnyBuilder'
-require './builders/NullBuilder'
-require './builders/UnitBuilder'
-require './builders/ExceptionBuilder'
-require './builders/BoolBuilder'
-require './builders/IntBuilder'
-require './builders/FloatBuilder'
-require './builders/StringBuilder'
-require './builders/ArrayBuilder'
-require './builders/FunctionBuilder'
-require './builders/NativeFunctionBuilder'
-
 class Interpreter
 
   def initialize (root)
@@ -21,20 +8,6 @@ class Interpreter
     @logger = Logger.new(STDOUT)
     @logger.level = Logger::WARN
     @logger.info("Initialized interpreter.")
-
-    # Import built-in objects
-    @globals['Class'] = $Registry['Class']
-    @globals['Any'] = $Registry['Any']
-    @globals['Null'] = $Registry['Null']
-    @globals['Unit'] = $Registry['Unit']
-    @globals['Exception'] = $Registry['Exception']
-    @globals['Bool'] = $Registry['Bool']
-    @globals['Int'] = $Registry['Int']
-    @globals['Float'] = $Registry['Float']
-    @globals['String'] = $Registry['String']
-    @globals['Array'] = $Registry['Array']
-    @globals['Function'] = $Registry['Function']
-    @globals['NativeFunction'] = $Registry['NativeFunction']
 
     # Frame pointer
     @fp = nil
@@ -47,6 +20,10 @@ class Interpreter
 
   def setLogLevel (level)
     @logger.level = level
+  end
+
+  def globals ()
+    @globals
   end
 
   def start ()
@@ -384,6 +361,11 @@ class Interpreter
     filename = node.text
     p = Processor.new(filename, @logger)
     p.process
+    # Create a namespace object -- should be $Namespace.make
+    # Actually, the namespace will be created in the imported file and passed
+    # back up. It will contain all global variables in the imported file.
+    @globals[node.text] = $Namespace
+    #pp p.exports
   end
 
   def printExpr (node)
@@ -463,8 +445,8 @@ class Interpreter
       when :OBJECT_ACCESS then loadObject(n)
       when :NAME then loadName(n)
       end
-    receiver.setMember(node.rightChild.text, e)
-    nil
+      receiver.setMember(node.rightChild.text, e)
+      nil
   end
 
   def loadObject (node)
@@ -881,6 +863,10 @@ class Interpreter
     if scope.link == nil
     # If we are at global scope then try to find the variable in the global hash
       result = @globals[node.text]
+      if result == nil
+        # Next search the built-ins namespace
+        result = $builtins[node.text]
+      end
       result
     else
       if index != nil
