@@ -9,7 +9,9 @@
 //module main;
 
 var xspace = Int.make(102);
-print xspace;
+print xspace + 10;
+print Int.addi(xspace, 10);
+print Int.addi;
 
 print Namespace;
 var math = Namespace.make();
@@ -19,9 +21,9 @@ var pi = math.PI;
 print 2 * pi;
 
 
-var x = 1;
-x.y = 2;
-print x.y;
+//var x = 1;
+//x.y = 2;
+//print x.y;
 
 //var myfun1 = lambda (x, y) => x + y;
 //print myfun1(8, 32);

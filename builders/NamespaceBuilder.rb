@@ -4,7 +4,7 @@ class NamespaceBuilder
     @classObj = TauObject.new($Class, "<class 'Namespace'>")
   end
 
-  def make ()
+  def make (params)
     TauObject.new($Namespace, '<namespace>')
   end
 
@@ -15,17 +15,7 @@ class NamespaceBuilder
   def build ()
     @classObj.setMember('super', $Any)
 
-    params = ['filename']
-    code = lambda { |params| make }
-    makeFun = TauObject.new($NativeFunction, [params, code])
-    #makeFun = $NativeFunction.make([params, code])
-    mkFun = $NativeFunction.getMember('make')
-    cdFun = mkFun.value[1]
-    pp cdFun
-    #cdFun.call()
-    #callFun = $NativeFunction.getMember('call')
-    #puts callFun
-
+    makeFun = TauObject.new($Function, [0, method(:make)])
     @classObj.setMember('make', makeFun)
   end
 

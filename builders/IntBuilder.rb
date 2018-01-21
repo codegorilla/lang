@@ -4,8 +4,12 @@ class IntBuilder
     @classObj = TauObject.new($Class, "<class 'Int'>")
   end
 
-  def make (value)
-    TauObject.new($Int, value)
+  # def make (value)
+  #   TauObject.new($Int, value)
+  # end
+
+  def make (params)
+    TauObject.new($Int, params[0].value)
   end
 
   def bor (x, y)
@@ -181,6 +185,13 @@ class IntBuilder
     result
   end
 
+  def addi (params)
+    x = params[0]
+    y = params[1]
+    z = x.value + y.value
+    TauObject.new($Int, z)
+  end
+
   def add (x, y)
     result = case y.type
     when $Int
@@ -269,12 +280,12 @@ class IntBuilder
   def build ()
     @classObj.setMember('super', $Any)
 
-    params = ['filename']
-    code = lambda { |params| make(params[0].value) }
-    makeFun = TauObject.new($NativeFunction, [params, code])
+    # Perhaps the value should be an array or some kind of 'NativeCode' ruby
+    # object that the interpreter will distinguish at runtime. An array will
+    # work for now.  Array is of the form [numParams, code].
+    makeFun = TauObject.new($Function, [1, method(:make)])
     @classObj.setMember('make', makeFun)
     
-    #@classObj.setMember('make', method(:make))
     @classObj.setMember('bor', method(:bor))
     @classObj.setMember('bxor', method(:bxor))
     @classObj.setMember('band', method(:band))
@@ -286,7 +297,12 @@ class IntBuilder
     @classObj.setMember('le', method(:le))
     @classObj.setMember('shl', method(:shl))
     @classObj.setMember('shr', method(:shr))
+
     @classObj.setMember('add', method(:add))
+    
+    #@classObj.setMember('add', TauObject.new($Function, [2, method(:addi)]))
+    @classObj.setMember('addi', TauObject.new($Function, [2, method(:addi)]))
+
     @classObj.setMember('sub', method(:sub))
     @classObj.setMember('mul', method(:mul))
     @classObj.setMember('div', method(:div))

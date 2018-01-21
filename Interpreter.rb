@@ -32,7 +32,13 @@ class Interpreter
 
   def program (node)
     @logger.debug("program")
+
     # Build first execution frame
+    # It is possible that there should be no frame at global scope. This needs
+    # to be investigated. For now it probably doesn't hurt, but global variables
+    # will be stored in a global hash. It might also be possible to store some
+    # global variables in the locals table in the frame for quick access, but
+    # this is not certain to have net positive benefit.
     @fp = Frame.new
 
     # Fetch the global scope
@@ -79,10 +85,10 @@ class Interpreter
     obj = expression(node.rightChild)
     @fp.store(index, obj)
 
-    # Check to see if this is the global scope
-    # Store the object into the global hash if it is
+    # The result must be stored into the globals hash when in global scope.
+    # Even in global scope, the result was stored into the locals table. This
+    # might change in the future.
     if @scope.link == nil
-      #puts "I am at global scope!"
       @globals[identifierNode.text] = obj
     end
   end
@@ -467,19 +473,34 @@ class Interpreter
     scope = @scope
     index = scope.lookup(node.text)
 
-    # probably want while scope != global
+    # probably want while scope != global for ease of reading
     while !index && scope.link != nil do
       fp = fp.staticLink
       scope = scope.link
       index = scope.lookup(node.text)
     end
 
-    if index != nil then
+    if scope.link == nil then
+      # If we are at global scope then try to find the variable in the global
+      # hash. Do not attempt to find it in the locals table of the global frame.
+      result = @globals[node.text]
+      if result == nil then
+        # Next search the built-ins namespace
+        result = $builtins[node.text]
+      end
+      result
+    elsif index != nil then
+    puts "Got #{node.text} from the locals table"
+    # Need to fix exclusivity of this if then chain
+    # if index != nil then
+      # This probably works for globals because even at global scope we seem
+      # to be storing into a locals table in additon to a globals hash.
       result = fp.load(index)
     else
       raise "Undefined variable '#{node.text}'"
     end
     result
+
   end
 
   def assignName (node, e)
@@ -624,7 +645,18 @@ class Interpreter
         # Then call the 'add' method stored in the class, passing a and b
         # The add method will check the type of b and perform a type
         # compatibility check, determining the type of the result
+
+        # This is (until now) a ruby method. It really needs to be a cobalt
+        # object because when getMember is called, it needs to return a cobalt,
+        # not a ruby object.
+
         classObj.getMember('add').call(a, b)
+
+        # It would look like this:
+        # methodObj = classObj.getMember('add')
+        # result = methodObj.getMember('call')
+        # Then we need to actually call the call method.  How to do that?
+
       when '-'
         classObj = a.type
         if classObj == nil
@@ -792,9 +824,13 @@ class Interpreter
       args.push(argObj)
     end
 
-    if functionObj.type == $NativeFunction
+    # We used to check the type of object and check if it is a nativefunction
+    # But now we just check if the underlying object is an array or not
+    # if functionObj.type == $NativeFunction
+
+    if functionObj.value.class == Array
       # Process as a native function
-      params = functionObj.value[0]
+      numParams = functionObj.value[0]
       code = functionObj.value[1]
       result = code.call(args)
       #puts "Value is: #{r.value} of type #{r.type}"
@@ -851,6 +887,7 @@ class Interpreter
     scope = @scope
     fp = @fp
     index = scope.lookup(node.text)
+
     # Logic to traverse higher scopes
     while !index && scope.link != nil
       scope = scope.link
@@ -861,7 +898,8 @@ class Interpreter
     end
 
     if scope.link == nil
-    # If we are at global scope then try to find the variable in the global hash
+      # If we are at global scope then try to find the variable in the global
+      # hash. Do not attempt to find it in the locals table of the global frame.
       result = @globals[node.text]
       if result == nil
         # Next search the built-ins namespace
@@ -873,7 +911,9 @@ class Interpreter
         # This might be a problem: assuming that we are loading a name from a
         # frame. What if we are loading it from an object?
         # Probably need to mark scopes as either procedural or object-based
-        # and load based on the result of a check
+        # and load based on the result of a check.
+        # I don't think this is the case anymore.  Object namespace lookups are
+        # not really scopes, they are just namespaces.
         if @scope.objectFlag == true then
           result = @thisPtr.getMember(node.text)
         else
@@ -882,6 +922,9 @@ class Interpreter
         result
       else
         # This needs to print a stack trace for lx, not ruby
+        # This might not be possible because if the index != nil then the search
+        # would have continued up the frame stack.
+        puts "I DON'T THINK THIS CAN EVER HAPPEN."
         raise "variable '#{node.text}' undefined."
       end
     end

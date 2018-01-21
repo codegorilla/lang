@@ -8,11 +8,14 @@ class FunctionBuilder
     @classObj = TauObject.new($Class, "<class 'Function'>")
   end
 
-  def make (value)
+  def make (params)
+    # What is a function object?
+    # Answer that question before proceeding
+
     # Where does this get used?
     # I think when we create functions, we've created them manually
     # Need to convert them to calls to $Function.make
-    TauObject.new($Function, value)
+    TauObject.new($Function, params[0])
   end
 
   def call ()
@@ -25,7 +28,16 @@ class FunctionBuilder
 
   def build ()
     @classObj.setMember('super', $Any)
-    @classObj.setMember('make', method(:make))
+
+    # The value held by a function object is either:
+    # (a) an AST node, or
+    # (b) an array containing paramNames and a handle to a native method
+    paramNames = ['x']
+    makeFun = TauObject.new($Function, [paramNames, method(:make)])
+    @classObj.setMember('make', makeFun)
+    
+    #@classObj.setMember('make', method(:make))
+
     @classObj.setMember('call', method(:call))
   end
 
