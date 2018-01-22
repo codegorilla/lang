@@ -8,10 +8,10 @@
 
 //module main;
 
-var xspace = Int.make(102);
-print xspace + 10;
-print Int.addi(xspace, 10);
-print Int.addi;
+//var xspace = Int.make(102);
+//print xspace + 10;
+//print Int.addi(xspace, 10);
+//print Int.addi;
 
 print Namespace;
 var math = Namespace.make();
@@ -54,9 +54,15 @@ print bvt;
 print bvf;
 print bvx;
 
-print 1.5 + 2.3;
+print 1 + 2;
+print 1 - 2;
+print 1 * 2;
+print 1 / 2;
+print -1;
+print ~1;
+print !1;
 
-print "Hello " + "world!";
+//print "Hello " + "world!";
 
 //var rf = tf + x1;
 

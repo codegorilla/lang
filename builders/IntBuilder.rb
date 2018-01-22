@@ -185,89 +185,72 @@ class IntBuilder
     result
   end
 
-  def addi (params)
+  def add (params)
     x = params[0]
     y = params[1]
-    z = x.value + y.value
-    TauObject.new($Int, z)
-  end
-
-  def add (x, y)
-    result = case y.type
-    when $Int
-      z = x.value + y.value
-      TauObject.new($Int, z)
-    when $Float
-      z = x.value + y.value
-      TauObject.new($Float, z)
-    when $Bool
-      TauObject.new($Exception, "Type error: unsupported operand types for +: Int and Bool")
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for +: Int and <other>")
-    end
+    result =
+      case y.type
+      when $Int then TauObject.new($Int, x.value + y.value)
+      when $Float then TauObject.new($Float, x.value + y.value)
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for +: Int and <other>")
+      end
     result
   end
 
-  def sub (x, y)
-    result = case y.type
-    when $Int
-      z = x.value - y.value
-      TauObject.new($Int, z)
-    when $Float
-      z = x.value - y.value
-      TauObject.new($Float, z)
-    when $Bool
-      TauObject.new($Exception, "Type error: unsupported operand types for -: Int and Bool")
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for -: Int and <other>")
-    end
-    result
-  end    
-
-  def mul (x, y)
-    result = case y.type
-    when $Int
-      z = x.value * y.value
-      TauObject.new($Int, z)
-    when $Float
-      z = x.value * y.value
-      TauObject.new($Float, z)
-    when $Bool
-      TauObject.new($Exception, "Type error: unsupported operand types for *: Int and Bool")
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for *: Int and <other>")
-    end
+  def sub (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then TauObject.new($Int, x.value - y.value)
+      when $Float then TauObject.new($Float, x.value - y.value)
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for -: Int and <other>")
+      end
     result
   end
 
-  def div (x, y)
-    result = case y.type
-    when $Int
-      z = x.value / y.value
-      TauObject.new($Int, z)
-    when $Float
-      z = x.value / y.value
-      TauObject.new($Float, z)
-    when $Bool
-      TauObject.new($Exception, "Type error: unsupported operand types for /: Int and Bool")
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for /: Int and <other>")
-    end
+  def mul (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then TauObject.new($Int, x.value * y.value)
+      when $Float then TauObject.new($Float, x.value * y.value)
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for *: Int and <other>")
+      end
     result
   end
 
-  def neg (x)
+  def div (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then TauObject.new($Int, x.value / y.value)
+      when $Float then TauObject.new($Float, x.value / y.value)
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for /: Int and <other>")
+      end
+    result
+  end
+
+  def neg (params)
+    x = params[0]
     result = TauObject.new($Int, -x.value)
     result
   end
 
-  def bnot (x)
+  def bnot (params)
+    x = params[0]
     result = TauObject.new($Int, ~x.value)
     result
   end
 
-  def not (x)
-    # Need to think about this
+  def not (params)
+    # Need to think about truthy vs. falsy values
     # Do we follow the python/javascript model or the ruby model?
     result = TauObject.new($Bool, false)
     result
@@ -298,17 +281,14 @@ class IntBuilder
     @classObj.setMember('shl', method(:shl))
     @classObj.setMember('shr', method(:shr))
 
-    @classObj.setMember('add', method(:add))
-    
-    #@classObj.setMember('add', TauObject.new($Function, [2, method(:addi)]))
-    @classObj.setMember('addi', TauObject.new($Function, [2, method(:addi)]))
+    @classObj.setMember('add', TauObject.new($Function, [2, method(:add)]))
+    @classObj.setMember('sub', TauObject.new($Function, [2, method(:sub)]))
+    @classObj.setMember('mul', TauObject.new($Function, [2, method(:mul)]))
+    @classObj.setMember('div', TauObject.new($Function, [2, method(:div)]))
 
-    @classObj.setMember('sub', method(:sub))
-    @classObj.setMember('mul', method(:mul))
-    @classObj.setMember('div', method(:div))
-    @classObj.setMember('neg', method(:neg))
-    @classObj.setMember('bnot', method(:bnot))
-    @classObj.setMember('not', method(:not))
+    @classObj.setMember('neg', TauObject.new($Function, [2, method(:neg)]))
+    @classObj.setMember('bnot', TauObject.new($Function, [2, method(:bnot)]))
+    @classObj.setMember('not', TauObject.new($Function, [2, method(:not)]))
 end
 
 end

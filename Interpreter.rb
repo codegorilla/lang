@@ -569,7 +569,8 @@ class Interpreter
     a = expr(node.leftChild)
     b = expr(node.rightChild)
     op = node.text
-    c = case op
+    c =
+      case op
       when '|'
         classObj = a.type
         if classObj == nil
@@ -650,32 +651,42 @@ class Interpreter
         # object because when getMember is called, it needs to return a cobalt,
         # not a ruby object.
 
-        classObj.getMember('add').call(a, b)
+        funObj = classObj.getMember('add')
+        fun = funObj.value[1]
+        res = fun.call([a, b])
+        res
 
-        # It would look like this:
-        # methodObj = classObj.getMember('add')
-        # result = methodObj.getMember('call')
-        # Then we need to actually call the call method.  How to do that?
+        # This is the old way to call it
+        #classObj.getMember('add').call(a, b)
 
       when '-'
         classObj = a.type
         if classObj == nil
           # Throw exception
         end
-        classObj.getMember('sub').call(a, b)
+        funObj = classObj.getMember('sub')
+        fun = funObj.value[1]
+        res = fun.call([a, b])
+        res
       when '*'
         classObj = a.type
         if classObj == nil
           # Throw exception
         end
-        classObj.getMember('mul').call(a, b)
+        funObj = classObj.getMember('mul')
+        fun = funObj.value[1]
+        res = fun.call([a, b])
+        res
       when '/'
         classObj = a.type
         if classObj == nil
           # Throw exception
         end
-        classObj.getMember('div').call(a, b)
-    end
+        funObj = classObj.getMember('div')
+        fun = funObj.value[1]
+        res = fun.call([a, b])
+        res
+      end
     result = c
     result
   end
@@ -690,19 +701,29 @@ class Interpreter
         if classObj == nil
           # Throw exception
         end
-        classObj.getMember('uminus').call(a)
+        # UMINUS
+        funObj = classObj.getMember('neg')
+        fun = funObj.value[1]
+        res = fun.call([a, b])
+        res
       when '~'
         classObj = a.type
         if classObj == nil
           # Throw exception
         end
-        classObj.getMember('bnot').call(a)
+        funObj = classObj.getMember('bnot')
+        fun = funObj.value[1]
+        res = fun.call([a, b])
+        res
       when '!'
         classObj = a.type
         if classObj == nil
           # Throw exception
         end
-        classObj.getMember('not').call(a)        
+        funObj = classObj.getMember('not')
+        fun = funObj.value[1]
+        res = fun.call([a, b])
+        res
     end
   end
 
