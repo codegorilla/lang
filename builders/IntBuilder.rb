@@ -58,130 +58,115 @@ class IntBuilder
     result
   end
 
-  def equ (x, y)
-    result = case y.type
-    when $Int
-      z = x.value == y.value
-      # return the singletons not a new value
-      if z == true then $true else $false end
-    when $Float
-      z = x.value == y.value
-      if z == true then $true else $false end
-    when $Bool
-      $false
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for ==: Int and <other>")
-    end
+  def equ (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then
+        z = x.value == y.value
+        # return the singletons not a new value
+        if z == true then $true else $false end
+      when $Float then
+        z = x.value == y.value
+        if z == true then $true else $false end
+      else
+        $false
+      end
     result
   end
 
-  def neq (x, y)
-    result = case y.type
-    when $Int
-      z = x.value != y.value
-      TauObject.new($Bool, z)
-    when $Float
-      z = x.value != y.value
-      TauObject.new($Bool, z)
-    when $Bool
-      TauObject.new($Bool, true)
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for !=: Int and <other>")
-    end
+  def neq (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then
+        z = x.value != y.value
+        # return the singletons not a new value
+        if z == true then $true else $false end
+      when $Float then
+        z = x.value != y.value
+        if z == true then $true else $false end
+      else
+        $true
+      end
     result
   end
 
-  def gt (x, y)
-    result = case y.type
-    when $Int
-      z = x.value > y.value
-      TauObject.new($Bool, z)
-    when $Float
-      z = x.value > y.value
-      TauObject.new($Bool, z)
-    when $Bool
-      TauObject.new($Exception, "Type error: unsupported operand types for >: Int and Bool")
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for >: Int and <other>")
-    end
+  def gt (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then TauObject.new($Bool, x.value > y.value)
+      when $Float then TauObject.new($Bool, x.value > y.value)
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for >: Int and <other>")
+      end
     result
   end
 
-  def lt (x, y)
-    result = case y.type
-    when $Int
-      z = x.value < y.value
-      TauObject.new($Bool, z)
-    when $Float
-      z = x.value < y.value
-      TauObject.new($Bool, z)
-    when $Bool
-      TauObject.new($Exception, "Type error: unsupported operand types for <: Int and Bool")
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for <: Int and <other>")
-    end
+  def lt (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then TauObject.new($Bool, x.value < y.value)
+      when $Float then TauObject.new($Bool, x.value < y.value)
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for <: Int and <other>")
+      end
     result
   end
 
-  def ge (x, y)
-    result = case y.type
-    when $Int
-      z = x.value >= y.value
-      TauObject.new($Bool, z)
-    when $Float
-      z = x.value >= y.value
-      TauObject.new($Bool, z)
-    when $Bool
-      TauObject.new($Exception, "Type error: unsupported operand types for >=: Int and Bool")
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for >=: Int and <other>")
-    end
+  def ge (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then TauObject.new($Bool, x.value >= y.value)
+      when $Float then TauObject.new($Bool, x.value >= y.value)
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for >=: Int and <other>")
+      end
     result
   end
 
-  def le (x, y)
-    result = case y.type
-    when $Int
-      z = x.value <= y.value
-      TauObject.new($Bool, z)
-    when $Float
-      z = x.value <= y.value
-      TauObject.new($Bool, z)
-    when $Bool
-      TauObject.new($Exception, "Type error: unsupported operand types for <=: Int and Bool")
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for <=: Int and <other>")
-    end
+  def le (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then TauObject.new($Bool, x.value <= y.value)
+      when $Float then TauObject.new($Bool, x.value <= y.value)
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for <=: Int and <other>")
+      end
     result
   end
 
-  def shl (x, y)
-    result = case y.type
-    when $Int
-      z = x.value << y.value
-      TauObject.new($Int, z)
-    when $Float
-      TauObject.new($Exception, "Type error: unsupported operand types for <<: Int and Float")
-    when $Bool
-      TauObject.new($Exception, "Type error: unsupported operand types for <<: Int and Bool")
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for <<: Int and <other>")
-    end
+  def shl (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then TauObject.new($Int, x.value << y.value)
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for <<: Int and <other>")
+      end
     result
   end
 
-  def shr (x, y)
-    result = case y.type
-    when $Int
-      z = x.value >> y.value
-      TauObject.new($Int, z)
-    when $Float
-      TauObject.new($Exception, "Type error: unsupported operand types for >>: Int and Float")
-    when $Bool
-      TauObject.new($Exception, "Type error: unsupported operand types for >>: Int and Bool")
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for >>: Int and <other>")
-    end
+  def shr (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then TauObject.new($Int, x.value >> y.value)
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for >>: Int and <other>")
+      end
     result
   end
 
@@ -269,23 +254,25 @@ class IntBuilder
     makeFun = TauObject.new($Function, [1, method(:make)])
     @classObj.setMember('make', makeFun)
     
+    # Need to replace these methods and rework interpreter binops
     @classObj.setMember('bor', method(:bor))
     @classObj.setMember('bxor', method(:bxor))
     @classObj.setMember('band', method(:band))
-    @classObj.setMember('equ', method(:equ))
-    @classObj.setMember('neq', method(:neq))
-    @classObj.setMember('gt', method(:gt))
-    @classObj.setMember('lt', method(:lt))
-    @classObj.setMember('ge', method(:ge))
-    @classObj.setMember('le', method(:le))
-    @classObj.setMember('shl', method(:shl))
-    @classObj.setMember('shr', method(:shr))
 
+    @classObj.setMember('equ', TauObject.new($Function, [2, method(:equ)]))
+    @classObj.setMember('neq', TauObject.new($Function, [2, method(:neq)]))
+
+    @classObj.setMember('gt', TauObject.new($Function, [2, method(:gt)]))
+    @classObj.setMember('lt', TauObject.new($Function, [2, method(:lt)]))
+    @classObj.setMember('ge', TauObject.new($Function, [2, method(:ge)]))
+    @classObj.setMember('le', TauObject.new($Function, [2, method(:le)]))
+    
+    @classObj.setMember('shl', TauObject.new($Function, [2, method(:shl)]))
+    @classObj.setMember('shr', TauObject.new($Function, [2, method(:shr)]))
     @classObj.setMember('add', TauObject.new($Function, [2, method(:add)]))
     @classObj.setMember('sub', TauObject.new($Function, [2, method(:sub)]))
     @classObj.setMember('mul', TauObject.new($Function, [2, method(:mul)]))
     @classObj.setMember('div', TauObject.new($Function, [2, method(:div)]))
-
     @classObj.setMember('neg', TauObject.new($Function, [2, method(:neg)]))
     @classObj.setMember('bnot', TauObject.new($Function, [2, method(:bnot)]))
     @classObj.setMember('not', TauObject.new($Function, [2, method(:not)]))

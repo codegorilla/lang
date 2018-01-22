@@ -594,49 +594,49 @@ class Interpreter
         if classObj == nil
           # Throw exception
         end
-        classObj.getMember('equ').call(a, b)
+        classObj.getMember('equ').value[1].call([a, b])
       when '!='
         classObj = a.type
         if classObj == nil
           # Throw exception
         end
-        classObj.getMember('neq').call(a, b)
+        classObj.getMember('neq').value[1].call([a, b])
       when '>'
         classObj = a.type
         if classObj == nil
           # Throw exception
         end
-        classObj.getMember('gt').call(a, b)
+        classObj.getMember('gt').value[1].call([a, b])
       when '<'
         classObj = a.type
         if classObj == nil
           # Throw exception
         end
-        classObj.getMember('lt').call(a, b)
+        classObj.getMember('lt').value[1].call([a, b])
       when '>='
         classObj = a.type
         if classObj == nil
           # Throw exception
         end
-        classObj.getMember('ge').call(a, b)
+        classObj.getMember('ge').value[1].call([a, b])
       when '<='
         classObj = a.type
         if classObj == nil
           # Throw exception
         end
-        classObj.getMember('le').call(a, b)
+        classObj.getMember('le').value[1].call([a, b])
       when '<<'
         classObj = a.type
         if classObj == nil
           # Throw exception
         end
-        classObj.getMember('shl').call(a, b)
+        classObj.getMember('shl').value[1].call([a, b])
       when '>>'
         classObj = a.type
         if classObj == nil
           # Throw exception
         end
-        classObj.getMember('shr').call(a, b)
+        classObj.getMember('shr').value[1].call([a, b])
       when '+'
         # First, need to get the type of a, which will yield a class
         classObj = a.type
