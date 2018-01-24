@@ -12,49 +12,39 @@ class IntBuilder
     TauObject.new($Int, params[0].value)
   end
 
-  def bor (x, y)
-    result = case y.type
-    when $Int
-      z = x.value | y.value
-      TauObject.new($Int, z)
-    when $Float
-      TauObject.new($Exception, "Type error: unsupported operand types for |: Int and Float")
-    when $Bool
-      # Should Bool get promoted to Int in bitwise operations?
-      TauObject.new($Exception, "Type error: unsupported operand types for |: Int and Bool")
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for |: Int and <other>")
-    end
+  def bor (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then TauObject.new($Int, x.value | y.value)
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for |: Int and <other>")
+      end
     result
   end
 
-  def bxor (x, y)
-    result = case y.type
-    when $Int
-      z = x.value ^ y.value
-      TauObject.new($Int, z)
-    when $Float
-      TauObject.new($Exception, "Type error: unsupported operand types for ^: Int and Float")
-    when $Bool
-      TauObject.new($Exception, "Type error: unsupported operand types for ^: Int and Bool")
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for ^: Int and <other>")
-    end
+  def bxor (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then TauObject.new($Int, x.value ^ y.value)
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for ^: Int and <other>")
+      end
     result
   end
 
-  def band (x, y)
-    result = case y.type
-    when $Int
-      z = x.value & y.value
-      TauObject.new($Int, z)
-    when $Float
-      TauObject.new($Exception, "Type error: unsupported operand types for &: Int and Float")
-    when $Bool
-      TauObject.new($Exception, "Type error: unsupported operand types for &: Int and Bool")
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for &: Int and <other>")
-    end
+  def band (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then TauObject.new($Int, x.value & y.value)
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for ^: Int and <other>")
+      end
     result
   end
 
@@ -254,19 +244,15 @@ class IntBuilder
     makeFun = TauObject.new($Function, [1, method(:make)])
     @classObj.setMember('make', makeFun)
     
-    # Need to replace these methods and rework interpreter binops
-    @classObj.setMember('bor', method(:bor))
-    @classObj.setMember('bxor', method(:bxor))
-    @classObj.setMember('band', method(:band))
-
+    @classObj.setMember('bor', TauObject.new($Function, [2, method(:bor)]))
+    @classObj.setMember('bxor', TauObject.new($Function, [2, method(:bxor)]))
+    @classObj.setMember('band', TauObject.new($Function, [2, method(:band)]))
     @classObj.setMember('equ', TauObject.new($Function, [2, method(:equ)]))
     @classObj.setMember('neq', TauObject.new($Function, [2, method(:neq)]))
-
     @classObj.setMember('gt', TauObject.new($Function, [2, method(:gt)]))
     @classObj.setMember('lt', TauObject.new($Function, [2, method(:lt)]))
     @classObj.setMember('ge', TauObject.new($Function, [2, method(:ge)]))
     @classObj.setMember('le', TauObject.new($Function, [2, method(:le)]))
-    
     @classObj.setMember('shl', TauObject.new($Function, [2, method(:shl)]))
     @classObj.setMember('shr', TauObject.new($Function, [2, method(:shr)]))
     @classObj.setMember('add', TauObject.new($Function, [2, method(:add)]))

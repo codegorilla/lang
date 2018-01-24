@@ -48,11 +48,11 @@ print NativeFunction;
 
 var bvt = true;
 var bvf = false;
-var bvx = bvt & bvf;
+//var bvx = bvt & bvf;
 
 print bvt;
 print bvf;
-print bvx;
+//print bvx;
 
 print 1 + 2;
 print 1 - 2;
@@ -72,6 +72,12 @@ print 1 == 1;
 print 1 == 2;
 print 1 != 1;
 print 1 != 2;
+
+print 1 | 2;
+print 1 ^ 2;
+print 1 & 2;
+
+
 
 //print "Hello " + "world!";
 

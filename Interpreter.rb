@@ -576,19 +576,19 @@ class Interpreter
         if classObj == nil
           # Throw exception
         end
-        classObj.getMember('bor').call(a, b)
+        classObj.getMember('bor').value[1].call([a, b])
       when '^'
         classObj = a.type
         if classObj == nil
           # Throw exception
         end
-        classObj.getMember('bxor').call(a, b)
+        classObj.getMember('bxor').value[1].call([a, b])
       when '&'
         classObj = a.type
         if classObj == nil
           # Throw exception
         end
-        classObj.getMember('band').call(a, b)
+        classObj.getMember('band').value[1].call([a, b])
       when '=='
         classObj = a.type
         if classObj == nil
