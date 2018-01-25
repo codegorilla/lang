@@ -1,15 +1,11 @@
 class IntBuilder
 
   def initialize ()
-    @classObj = TauObject.new($Class, "<class 'Int'>")
+    @Int = TauObject.new($Class, "<class 'Int'>")
   end
 
-  # def make (value)
-  #   TauObject.new($Int, value)
-  # end
-
   def make (params)
-    TauObject.new($Int, params[0].value)
+    TauObject.new(@Int, params[0].value)
   end
 
   def bor (params)
@@ -17,7 +13,7 @@ class IntBuilder
     y = params[1]
     result =
       case y.type
-      when $Int then TauObject.new($Int, x.value | y.value)
+      when @Int then TauObject.new(@Int, x.value | y.value)
       else
         TauObject.new($Exception, "Type error: unsupported operand types for |: Int and <other>")
       end
@@ -29,7 +25,7 @@ class IntBuilder
     y = params[1]
     result =
       case y.type
-      when $Int then TauObject.new($Int, x.value ^ y.value)
+      when @Int then TauObject.new(@Int, x.value ^ y.value)
       else
         TauObject.new($Exception, "Type error: unsupported operand types for ^: Int and <other>")
       end
@@ -41,7 +37,7 @@ class IntBuilder
     y = params[1]
     result =
       case y.type
-      when $Int then TauObject.new($Int, x.value & y.value)
+      when @Int then TauObject.new(@Int, x.value & y.value)
       else
         TauObject.new($Exception, "Type error: unsupported operand types for ^: Int and <other>")
       end
@@ -53,7 +49,7 @@ class IntBuilder
     y = params[1]
     result =
       case y.type
-      when $Int then
+      when @Int then
         z = x.value == y.value
         # return the singletons not a new value
         if z == true then $true else $false end
@@ -71,7 +67,7 @@ class IntBuilder
     y = params[1]
     result =
       case y.type
-      when $Int then
+      when @Int then
         z = x.value != y.value
         # return the singletons not a new value
         if z == true then $true else $false end
@@ -89,7 +85,7 @@ class IntBuilder
     y = params[1]
     result =
       case y.type
-      when $Int then TauObject.new($Bool, x.value > y.value)
+      when @Int then TauObject.new($Bool, x.value > y.value)
       when $Float then TauObject.new($Bool, x.value > y.value)
       else
         TauObject.new($Exception, "Type error: unsupported operand types for >: Int and <other>")
@@ -102,7 +98,7 @@ class IntBuilder
     y = params[1]
     result =
       case y.type
-      when $Int then TauObject.new($Bool, x.value < y.value)
+      when @Int then TauObject.new($Bool, x.value < y.value)
       when $Float then TauObject.new($Bool, x.value < y.value)
       else
         TauObject.new($Exception, "Type error: unsupported operand types for <: Int and <other>")
@@ -115,7 +111,7 @@ class IntBuilder
     y = params[1]
     result =
       case y.type
-      when $Int then TauObject.new($Bool, x.value >= y.value)
+      when @Int then TauObject.new($Bool, x.value >= y.value)
       when $Float then TauObject.new($Bool, x.value >= y.value)
       else
         TauObject.new($Exception, "Type error: unsupported operand types for >=: Int and <other>")
@@ -128,7 +124,7 @@ class IntBuilder
     y = params[1]
     result =
       case y.type
-      when $Int then TauObject.new($Bool, x.value <= y.value)
+      when @Int then TauObject.new($Bool, x.value <= y.value)
       when $Float then TauObject.new($Bool, x.value <= y.value)
       else
         TauObject.new($Exception, "Type error: unsupported operand types for <=: Int and <other>")
@@ -141,7 +137,7 @@ class IntBuilder
     y = params[1]
     result =
       case y.type
-      when $Int then TauObject.new($Int, x.value << y.value)
+      when @Int then TauObject.new(@Int, x.value << y.value)
       else
         TauObject.new($Exception, "Type error: unsupported operand types for <<: Int and <other>")
       end
@@ -153,7 +149,7 @@ class IntBuilder
     y = params[1]
     result =
       case y.type
-      when $Int then TauObject.new($Int, x.value >> y.value)
+      when @Int then TauObject.new(@Int, x.value >> y.value)
       else
         TauObject.new($Exception, "Type error: unsupported operand types for >>: Int and <other>")
       end
@@ -165,7 +161,7 @@ class IntBuilder
     y = params[1]
     result =
       case y.type
-      when $Int then TauObject.new($Int, x.value + y.value)
+      when @Int then TauObject.new(@Int, x.value + y.value)
       when $Float then TauObject.new($Float, x.value + y.value)
       else
         TauObject.new($Exception, "Type error: unsupported operand types for +: Int and <other>")
@@ -178,7 +174,7 @@ class IntBuilder
     y = params[1]
     result =
       case y.type
-      when $Int then TauObject.new($Int, x.value - y.value)
+      when @Int then TauObject.new(@Int, x.value - y.value)
       when $Float then TauObject.new($Float, x.value - y.value)
       else
         TauObject.new($Exception, "Type error: unsupported operand types for -: Int and <other>")
@@ -191,7 +187,7 @@ class IntBuilder
     y = params[1]
     result =
       case y.type
-      when $Int then TauObject.new($Int, x.value * y.value)
+      when @Int then TauObject.new(@Int, x.value * y.value)
       when $Float then TauObject.new($Float, x.value * y.value)
       else
         TauObject.new($Exception, "Type error: unsupported operand types for *: Int and <other>")
@@ -204,7 +200,7 @@ class IntBuilder
     y = params[1]
     result =
       case y.type
-      when $Int then TauObject.new($Int, x.value / y.value)
+      when @Int then TauObject.new(@Int, x.value / y.value)
       when $Float then TauObject.new($Float, x.value / y.value)
       else
         TauObject.new($Exception, "Type error: unsupported operand types for /: Int and <other>")
@@ -214,54 +210,54 @@ class IntBuilder
 
   def neg (params)
     x = params[0]
-    result = TauObject.new($Int, -x.value)
+    result = TauObject.new(@Int, -x.value)
     result
   end
 
   def bnot (params)
     x = params[0]
-    result = TauObject.new($Int, ~x.value)
+    result = TauObject.new(@Int, ~x.value)
     result
   end
 
   def not (params)
     # Need to think about truthy vs. falsy values
     # Do we follow the python/javascript model or the ruby model?
-    result = TauObject.new($Bool, false)
+    result = $false
     result
   end
 
   def classObj ()
-    @classObj
+    @Int
   end
 
   def build ()
-    @classObj.setMember('super', $Any)
+    @Int.setMember('super', $Any)
 
     # Perhaps the value should be an array or some kind of 'NativeCode' ruby
     # object that the interpreter will distinguish at runtime. An array will
     # work for now.  Array is of the form [numParams, code].
     makeFun = TauObject.new($Function, [1, method(:make)])
-    @classObj.setMember('make', makeFun)
+    @Int.setMember('make', makeFun)
     
-    @classObj.setMember('bor', TauObject.new($Function, [2, method(:bor)]))
-    @classObj.setMember('bxor', TauObject.new($Function, [2, method(:bxor)]))
-    @classObj.setMember('band', TauObject.new($Function, [2, method(:band)]))
-    @classObj.setMember('equ', TauObject.new($Function, [2, method(:equ)]))
-    @classObj.setMember('neq', TauObject.new($Function, [2, method(:neq)]))
-    @classObj.setMember('gt', TauObject.new($Function, [2, method(:gt)]))
-    @classObj.setMember('lt', TauObject.new($Function, [2, method(:lt)]))
-    @classObj.setMember('ge', TauObject.new($Function, [2, method(:ge)]))
-    @classObj.setMember('le', TauObject.new($Function, [2, method(:le)]))
-    @classObj.setMember('shl', TauObject.new($Function, [2, method(:shl)]))
-    @classObj.setMember('shr', TauObject.new($Function, [2, method(:shr)]))
-    @classObj.setMember('add', TauObject.new($Function, [2, method(:add)]))
-    @classObj.setMember('sub', TauObject.new($Function, [2, method(:sub)]))
-    @classObj.setMember('mul', TauObject.new($Function, [2, method(:mul)]))
-    @classObj.setMember('div', TauObject.new($Function, [2, method(:div)]))
-    @classObj.setMember('neg', TauObject.new($Function, [2, method(:neg)]))
-    @classObj.setMember('bnot', TauObject.new($Function, [2, method(:bnot)]))
-    @classObj.setMember('not', TauObject.new($Function, [2, method(:not)]))
-end
+    @Int.setMember('bor', TauObject.new($Function, [2, method(:bor)]))
+    @Int.setMember('bxor', TauObject.new($Function, [2, method(:bxor)]))
+    @Int.setMember('band', TauObject.new($Function, [2, method(:band)]))
+    @Int.setMember('equ', TauObject.new($Function, [2, method(:equ)]))
+    @Int.setMember('neq', TauObject.new($Function, [2, method(:neq)]))
+    @Int.setMember('gt', TauObject.new($Function, [2, method(:gt)]))
+    @Int.setMember('lt', TauObject.new($Function, [2, method(:lt)]))
+    @Int.setMember('ge', TauObject.new($Function, [2, method(:ge)]))
+    @Int.setMember('le', TauObject.new($Function, [2, method(:le)]))
+    @Int.setMember('shl', TauObject.new($Function, [2, method(:shl)]))
+    @Int.setMember('shr', TauObject.new($Function, [2, method(:shr)]))
+    @Int.setMember('add', TauObject.new($Function, [2, method(:add)]))
+    @Int.setMember('sub', TauObject.new($Function, [2, method(:sub)]))
+    @Int.setMember('mul', TauObject.new($Function, [2, method(:mul)]))
+    @Int.setMember('div', TauObject.new($Function, [2, method(:div)]))
+    @Int.setMember('neg', TauObject.new($Function, [2, method(:neg)]))
+    @Int.setMember('bnot', TauObject.new($Function, [2, method(:bnot)]))
+    @Int.setMember('not', TauObject.new($Function, [2, method(:not)]))
+  end
 
-end
+end # class

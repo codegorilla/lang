@@ -367,11 +367,14 @@ class Interpreter
     filename = node.text
     p = Processor.new(filename, @logger)
     p.process
-    # Create a namespace object -- should be $Namespace.make
-    # Actually, the namespace will be created in the imported file and passed
-    # back up. It will contain all global variables in the imported file.
-    @globals[node.text] = $Namespace
-    #pp p.exports
+    # Create a namespace object to hold imported names.
+    # It will contain all global variables in the imported file.
+    @globals[node.text] = $Namespace.getMember('make').value[1].call([])
+    # Obtain the globals of the imported file
+    impglob = p.exports
+    #puts impglob['x1'].value
+    # for each item in exports, load set it as member of the namespace
+    @globals[node.text].setMember('x1', impglob['x1'])
   end
 
   def printExpr (node)

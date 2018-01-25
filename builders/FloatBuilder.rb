@@ -1,190 +1,191 @@
 class FloatBuilder
 
-    def initialize ()
-      @classObj = TauObject.new($Class, "<class 'Float'>")
-    end
+  def initialize ()
+    @Float = TauObject.new($Class, "<class 'Int'>")
+  end
 
-    def make (value)
-      TauObject.new($Float, value)
-    end
+  def make (params)
+    TauObject.new(@Float, params[0].value.to_f)
+  end
 
-    def classObj ()
-      @classObj
-    end
-
-    def equ (x, y)
-      result = case y.type
-      when $Int
+  def equ (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then
         z = x.value == y.value
-        TauObject.new($Bool, z)
-      when $Float
+        # return the singletons not a new value
+        if z == true then $true else $false end
+      when @Float then
         z = x.value == y.value
-        TauObject.new($Bool, z)
-      when $Bool
-        TauObject.new($Bool, false)
+        if z == true then $true else $false end
       else
-        TauObject.new($Exception, "Type error: unsupported operand types for ==: Float and <other>")
+        $false
       end
-      result
-    end
+    result
+  end
 
-    def neq (x, y)
-      result = case y.type
-      when $Int
+  def neq (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then
         z = x.value != y.value
-        TauObject.new($Bool, z)
-      when $Float
+        # return the singletons not a new value
+        if z == true then $true else $false end
+      when @Float then
         z = x.value != y.value
-        TauObject.new($Bool, z)
-      when $Bool
-        TauObject.new($Bool, true)
+        if z == true then $true else $false end
       else
-        TauObject.new($Exception, "Type error: unsupported operand types for !=: Float and <other>")
+        $true
       end
-      result
-    end
+    result
+  end
 
-    def gt (x, y)
-      result = case y.type
-      when $Int
-        z = x.value > y.value
-        TauObject.new($Bool, z)
-      when $Float
-        z = x.value > y.value
-        TauObject.new($Bool, z)
-      when $Bool
-        TauObject.new($Exception, "Type error: unsupported operand types for >: Float and Bool")
+  def gt (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then TauObject.new($Bool, x.value > y.value)
+      when @Float then TauObject.new($Bool, x.value > y.value)
       else
         TauObject.new($Exception, "Type error: unsupported operand types for >: Float and <other>")
       end
-      result
-    end
+    result
+  end
 
-    def lt (x, y)
-      result = case y.type
-      when $Int
-        z = x.value < y.value
-        TauObject.new($Bool, z)
-      when $Float
-        z = x.value < y.value
-        TauObject.new($Bool, z)
-      when $Bool
-        TauObject.new($Exception, "Type error: unsupported operand types for <: Float and Bool")
+  def lt (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then TauObject.new($Bool, x.value < y.value)
+      when @Float then TauObject.new($Bool, x.value < y.value)
       else
         TauObject.new($Exception, "Type error: unsupported operand types for <: Float and <other>")
       end
-      result
-    end
+    result
+  end
 
-    def ge (x, y)
-      result = case y.type
-      when $Int
-        z = x.value >= y.value
-        TauObject.new($Bool, z)
-      when $Float
-        z = x.value >= y.value
-        TauObject.new($Bool, z)
-      when $Bool
-        TauObject.new($Exception, "Type error: unsupported operand types for >=: Float and Bool")
+  def ge (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then TauObject.new($Bool, x.value >= y.value)
+      when @Float then TauObject.new($Bool, x.value >= y.value)
       else
         TauObject.new($Exception, "Type error: unsupported operand types for >=: Float and <other>")
       end
-      result
-    end
+    result
+  end
 
-    def le (x, y)
-      result = case y.type
-      when $Int
-        z = x.value <= y.value
-        TauObject.new($Bool, z)
-      when $Float
-        z = x.value <= y.value
-        TauObject.new($Bool, z)
-      when $Bool
-        TauObject.new($Exception, "Type error: unsupported operand types for <=: Float and Bool")
+  def le (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then TauObject.new($Bool, x.value <= y.value)
+      when @Float then TauObject.new($Bool, x.value <= y.value)
       else
         TauObject.new($Exception, "Type error: unsupported operand types for <=: Float and <other>")
       end
-      result
-    end
+    result
+  end
 
-    def add (x, y)
-      result = case y.type
-      when $Int
-        z = x.value + y.value
-        TauObject.new($Float, z)
-      when $Float
-        z = x.value + y.value
-        TauObject.new($Float, z)
-      when $Bool
-        TauObject.new($Exception, "Type error: unsupported operand types for +: Float and Bool")
+  def add (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then TauObject.new(@Float, x.value + y.value)
+      when @Float then TauObject.new(@Float, x.value + y.value)
       else
         TauObject.new($Exception, "Type error: unsupported operand types for +: Float and <other>")
       end
-      result
-    end
+    result
+  end
 
-    def sub (x, y)
-      result = case y.type
-      when $Int
-        z = x.value - y.value
-        TauObject.new($Float, z)
-      when $Float
-        z = x.value - y.value
-        TauObject.new($Float, z)
-      when $Bool
-        TauObject.new($Exception, "Type error: unsupported operand types for -: Float and Bool")
+  def sub (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then TauObject.new(@Float, x.value - y.value)
+      when @Float then TauObject.new(@Float, x.value - y.value)
       else
         TauObject.new($Exception, "Type error: unsupported operand types for -: Float and <other>")
       end
-      result
-    end    
+    result
+  end
 
-    def mul (x, y)
-      result = case y.type
-      when $Int
-        z = x.value * y.value
-        TauObject.new($Float, z)
-      when $Float
-        z = x.value * y.value
-        TauObject.new($Float, z)
-      when $Bool
-        TauObject.new($Exception, "Type error: unsupported operand types for *: Float and Bool")
+  def mul (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then TauObject.new(@Float, x.value * y.value)
+      when @Float then TauObject.new(@Float, x.value * y.value)
       else
         TauObject.new($Exception, "Type error: unsupported operand types for *: Float and <other>")
       end
-      result
-    end
+    result
+  end
 
-    def div (x, y)
-      result = case y.type
-      when $Int
-        z = x.value / y.value
-        TauObject.new($Float, z)
-      when $Float
-        z = x.value / y.value
-        TauObject.new($Float, z)
-      when $Bool
-        TauObject.new($Exception, "Type error: unsupported operand types for /: Float and Bool")
+  def div (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $Int then TauObject.new(@Float, x.value / y.value)
+      when @Float then TauObject.new(@Float, x.value / y.value)
       else
         TauObject.new($Exception, "Type error: unsupported operand types for /: Float and <other>")
       end
-      result
-    end
-
-    def build ()
-      @classObj.setMember('super', $Any)
-      @classObj.setMember('make', method(:make))
-      @classObj.setMember('equ', method(:equ))
-      @classObj.setMember('neq', method(:neq))
-      @classObj.setMember('gt', method(:gt))
-      @classObj.setMember('lt', method(:lt))
-      @classObj.setMember('ge', method(:ge))
-      @classObj.setMember('le', method(:le))
-      @classObj.setMember('add', method(:add))
-      @classObj.setMember('sub', method(:sub))
-      @classObj.setMember('mul', method(:mul))
-      @classObj.setMember('div', method(:div))
-    end
-
+    result
   end
+
+  def neg (params)
+    x = params[0]
+    result = TauObject.new(@Float, -x.value)
+    result
+  end
+
+  def not (params)
+    # Need to think about truthy vs. falsy values
+    # Do we follow the python/javascript model or the ruby model?
+    result = $false
+    result
+  end
+
+  def classObj ()
+    @Float
+  end
+
+  def build ()
+    @Float.setMember('super', $Any)
+
+    # Perhaps the value should be an array or some kind of 'NativeCode' ruby
+    # object that the interpreter will distinguish at runtime. An array will
+    # work for now.  Array is of the form [numParams, code].
+    makeFun = TauObject.new($Function, [1, method(:make)])
+    @Float.setMember('make', makeFun)
+    
+    @Float.setMember('equ', TauObject.new($Function, [2, method(:equ)]))
+    @Float.setMember('neq', TauObject.new($Function, [2, method(:neq)]))
+    @Float.setMember('gt', TauObject.new($Function, [2, method(:gt)]))
+    @Float.setMember('lt', TauObject.new($Function, [2, method(:lt)]))
+    @Float.setMember('ge', TauObject.new($Function, [2, method(:ge)]))
+    @Float.setMember('le', TauObject.new($Function, [2, method(:le)]))
+    @Float.setMember('add', TauObject.new($Function, [2, method(:add)]))
+    @Float.setMember('sub', TauObject.new($Function, [2, method(:sub)]))
+    @Float.setMember('mul', TauObject.new($Function, [2, method(:mul)]))
+    @Float.setMember('div', TauObject.new($Function, [2, method(:div)]))
+    @Float.setMember('neg', TauObject.new($Function, [2, method(:neg)]))
+    @Float.setMember('not', TauObject.new($Function, [2, method(:not)]))
+  end
+
+end # class

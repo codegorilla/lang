@@ -1,6 +1,6 @@
 // Test file
 
-//import random;
+import random;
 //import math;
 //import complex;
 //import List;
@@ -13,6 +13,9 @@
 //print Int.addi(xspace, 10);
 //print Int.addi;
 
+var fspace = Float.make(92);
+print fspace;
+
 print Namespace;
 var math = Namespace.make();
 print math;
@@ -20,6 +23,7 @@ math.PI = 3.14159;
 var pi = math.PI;
 print 2 * pi;
 
+print random.x1;
 
 //var x = 1;
 //x.y = 2;
@@ -77,6 +81,18 @@ print 1 | 2;
 print 1 ^ 2;
 print 1 & 2;
 
+print 1 > 1.5;
+
+print 1.2 + 2.0;
+print 1.2 - 2.0;
+print 1.2 * 2.0;
+print 1.2 / 2.0;
+print -1.2;
+print !1.2;
+print 1.2 > 2.0;
+print 1.2 < 2.0;
+print 1.2 >= 2.0;
+print 1.2 <= 2.0;
 
 
 //print "Hello " + "world!";
