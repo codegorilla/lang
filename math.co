@@ -1,4 +1,12 @@
 // Stub file to load native math library
 
-loadlib("./math", "MathModule");
+var m = loadlib("./math", "MathModule");
+
+var atan2 = m.cos;
+var cos = m.cos;
+var log = m.log;
+var log10 = m.log10;
+var sin = m.sin;
+var sqrt = m.sqrt;
+var tan = m.tan;
 

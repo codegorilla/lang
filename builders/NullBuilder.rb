@@ -2,49 +2,72 @@ class NullBuilder
 
   def initialize ()
     # Create the Null class object
-    @classObj = TauObject.new($Class, "<class 'Null'>")
-    @null = TauObject.new(@classObj, nil)
+    @Null = TauObject.new($Class, "<class 'Null'>")
+    @null = makeRaw
   end
 
   def get_null ()
     @null
   end
 
-  def make ()
+  def makeRaw ()
+    TauObject.new(@Null, nil)
+  end
+
+  def make (params)
     # Make a new object of type Null
     # We should only ever create one of these because it is a singleton
-    TauObject.new($Null)
+    makeRaw
   end
 
-  def equ (x, y)
-    result = case y.type
-    when $Null
-      TauObject.new($Bool, true)
-    else
-      TauObject.new($Bool, false)
-    end
+  def equ (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when @Null
+        $true
+      else
+        $false
+      end
     result
   end
 
-  def neq (x, y)
-    result = case y.type
-    when $Null
-      TauObject.new($Bool, false)
-    else
-      TauObject.new($Bool, true)
-    end
+  def neq (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when @Null
+        $false
+      else
+        $true
+      end
     result
   end
 
+  def not (params)
+    # null is a 'falsy' value so !null is true
+    result = $true
+    result
+  end
+
+  def toString (params)
+    x = params[0]
+    result = TauObject.new($String, x.value.to_s)
+  end
+  
   def classObj ()
-    @classObj
+    @Null
   end
 
   def build ()
-    @classObj.setMember('super', $Any)
-    @classObj.setMember('make', method(:make))
-    @classObj.setMember('equ', method(:equ))
-    @classObj.setMember('neq', method(:neq))
+    @Null.setMember('super', $Any)
+    @Null.setMember('make', TauObject.new($Function, [0, method(:make)]))
+    @Null.setMember('equ', TauObject.new($Function, [2, method(:equ)]))
+    @Null.setMember('neq', TauObject.new($Function, [2, method(:neq)]))
+    @Null.setMember('not', TauObject.new($Function, [1, method(:not)]))
+    @Null.setMember('toString', TauObject.new($Function, [1, method(:toString)]))
   end
 
-end
+end # class

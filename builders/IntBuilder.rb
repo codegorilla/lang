@@ -227,6 +227,11 @@ class IntBuilder
     result
   end
 
+  def toString (params)
+    x = params[0]
+    result = TauObject.new($String, x.value.to_s)
+  end
+
   def classObj ()
     @Int
   end
@@ -256,8 +261,9 @@ class IntBuilder
     @Int.setMember('mul', TauObject.new($Function, [2, method(:mul)]))
     @Int.setMember('div', TauObject.new($Function, [2, method(:div)]))
     @Int.setMember('neg', TauObject.new($Function, [2, method(:neg)]))
-    @Int.setMember('bnot', TauObject.new($Function, [2, method(:bnot)]))
-    @Int.setMember('not', TauObject.new($Function, [2, method(:not)]))
+    @Int.setMember('bnot', TauObject.new($Function, [1, method(:bnot)]))
+    @Int.setMember('not', TauObject.new($Function, [1, method(:not)]))
+    @Int.setMember('toString', TauObject.new($Function, [1, method(:toString)]))
   end
 
 end # class

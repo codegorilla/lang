@@ -6,89 +6,58 @@
 
 module MathModule
 
-  def MathModule.init (globalHash)
-    globalHash['atan2'] = MathModule.atan2
-    globalHash['cos']   = MathModule.cos
-    globalHash['log']   = MathModule.log
-    globalHash['log10'] = MathModule.log10
-    globalHash['sin']   = MathModule.sin
-    globalHash['sqrt']  = MathModule.sqrt
-    globalHash['tan']   = MathModule.tan
+  def MathModule.init ()
+    @symbols = {}
+    @symbols['atan2'] = TauObject.new($Function, [2, method(:atan2)])
+    @symbols['cos']   = TauObject.new($Function, [1, method(:cos)])
+    @symbols['log']   = TauObject.new($Function, [1, method(:log)])
+    @symbols['log10'] = TauObject.new($Function, [1, method(:log10)])
+    @symbols['sin']   = TauObject.new($Function, [1, method(:sin)])
+    @symbols['sqrt']  = TauObject.new($Function, [1, method(:sqrt)])
+    @symbols['tan']   = TauObject.new($Function, [1, method(:tan)])
   end
 
-  # A function object normally contains an AST node, whose children are a list
-  # of parameters and a block of code to execute
-  # A native function object needs to appear similar
-  # The runtime needs to detect that it has encountered a native function
-  # and then execute it properly.
-  # Native function objects have a different object type than normal function
-  # objects.
+  def MathModule.symbols ()
+    @symbols
+  end
 
   # The parameters get passed in as cobalt objects and have to be "un-boxed".
   # They need to be re-boxed for passing back to the cobalt evaluator.
 
-  def MathModule.atan2 ()
-    params = ['y', 'x']
-    code = lambda do |params|
-      y = params[0].value
-      x = params[1].value
-      TauObject.new($Float, Math.atan2(y, x))
-    end
-    result = TauObject.new($NativeFunction, [params, code])
+  def MathModule.atan2 (params)
+    y = params[0].value
+    x = params[1].value
+    TauObject.new($Float, Math.atan2(y, x))
   end
 
-  def MathModule.cos ()
-    params = ['x']
-    code = lambda do |params|
-      x = params[0].value
-      TauObject.new($Float, Math.cos(x))
-    end
-    result = TauObject.new($NativeFunction, [params, code])
+  def MathModule.cos (params)
+    x = params[0].value
+    TauObject.new($Float, Math.cos(x))
   end
 
-  def MathModule.log ()
-    params = ['x']
-    code = lambda do |params|
-      x = params[0].value
-      TauObject.new($Float, Math.log(x))
-    end
-    result = TauObject.new($NativeFunction, [params, code])
+  def MathModule.log (params)
+    x = params[0].value
+    TauObject.new($Float, Math.log(x))
   end
 
-  def MathModule.log10 ()
-    params = ['x']
-    code = lambda do |params|
-      x = params[0].value
-      TauObject.new($Float, Math.log10(x))
-    end
-    result = TauObject.new($NativeFunction, [params, code])
+  def MathModule.log10 (params)
+    x = params[0].value
+    TauObject.new($Float, Math.log10(x))
   end
 
-  def MathModule.sin ()
-    params = ['x']
-    code = lambda do |params|
-      x = params[0].value
-      TauObject.new($Float, Math.sin(x))
-    end
-    result = TauObject.new($NativeFunction, [params, code])
+  def MathModule.sin (params)
+    x = params[0].value
+    TauObject.new($Float, Math.sin(x))
   end
 
-  def MathModule.sqrt ()
-    params = ['x']
-    code = lambda do |params|
-      x = params[0].value
-      TauObject.new($Float, Math.sqrt(x))
-    end
-    result = TauObject.new($NativeFunction, [params, code])
+  def MathModule.sqrt (params)
+    x = params[0].value
+    TauObject.new($Float, Math.sqrt(x))
   end
 
-  def MathModule.tan ()
-    params = ['x']
-    code = lambda do |params|
-      x = params[0].value
-      TauObject.new($Float, Math.tan(x))
-    end
-    result = TauObject.new($NativeFunction, [params, code])
+  def MathModule.tan (params)
+    x = params[0].value
+    TauObject.new($Float, Math.tan(x))
   end
 
 end

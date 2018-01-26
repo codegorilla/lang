@@ -1,33 +1,33 @@
 // Test file
 
 import random;
-//import math;
+import math;
 //import complex;
 //import List;
 
-
 //module main;
 
-//var xspace = Int.make(102);
-//print xspace + 10;
-//print Int.addi(xspace, 10);
-//print Int.addi;
+var xspace = Int.make(102);
+print xspace + 10;
+print Int.add(xspace, 10);
 
 var fspace = Float.make(92);
 print fspace;
 
 print Namespace;
-var math = Namespace.make();
-print math;
-math.PI = 3.14159;
-var pi = math.PI;
+var math1 = Namespace.make();
+print math1;
+math1.PI = 3.14159;
+var pi = math1.PI;
 print 2 * pi;
 
 print random.x1;
+print random.tf;
 
-//var x = 1;
-//x.y = 2;
-//print x.y;
+print math.cos(60.0*math1.PI/180);
+print math.sin(30.0*math1.PI/180);
+print math.tan(45.0*math1.PI/180);
+print math.sqrt(25);
 
 //var myfun1 = lambda (x, y) => x + y;
 //print myfun1(8, 32);
@@ -44,19 +44,39 @@ var rrr = Class.make;
 
 print Null;
 print Unit;
+print Bool;
 print Int;
-print Float;
-print Function;
-print NativeFunction;
+//print Float;
+//print Function;
+//print NativeFunction;
 
+var atest = Int.make(1024);
+print atest;
 
-var bvt = true;
-var bvf = false;
-//var bvx = bvt & bvf;
+print Int.toString(atest);
 
-print bvt;
-print bvf;
-//print bvx;
+// Test Null type
+print null;
+print !null;
+print !!null;
+
+// Test Bool type
+print true;
+print false;
+print !true;
+print !false;
+print true | true;
+print true | false;
+print true ^ true;
+print true ^ false;
+print true & true;
+print true & false;
+print false | true;
+print false | false;
+print false ^ true;
+print false ^ false;
+print false & true;
+print false & false;
 
 print 1 + 2;
 print 1 - 2;
@@ -103,12 +123,6 @@ print 1.2 <= 2.0;
 
 //print m11 - m12;
 
-//print sqrt(25);
-//print sin(3.141593*45/180) + 1;
-//print tan(3.141593*45/180);
-//print atan2(1, 4);
-//print log(2.71818);
-//print log10(1000);
 
 //var li = List.make(1);
 //li.prepend(2);

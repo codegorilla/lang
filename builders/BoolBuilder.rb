@@ -1,11 +1,9 @@
 class BoolBuilder
 
   def initialize ()
-    # Create the Bool class object
-    @classObj = TauObject.new($Class, "<class 'Bool'>")
-    # Singleton true and false
-    @true = TauObject.new(@classObj, true)
-    @false = TauObject.new(@classObj, false)
+    @Bool = TauObject.new($Class, "<class 'Bool'>")
+    @true = makeRaw(true)
+    @false = makeRaw(false)
   end
 
   def get_true ()
@@ -16,108 +14,110 @@ class BoolBuilder
     @false
   end
 
-  def make (value)
+  def makeRaw (value)
+    TauObject.new(@Bool, value)
+  end
+
+  def make (params)
     # Make a new object of type Bool
     # There are only two instances of this class, true and false
     # So there is probably no need for this method
     # Would it be unregistered?
-    TauObject.new($Bool, value)
+    makeRaw(params[0].value)
   end
 
-  def bor (x, y)
-    result = case y.type
-    when $Bool
-      z = x.value | y.value
-      TauObject.new($Bool, z)
-    when $Int
-      TauObject.new($Exception, "Type error: unsupported operand types for |: Bool and Int")
-    when $Float
-      TauObject.new($Exception, "Type error: unsupported operand types for |: Bool and Float")
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for |: Bool and <other>")
-    end
+  def bor (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when @Bool then makeRaw(x.value | y.value)
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for |: Bool and <other>")
+      end
     result
   end
 
-  def bxor (x, y)
-    result = case y.type
-    when $Bool
-      z = x.value ^ y.value
-      TauObject.new($Bool, z)
-    when $Int
-      TauObject.new($Exception, "Type error: unsupported operand types for ^: Bool and Int")
-    when $Float
-      TauObject.new($Exception, "Type error: unsupported operand types for ^: Bool and Float")
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for ^: Bool and <other>")
-    end
+  def bxor (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when @Bool then TauObject.new(@Bool, x.value ^ y.value)
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for ^: Bool and <other>")
+      end
     result
   end
 
-  def band (x, y)
-    result = case y.type
-    when $Bool
-      z = x.value & y.value
-      TauObject.new($Bool, z)
-    when $Int
-      TauObject.new($Exception, "Type error: unsupported operand types for &: Bool and Int")
-    when $Float
-      TauObject.new($Exception, "Type error: unsupported operand types for &: Bool and Float")
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for &: Bool and <other>")
-    end
+  def band (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when @Bool then TauObject.new(@Bool, x.value & y.value)
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for &: Bool and <other>")
+      end
     result
   end
 
-  def equ (x, y)
-    result = case y.type
-    when $Bool
-      z = x.value == y.value
-      if z == true then $true else $false end
-      #TauObject.new($Bool, z)
-    when $Int
-      $false
-    when $Float
-      $false
-    else
-      $false
-    end
+  def equ (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when @Bool then
+        z = x.value == y.value
+        # return the singletons not a new value
+        if z == true then $true else $false end
+      else
+        $false
+      end
     result
   end
 
-  def neq (x, y)
-    result = case y.type
-    when $Bool
-      z = x.value != y.value
-      TauObject.new($Bool, z)
-    when $Int
-      $true
-    when $Float
-      $true
-    else
-      $true
-    end
+  def neq (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when @Bool then
+        z = x.value != y.value
+        # return the singletons not a new value
+        if z == true then $true else $false end
+      else
+        $true
+      end
     result
   end
 
-  def not (x)
-    result = TauObject.new($Bool, !x.value)
+  def not (params)
+    x = params[0]
+    result =
+      if x.value == true then $false else $true end
     result
+  end
+
+  def toString (params)
+    x = params[0]
+    result = TauObject.new($String, x.value.to_s)
   end
 
   def classObj ()
-    @classObj
+    @Bool
   end
 
   def build ()
-    @classObj.setMember('super', $Any)
-    @classObj.setMember('make', method(:make))
-    @classObj.setMember('bor', method(:bor))
-    @classObj.setMember('bxor', method(:bxor))
-    @classObj.setMember('band', method(:band))
-    @classObj.setMember('equ', method(:equ))
-    @classObj.setMember('neq', method(:neq))
-    @classObj.setMember('not', method(:not))
+    @Bool.setMember('super', $Any)
+    @Bool.setMember('make', TauObject.new($Function, [1, method(:make)]))
+    @Bool.setMember('bor', TauObject.new($Function, [2, method(:bor)]))
+    @Bool.setMember('bxor', TauObject.new($Function, [2, method(:bxor)]))
+    @Bool.setMember('band', TauObject.new($Function, [2, method(:band)]))
+    @Bool.setMember('equ', TauObject.new($Function, [2, method(:equ)]))
+    @Bool.setMember('neq', TauObject.new($Function, [2, method(:neq)]))
+    @Bool.setMember('not', TauObject.new($Function, [1, method(:not)]))
+    @Bool.setMember('toString', TauObject.new($Function, [1, method(:toString)]))
   end
 
 end

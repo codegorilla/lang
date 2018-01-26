@@ -370,11 +370,13 @@ class Interpreter
     # Create a namespace object to hold imported names.
     # It will contain all global variables in the imported file.
     @globals[node.text] = $Namespace.getMember('make').value[1].call([])
-    # Obtain the globals of the imported file
-    impglob = p.exports
-    #puts impglob['x1'].value
-    # for each item in exports, load set it as member of the namespace
-    @globals[node.text].setMember('x1', impglob['x1'])
+
+    # for each item in exports, add it to the namespace
+    p.exports.each do |i|
+      name = i[0]
+      value = i[1]
+      @globals[node.text].setMember(name, value)
+    end
   end
 
   def printExpr (node)
@@ -393,12 +395,10 @@ class Interpreter
       puts x
     when $Function then
       puts "<function>"
-    #when $Class then
-    #  puts "<class>"
     else
-      puts resultObj.value
+      res = resultObj.type.getMember('toString').value[1].call([resultObj])
+      puts res.value
     end
-    #puts resultObj.value # "#{result.class}"
     $unit
   end
 

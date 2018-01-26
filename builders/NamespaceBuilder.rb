@@ -8,6 +8,11 @@ class NamespaceBuilder
     TauObject.new($Namespace, '<namespace>')
   end
 
+  def toString (params)
+    x = params[0]
+    result = TauObject.new($String, x.value.to_s)
+  end
+
   def classObj ()
     @classObj
   end
@@ -17,6 +22,7 @@ class NamespaceBuilder
 
     makeFun = TauObject.new($Function, [0, method(:make)])
     @classObj.setMember('make', makeFun)
+    @classObj.setMember('toString', TauObject.new($Function, [1, method(:toString)]))
   end
 
 end

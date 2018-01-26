@@ -98,6 +98,12 @@ class StringBuilder
     result
   end
 
+  def toString (params)
+    x = params[0]
+    # Just return the string
+    result = x
+  end
+
   def classObj ()
     @classObj
   end
@@ -113,6 +119,7 @@ class StringBuilder
     @classObj.setMember('le', method(:le))
     @classObj.setMember('add', method(:add))
     @classObj.setMember('not', method(:not))
+    @classObj.setMember('toString', TauObject.new($Function, [1, method(:toString)]))
 end
 
 end

@@ -175,17 +175,32 @@ def main (filename = 'test_input')
 
   # Quick test - set up the loadlib facility.
   # Native function for loading ruby libraries
-  # params = ['filename']
-  # code = lambda do |params|
-  #   filename = params[0].value
-  #   moduleName = params[1].value
-  #   require filename
-  #   classRef = Kernel.const_get(moduleName)
-  #   classRef.init(globalHash)
-  #   $unit
-  # end
-  # native_loadlib = TauObject.new($NativeFunction, [params, code])
-  # globalHash['loadlib'] = native_loadlib
+
+
+
+  def native_loadlib (params)
+    filename = params[0].value
+    moduleName = params[1].value
+    require filename
+    classRef = Kernel.const_get(moduleName)
+    classRef.init()
+    # Create a namespace and put all symbols into it
+    # Goal is for native_loadlib to load symbols into the current namespace.
+    # But this is not possible right now because it doesn't have a reference
+    # to the current namespace. A solution needs to be investigated.
+    sym = classRef.symbols
+    ns = TauObject.new($Namespace, "<namespace>")
+    sym.each do |i|
+      name = i[0]
+      value = i[1]
+      ns.setMember(name, value)
+    end
+    ns
+  end
+
+  loadlib = TauObject.new($Function, [2, method(:native_loadlib)])
+  $builtins['loadlib'] = loadlib
+
 
   # # Quick test - function to create objects
   # params = []
