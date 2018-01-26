@@ -46,9 +46,9 @@ print Null;
 print Unit;
 print Bool;
 print Int;
-//print Float;
-//print Function;
-//print NativeFunction;
+print Float;
+print Function;
+print NativeFunction;
 
 var atest = Int.make(1024);
 print atest;
@@ -115,7 +115,11 @@ print 1.2 >= 2.0;
 print 1.2 <= 2.0;
 
 
-//print "Hello " + "world!";
+print "Hello " + "world!";
+print String.concat("Hello ", "world!");
+print String.reverse("Please reverse me!");
+print String.reverse("A MAN A PLAN A CANAL PANAMA");
+
 
 //var rf = tf + x1;
 

@@ -1,34 +1,58 @@
 class StringBuilder
 
   def initialize ()
-    @classObj = TauObject.new($Class, "<class 'String'>")
+    @String = TauObject.new($Class, "<class 'String'>")
   end
 
   def make (value)
     TauObject.new($String, value)
   end
 
-  def equ (x, y)
-    result = case y.type
-    when $String
-      z = x.value == y.value
-      # return the singletons not a new value
-      if z == true then $true else $false end
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for ==: String and <other>")
-    end
+  def concat (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $String
+        z = x.value + y.value
+        TauObject.new($String, z)
+      else
+        TauObject.new($Exception, "Type error: unsupported types for concat: String and <other>")
+      end
     result
   end
 
-  def neq (x, y)
-    result = case y.type
-    when $String
-      z = x.value != y.value
-      # return the singletons not a new value
-      if z == true then $true else $false end
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for !=: String and <other>")
-    end
+  def reverse (params)
+    TauObject.new($String, params[0].value.reverse)
+  end
+
+  def equ (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when $String
+        z = x.value == y.value
+        # return the singletons not a new value
+        if z == true then $true else $false end
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for ==: String and <other>")
+      end
+    result
+  end
+
+  def neq (params)
+    x = params[0]
+    y = params[1]
+    result =
+    case y.type
+      when $String
+        z = x.value != y.value
+        # return the singletons not a new value
+        if z == true then $true else $false end
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for !=: String and <other>")
+      end
     result
   end
 
@@ -105,21 +129,24 @@ class StringBuilder
   end
 
   def classObj ()
-    @classObj
+    @String
   end
 
   def build ()
-    @classObj.setMember('super', $Any)
-    @classObj.setMember('make', method(:make))
-    @classObj.setMember('equ', method(:equ))
-    @classObj.setMember('neq', method(:neq))
-    @classObj.setMember('gt', method(:gt))
-    @classObj.setMember('lt', method(:lt))
-    @classObj.setMember('ge', method(:ge))
-    @classObj.setMember('le', method(:le))
-    @classObj.setMember('add', method(:add))
-    @classObj.setMember('not', method(:not))
-    @classObj.setMember('toString', TauObject.new($Function, [1, method(:toString)]))
-end
+    @String.setMember('super', $Any)
+    @String.setMember('make', method(:make))
+    # add should be :add
+    @String.setMember('add', TauObject.new($Function, [2, method(:concat)]))
+    @String.setMember('concat', TauObject.new($Function, [2, method(:concat)]))
+    @String.setMember('reverse', TauObject.new($Function, [2, method(:reverse)]))
+    @String.setMember('equ', TauObject.new($Function, [2, method(:equ)]))
+    @String.setMember('neq', TauObject.new($Function, [2, method(:neq)]))
+    @String.setMember('gt', method(:gt))
+    @String.setMember('lt', method(:lt))
+    @String.setMember('ge', method(:ge))
+    @String.setMember('le', method(:le))
+    @String.setMember('not', method(:not))
+    @String.setMember('toString', TauObject.new($Function, [1, method(:toString)]))
+  end
 
 end
