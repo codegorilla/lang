@@ -1,6 +1,7 @@
 // Complex class definition
 
-var Complex = 12;
+var Complex = Class.make("Complex");
+
 
 Complex.make = lambda (re, im) => {
   var instance = 14;

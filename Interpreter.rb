@@ -493,9 +493,9 @@ class Interpreter
       end
       result
     elsif index != nil then
-    puts "Got #{node.text} from the locals table"
-    # Need to fix exclusivity of this if then chain
-    # if index != nil then
+      #puts "Got #{node.text} from the locals table"
+      # Need to fix exclusivity of this if then chain
+      # if index != nil then
       # This probably works for globals because even at global scope we seem
       # to be storing into a locals table in additon to a globals hash.
       result = fp.load(index)

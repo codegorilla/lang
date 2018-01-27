@@ -1,18 +1,10 @@
 // Test file
 
-import random;
 import math;
-//import complex;
+import complex;
 //import List;
 
 //module main;
-
-var xspace = Int.make(102);
-print xspace + 10;
-print Int.add(xspace, 10);
-
-var fspace = Float.make(92);
-print fspace;
 
 print Namespace;
 var math1 = Namespace.make();
@@ -21,9 +13,8 @@ math1.PI = 3.14159;
 var pi = math1.PI;
 print 2 * pi;
 
-print random.x1;
-print random.tf;
-
+// Test imports
+print 2 * math.PI;
 print math.cos(60.0*math1.PI/180);
 print math.sin(30.0*math1.PI/180);
 print math.tan(45.0*math1.PI/180);
@@ -36,12 +27,8 @@ print math.sqrt(25);
 //myfun2 = lambda (x, y) => x + y;
 //print myfun2(4, 6);
 
-//print random;
-
-
+// Test classes
 print Class;
-var rrr = Class.make;
-
 print Null;
 print Unit;
 print Bool;
@@ -50,10 +37,6 @@ print Float;
 print Function;
 print Array;
 
-var atest = Int.make(1024);
-print atest;
-
-print Int.toString(atest);
 
 // Test Null type
 print null;
@@ -78,6 +61,8 @@ print false ^ false;
 print false & true;
 print false & false;
 
+// Test Int type
+print 1;
 print 1 + 2;
 print 1 - 2;
 print 1 * 2;
@@ -103,6 +88,13 @@ print 1 & 2;
 
 print 1 > 1.5;
 
+var ir = Int.make(102);
+print ir + 10;
+print Int.add(ir, 10);
+
+
+// Test Float type
+print 1.2;
 print 1.2 + 2.0;
 print 1.2 - 2.0;
 print 1.2 * 2.0;
@@ -114,7 +106,23 @@ print 1.2 < 2.0;
 print 1.2 >= 2.0;
 print 1.2 <= 2.0;
 
-// Test strings
+var fr = Float.make(92);
+print fr;
+
+
+// Test Complex type
+
+
+var Complex = complex.Complex;
+print Complex;
+var z1 = Complex.make(3, 4);
+print z1;
+print z1.real;
+print z1.imag;
+print z1.type;
+
+
+// Test String type
 print "Hello world!";
 print "Hello" == "Hello";
 print "Hello " + "world!";
@@ -125,7 +133,7 @@ print String.reverse("Hello world!");
 print String.lower("Hello world!");
 print String.upper("Hello world!");
 
-// Test arrays
+// Test Array type
 print [1, 2, 3];
 print [1, 2, 3] == [1, 2, 3];
 print [1, 2, 3] + [4, 5, 6];
@@ -133,19 +141,24 @@ print Array.concat([1, 2, 3], [4, 5, 6]);
 print Array.length([1, 2, 3]);
 print Array.reverse([1, 2, 3]);
 
-var List = Class.make();
-List.make = lambda (x) => {
-  var instance = 10;
-  //mkObject();
-  instance.type = List;
-  instance.head = x;
-  instance.tail = null;
-  instance;
-};
 
-print List;
-var li = List.make(1);
-print li;
+
+
+
+//var List = Class.make();
+
+//List.make = lambda (x) => {
+  //var instance = 10;
+  //mkObject();
+  //instance.type = List;
+  //instance.head = x;
+  //instance.tail = null;
+  //instance;
+//};
+
+//print List;
+//var li = List.make(1);
+//print li;
 
 
 //var li = List.make(1);

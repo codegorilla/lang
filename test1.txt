@@ -1,7 +1,0 @@
-// Test1
-
-var t0 = "hello";
-var t1 = " world!";
-
-print t0 + t1;
-
