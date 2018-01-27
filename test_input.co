@@ -114,12 +114,14 @@ print 1.2 < 2.0;
 print 1.2 >= 2.0;
 print 1.2 <= 2.0;
 
-
+// Test strings
 print "Hello " + "world!";
 print String.concat("Hello ", "world!");
-print String.reverse("Please reverse me!");
-print String.reverse("A MAN A PLAN A CANAL PANAMA");
-
+print String.capitalize("HELLO world!");
+print String.length("Hello world!");
+print String.reverse("Hello world!");
+print String.lower("Hello world!");
+print String.upper("Hello world!");
 
 //var rf = tf + x1;
 
