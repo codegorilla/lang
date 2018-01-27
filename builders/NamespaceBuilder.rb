@@ -1,11 +1,11 @@
 class NamespaceBuilder
 
   def initialize ()
-    @classObj = TauObject.new($Class, "<class 'Namespace'>")
+    @Namespace = TauObject.new($Class, "<class 'Namespace'>")
   end
 
   def make (params)
-    TauObject.new($Namespace, '<namespace>')
+    TauObject.new(@Namespace, '<namespace>')
   end
 
   def toString (params)
@@ -14,15 +14,13 @@ class NamespaceBuilder
   end
 
   def classObj ()
-    @classObj
+    @Namespace
   end
 
   def build ()
-    @classObj.setMember('super', $Any)
-
-    makeFun = TauObject.new($Function, [0, method(:make)])
-    @classObj.setMember('make', makeFun)
-    @classObj.setMember('toString', TauObject.new($Function, [1, method(:toString)]))
+    @Namespace.setMember('super', $Any)
+    @Namespace.setMember('make', TauObject.new($Function, [0, method(:make)]))
+    @Namespace.setMember('toString', TauObject.new($Function, [1, method(:toString)]))
   end
 
 end

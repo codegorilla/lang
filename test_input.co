@@ -48,7 +48,7 @@ print Bool;
 print Int;
 print Float;
 print Function;
-print NativeFunction;
+print Array;
 
 var atest = Int.make(1024);
 print atest;
@@ -115,6 +115,8 @@ print 1.2 >= 2.0;
 print 1.2 <= 2.0;
 
 // Test strings
+print "Hello world!";
+print "Hello" == "Hello";
 print "Hello " + "world!";
 print String.concat("Hello ", "world!");
 print String.capitalize("HELLO world!");
@@ -123,11 +125,27 @@ print String.reverse("Hello world!");
 print String.lower("Hello world!");
 print String.upper("Hello world!");
 
-//var rf = tf + x1;
+// Test arrays
+print [1, 2, 3];
+print [1, 2, 3] == [1, 2, 3];
+print [1, 2, 3] + [4, 5, 6];
+print Array.concat([1, 2, 3], [4, 5, 6]);
+print Array.length([1, 2, 3]);
+print Array.reverse([1, 2, 3]);
 
-//print rf;
+var List = Class.make();
+List.make = lambda (x) => {
+  var instance = 10;
+  //mkObject();
+  instance.type = List;
+  instance.head = x;
+  instance.tail = null;
+  instance;
+};
 
-//print m11 - m12;
+print List;
+var li = List.make(1);
+print li;
 
 
 //var li = List.make(1);

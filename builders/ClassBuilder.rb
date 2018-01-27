@@ -6,7 +6,7 @@ class ClassBuilder
     @classObj.setType(@classObj)
   end
 
-  def make ()
+  def make (params)
     # Make a new object of type Class
     TauObject.new(@classObj)
   end
@@ -26,7 +26,7 @@ class ClassBuilder
   def build ()
     # Set its superclass -- should it have one? Is this the same as its type?
     @classObj.setMember('super', $Registry['Any'])
-    @classObj.setMember('make', method(:make))
+    @classObj.setMember('make', TauObject.new($Function, [0, method(:make)]))
     @classObj.setMember('toString', TauObject.new($Function, [1, method(:toString)]))
   end
 

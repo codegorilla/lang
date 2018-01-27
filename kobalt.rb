@@ -26,7 +26,6 @@ require './builders/FloatBuilder'
 require './builders/StringBuilder'
 require './builders/ArrayBuilder'
 require './builders/FunctionBuilder'
-require './builders/NativeFunctionBuilder'
 require './builders/NamespaceBuilder'
 
 require 'pp'
@@ -96,10 +95,6 @@ def main (filename = 'test_input')
   $Registry['Function'] = fnb.classObj
   $Function = fnb.classObj
 
-  nfnb = NativeFunctionBuilder.new
-  $Registry['NativeFunction'] = nfnb.classObj
-  $NativeFunction = nfnb.classObj
-
   nsb = NamespaceBuilder.new
   $Registry['Namespace'] = nsb.classObj
   $Namespace = nsb.classObj
@@ -117,9 +112,7 @@ def main (filename = 'test_input')
   sb.build
   rb.build
   fnb.build
-  nfnb.build
   nsb.build
-
 
   # Built-in objects
   # These should be placed into an outer 'builtins' scope
@@ -135,7 +128,6 @@ def main (filename = 'test_input')
   $builtins['String'] = $Registry['String']
   $builtins['Array'] = $Registry['Array']
   $builtins['Function'] = $Registry['Function']
-  $builtins['NativeFunction'] = $Registry['NativeFunction']
   $builtins['Namespace'] = $Registry['Namespace']
 
   # Global variable store
@@ -208,18 +200,9 @@ def main (filename = 'test_input')
   #   # Ignore params
   #   TauObject.new()
   # end
-  # mkObject = TauObject.new($NativeFunction, [params, code])
+  # mkObject = TauObject.new($Function, [params, code])
   # globalHash['mkObject'] = mkObject
 
-  # # Quick test - function to create classes
-  # params = []
-  # code = lambda do |params|
-  #   # Ignore params
-  #   TauObject.new($Class)
-  # end
-  # mkClass = TauObject.new($NativeFunction, [params, code])
-  # globalHash['mkClass'] = mkClass
-  
   # This is where some built-ins need to go
   # It is important that they be created one time only
   # and then injected into the interpreter once

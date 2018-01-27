@@ -1,118 +1,94 @@
 class ArrayBuilder
 
   def initialize ()
-    @classObj = TauObject.new($Class, "<class 'Array'>")
+    @Array = TauObject.new($Class, "<class 'Array'>")
   end
 
-  def make (value)
-    TauObject.new($Array, value)
+  def makeRaw (value)
+    TauObject.new(@Array, value)
   end
 
-  def equ (x, y)
-    result = case y.type
-    when $Array
-      z = x.value == y.value
-      # return the singletons not a new value
-      if z == true then $true else $false end
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for ==: Array and <other>")
-    end
+  def make (params)
+    makeRaw(params[0].value)
+  end
+
+  def equ (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when @Array
+        # Might need to compare items individually
+        if x.value == y.value then $true else $false end
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for ==: Array and <other>")
+      end
     result
   end
 
-  def neq (x, y)
-    result = case y.type
-    when $Array
-      z = x.value != y.value
-      # return the singletons not a new value
-      if z == true then $true else $false end
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for !=: Array and <other>")
-    end
+  def neq (params)
+    x = params[0]
+    y = params[1]
+    result =
+      case y.type
+      when @Array
+        if x.value != y.value then $true else $false end
+      else
+        TauObject.new($Exception, "Type error: unsupported operand types for !=: Array and <other>")
+      end
     result
   end
 
-  def gt (x, y)
+  def add (params)
+    x = params[0]
+    y = params[1]
     result = case y.type
-    when $Array
-      z = x.value > y.value
-      # return the singletons not a new value
-      if z == true then $true else $false end
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for >: Array and <other>")
-    end
-    result
-  end
-
-  def lt (x, y)
-    result = case y.type
-    when $Array
-      z = x.value < y.value
-      # return the singletons not a new value
-      if z == true then $true else $false end
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for <: Array and <other>")
-    end
-    result
-  end
-
-  def ge (x, y)
-    result = case y.type
-    when $Array
-      z = x.value >= y.value
-      # return the singletons not a new value
-      if z == true then $true else $false end
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for >=: Array and <other>")
-    end
-    result
-  end
-
-  def le (x, y)
-    result = case y.type
-    when $Array
-      z = x.value <= y.value
-      # return the singletons not a new value
-      if z == true then $true else $false end
-    else
-      TauObject.new($Exception, "Type error: unsupported operand types for <=: Array and <other>")
-    end
-    result
-  end
-
-  def add (x, y)
-    result = case y.type
-    when $Array
-      z = x.value + y.value
-      TauObject.new($String, z)
+    when @Array
+      makeRaw(x.value + y.value)
     else
       TauObject.new($Exception, "Type error: unsupported operand types for +: Array and <other>")
     end
     result
   end
 
-  def not (x)
-    # Need to think about this
-    # Do we follow the python/javascript model or the ruby model?
-    result = TauObject.new($Bool, false)
+  def not (params)
+    $false
+  end
+
+  def concat (params)
+    x = params[0]
+    y = params[1]
+    result = case y.type
+    when @Array
+      makeRaw(x.value + y.value)
+    else
+      TauObject.new($Exception, "Type error: unsupported operand types for +: Array and <other>")
+    end
     result
   end
 
+  def length (params)
+    TauObject.new($Int, params[0].value.length)
+  end
+
+  def reverse (params)
+    makeRaw(params[0].value.reverse)
+  end
+
   def classObj ()
-    @classObj
+    @Array
   end
 
   def build ()
-    @classObj.setMember('super', $Any)
-    @classObj.setMember('make', method(:make))
-    @classObj.setMember('equ', method(:equ))
-    @classObj.setMember('neq', method(:neq))
-    @classObj.setMember('gt', method(:gt))
-    @classObj.setMember('lt', method(:lt))
-    @classObj.setMember('ge', method(:ge))
-    @classObj.setMember('le', method(:le))
-    @classObj.setMember('add', method(:add))
-    @classObj.setMember('not', method(:not))
+    @Array.setMember('super', $Any)
+    @Array.setMember('make', TauObject.new($Function, [0, method(:make)]))
+    @Array.setMember('equ', TauObject.new($Function, [2, method(:equ)]))
+    @Array.setMember('neq', TauObject.new($Function, [2, method(:neq)]))
+    @Array.setMember('add', TauObject.new($Function, [2, method(:add)]))
+    @Array.setMember('not', TauObject.new($Function, [1, method(:not)]))
+    @Array.setMember('concat', TauObject.new($Function, [2, method(:concat)]))
+    @Array.setMember('length', TauObject.new($Function, [1, method(:length)]))
+    @Array.setMember('reverse', TauObject.new($Function, [1, method(:reverse)]))
   end
 
 end
