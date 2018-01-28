@@ -125,7 +125,16 @@ class Interpreter
 
     # It might also be a native code block if defined in the underlying
     # implementation language, which could be C or Ruby.
-    result = TauObject.new($Function, node)
+    result = TauObject.new($Function, [@globals, node])
+
+    # One thing we need to do is find a way to attach the proper lexical
+    # environment to the function so that if the function is a closure and
+    # "escapes" then it still has access to its lexical environment. For now
+    # this environment will only work for globals.
+    
+    # The best way is to store an array, not just the AST node. The array will
+    # have a link to @globals and the AST node.
+
   end
 
   def parameters (node)
@@ -852,7 +861,16 @@ class Interpreter
     # But now we just check if the underlying object is an array or not
     # if functionObj.type == $NativeFunction
 
-    if functionObj.value.class == Array
+    # This is a temporary hack because regular functions and native functions
+    # both use arrays for their value now, so we can't distinguish based on the
+    # type of the value.  But native functions (for now) have numParams as the
+    # first element of the array, where regular functions have a link to
+    # their globals.
+
+    kind = functionObj.value[0].class
+
+    # if functionObj.value.class == Array
+    if kind == Fixnum
       # Process as a native function
       numParams = functionObj.value[0]
       code = functionObj.value[1]
@@ -861,13 +879,14 @@ class Interpreter
       result
     else
       # The function call should cause a jump to the location of the code
-      jumpNode = functionObj.value
-      result = function1(jumpNode, args)
+      xglobals = functionObj.value[0]
+      jumpNode = functionObj.value[1]
+      result = function1(xglobals, jumpNode, args)
       result
     end
   end
 
-  def function1 (node, args)
+  def function1 (xglobals, node, args)
     @logger.debug("function1")
     # Fetch the scope attribute stored in the node
     # In Parr's book, the function actually has a scope outside of the block
@@ -875,6 +894,10 @@ class Interpreter
     # parameter locals, while the block holds all other locals.
     saveScope = @scope
     @scope = node.getAttribute("scope")
+
+    # Temporary test
+    saveGlobals = @globals
+    @globals = xglobals
 
     # Push new frame
     # For blocks, the dynamic and static links are the same
@@ -902,6 +925,9 @@ class Interpreter
     @fp = @fp.dynamicLink
     @scope = saveScope
 
+    # restore globals
+    @globals = saveGlobals
+
     result
   end
 
@@ -925,6 +951,14 @@ class Interpreter
       # If we are at global scope then try to find the variable in the global
       # hash. Do not attempt to find it in the locals table of the global frame.
       result = @globals[node.text]
+
+      # The problem is that we want a lambda function to capture its lexical
+      # scope. This will be solved generally later. For now we will implement a
+      # cheap trick that allows a lambda to have access to its proper global
+      # environment. We need to attach the globals from the given module to the
+      # lambda. That way, when we search up, it will see the lambda's globals
+      # rather than the globals from the current module.
+
       if result == nil
         # Next search the built-ins namespace
         result = $builtins[node.text]

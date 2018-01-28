@@ -113,9 +113,9 @@ print fr;
 // Test Complex type
 
 
-var Complex = complex.Complex;
-print Complex;
-var z1 = Complex.make(3, 4);
+var Complexi = complex.Complex;
+print Complexi;
+var z1 = Complexi.make(3, 4);
 print z1;
 print z1.real;
 print z1.imag;
