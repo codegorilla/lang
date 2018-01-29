@@ -4,8 +4,12 @@ class IntBuilder
     @Int = TauObject.new($Class, "<class 'Int'>")
   end
 
+  def makeRaw (value)
+    TauObject.new(@Int, value)
+  end
+
   def make (params)
-    TauObject.new(@Int, params[0].value)
+    makeRaw(params[0].value)
   end
 
   def bor (params)

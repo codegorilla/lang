@@ -405,8 +405,18 @@ class Interpreter
     when $Function then
       puts "<function>"
     else
-      res = resultObj.type.getMember('toString').value[1].call([resultObj])
-      puts res.value
+      #res = resultObj.type.getMember('toString')
+      
+      # Check if it is a native method or not
+      functionObj = resultObj.type.getMember('toString')
+      kind = functionObj.value[0].class
+
+      if kind == Fixnum
+        res = functionObj.value[1].call([resultObj])
+        puts res.value
+      else
+        puts "Cannot print a non built-in type."
+      end
     end
     $unit
   end
@@ -462,6 +472,13 @@ class Interpreter
       case n.kind
       when :OBJECT_ACCESS then loadObject(n)
       when :NAME then loadName(n)
+      end
+
+      # Special magic. If member is 'type' then set the internal type value as
+      # well.
+      if (node.rightChild.text == 'type')
+        receiver.setType(e)
+#        puts e
       end
       receiver.setMember(node.rightChild.text, e)
       nil

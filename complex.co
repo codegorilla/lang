@@ -2,13 +2,18 @@
 
 var Complex = Class.make("Complex");
 
-
-Complex.make = lambda (re, im) => {
+Complex.make = lambda (real, imag) => {
+  //var instance = mkObject(Complex)
   var instance = 14;
   instance.type = Complex;
-  instance.real = re;
-  instance.imag = im;
+  Complex.init(instance, real, imag);
   instance;
+};
+
+Complex.init = lambda (self, real, imag) => {
+  self.real = real;
+  self.imag = imag;
+  ();
 };
 
 Complex.square =
@@ -25,7 +30,14 @@ Complex.double = lambda (self) => {
 };
 
 Complex.add = lambda (x, y) => {
-  x.real = x.real + y.real;
-  x.imag = x.imag + y.imag;
+  var real = x.real + y.real;
+  var imag = x.imag + y.imag;
+  var result = Complex.make(real, imag);
+  result;
+};
+
+Complex.toString = lambda (self) => {
+  var result = "(" + Float.toString(self.real) + "," + Float.toString(self.imag) + ")";
+  result;
 };
 

@@ -16,6 +16,7 @@ require './ProblemLogger'
 require './Processor'
 
 require './builders/ClassBuilder'
+require './builders/ObjectBuilder'
 require './builders/AnyBuilder'
 require './builders/NullBuilder'
 require './builders/UnitBuilder'
@@ -48,6 +49,13 @@ def main (filename = 'test_input')
   cb = ClassBuilder.new
   $Registry['Class'] = cb.classObj
   $Class = cb.classObj
+
+  # Perhaps the $Object class is the root of the class hierarchy
+  # In this case, classes would inherit from Object?
+  # Or perhaps Any inherits from Object and all other classes inherit from Any
+  ob = ObjectBuilder.new
+  $Registry['Object'] = ob.classObj
+  $Object = ob.classObj
 
   # The $Any class is the root of the class hierarchy
   # All classes inherit from $Any by default
@@ -102,6 +110,7 @@ def main (filename = 'test_input')
   # We needed to make the objects above so that the following methods can
   # reference them while building out their attributes and methods
   cb.build
+  ob.build
   ab.build
   nb.build
   ub.build
@@ -118,6 +127,7 @@ def main (filename = 'test_input')
   # These should be placed into an outer 'builtins' scope
   $builtins = {}
   $builtins['Class'] = $Registry['Class']
+  $builtins['Object'] = $Registry['Object']
   $builtins['Any'] = $Registry['Any']
   $builtins['Null'] = $Registry['Null']
   $builtins['Unit'] = $Registry['Unit']
