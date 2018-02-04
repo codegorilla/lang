@@ -89,7 +89,7 @@ class Parser
         n.addChild(declaration)
       when 'break', 'continue', 'do', ';', 'for', 'import', 'print', 'return', 'while'
         n.addChild(statement)
-      when 'if', :ID, :NULL, :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, :STRING, '(', '[', '{', 'lambda'
+      when 'if', :ID, :NULL, :BOOLEAN, :INTEGER, :FLOAT, :IMAGINARY, :STRING, '(', '[', '{', 'lambda', '-', '!', '~'
         n.addChild(statement)
       when 'EOF'
         done = true

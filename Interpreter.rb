@@ -272,6 +272,7 @@ class Interpreter
   def expression (node)
     @logger.debug("expression")
     # Root expression nodes only exist at the top of an expression tree
+    # Not sure if this is even required.
     result = expr(node.child)
     result
   end

@@ -52,14 +52,21 @@ class Processor
       lexer.problems.errorCount +
       parser.problems.errorCount +
       sb.problems.errorCount
-  
+    
+    # Generate code
+    @logger.info("Building scopes...")
+    gen = Generator.new(root)
+    gen.setLogLevel(Logger::WARN)
+    chain = gen.start
+    #puts chain
+
     if errorCount == 0 then
       # Evaluate AST
       @logger.info("Evaluating...")
       # Really the entire program is an interpreter, not just this stage
       evaluator = Interpreter.new(root)
       evaluator.setLogLevel(Logger::WARN)
-      evaluator.start
+      #evaluator.start
     end
     
     @exports = evaluator.globals

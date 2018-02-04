@@ -27,6 +27,22 @@ print math.sqrt(25);
 //myfun2 = lambda (x, y) => x + y;
 //print myfun2(4, 6);
 
+null;
+();
+true;
+!2;
+~4;
+-3.14;
+
+-1 + 4;
+
+var a = 1;
+
+(1 + a) / 2;
+
+a = 2;
+
+
 // Test classes
 print Class;
 print Object;
