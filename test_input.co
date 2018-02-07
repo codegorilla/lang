@@ -6,19 +6,24 @@ import complex;
 
 //module main;
 
-print Namespace;
-var math1 = Namespace.make();
-print math1;
-math1.PI = 3.14159;
-var pi = math1.PI;
-print 2 * pi;
+//print Namespace;
+//var math1 = Namespace.make();
+//print math1;
+
+var math1 = 0;
+
+math1.PI.x = 3.14159;
+
+
+//var pi = math1.PI;
+//print 2 * pi;
 
 // Test imports
-print 2 * math.PI;
-print math.cos(60.0*math1.PI/180);
-print math.sin(30.0*math1.PI/180);
-print math.tan(45.0*math1.PI/180);
-print math.sqrt(25);
+//print 2 * math.PI;
+//print math.cos(60.0*math1.PI/180);
+//print math.sin(30.0*math1.PI/180);
+//print math.tan(45.0*math1.PI/180);
+//print math.sqrt(25);
 
 //var myfun1 = lambda (x, y) => x + y;
 //print myfun1(8, 32);
@@ -27,20 +32,20 @@ print math.sqrt(25);
 //myfun2 = lambda (x, y) => x + y;
 //print myfun2(4, 6);
 
-null;
-();
-true;
-!2;
-~4;
--3.14;
+//null;
+//();
+//true;
+//!2;
+//~4;
+//-3.14;
 
--1 + 4;
+//-1 + 4;
 
-var a = 1;
+//var a = 1;
 
-(1 + a) / 2;
+//(1 + a) / 2;
 
-a = 2;
+//a = 2;
 
 
 // Test classes

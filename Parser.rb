@@ -792,6 +792,8 @@ class Parser
   def objectAccess (node)
     @logger.debug("objectAccess")
     # Perhaps this should just be called access
+    # Is there any way to know here whether or not this is just an access or if
+    # it is part of lhs attribute assignment?
     n = Node.new(:OBJECT_ACCESS)
     n.addChild(node)
     match('.')

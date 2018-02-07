@@ -71,13 +71,17 @@ class Generator
   
     def variableDecl (node)
       @logger.debug("variableDecl")
-      add(Instruction.new(:VAR))
+      # Declarations only matter at compile time
+      # Delegate to assignmentExpr
+      assignmentExpr(node)
     end
-    
+
     def statement (node)
       @logger.debug("statement")
       n = node.child
       expression(n)
+      # Might need to pop and throw away any results
+      # Or perhaps VM is built on non-functional model to avoid useless pops
     end
 
     def expression (node)
@@ -94,6 +98,8 @@ class Generator
         when :BINARY_EXPR then binaryExpr(node)
         when :UNARY_EXPR then unaryExpr(node)
         when :BLOCK_EXPR then blockExpr(node)
+        when :FUNCTION_CALL then functionCall(node)
+        when :OBJECT_ACCESS then objectAccess(node)
         when :NAME then name(node)
         when :NULL_LITERAL then nullLiteral(node)
         when :UNIT_LITERAL then unitLiteral(node)
@@ -112,8 +118,19 @@ class Generator
     end
 
     def assignmentExpr (node)
-      expr(node.rightChild)
-      add(Instruction.new(:STORE, node.leftChild.text))
+      lhs = node.leftChild
+      rhs = node.rightChild
+      expr(rhs)
+      if lhs.kind == :OBJECT_ACCESS then
+        objectSet(lhs)
+      else
+        add(Instruction.new(:STORE, lhs.text))
+      end
+    end
+
+    def objectSet (node)
+      expr(node.leftChild)
+      add(Instruction.new(:SET, node.rightChild.text))
     end
 
     def binaryExpr (node)
@@ -153,6 +170,20 @@ class Generator
 
     def blockExpr (node)
       
+    end
+
+    def functionCall (node)
+      callable = node.leftChild
+      arguments = node.rightChild
+      expr(callable)
+      add(Instruction.new(:CALL))
+    end
+
+    def objectAccess (node)
+      namespace = node.leftChild
+      member = node.rightChild
+      add(Instruction.new(:LOAD, namespace.text))
+      add(Instruction.new(:GET, member.text))
     end
 
     def name (node)
