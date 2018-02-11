@@ -64,12 +64,14 @@ class Processor
       # Evaluate AST
       @logger.info("Evaluating...")
       # Really the entire program is an interpreter, not just this stage
-      evaluator = Interpreter.new(root)
-      evaluator.setLogLevel(Logger::WARN)
-      #evaluator.start
+      evaluator = Evaluator.new(chain)
+      ##evaluator.setLogLevel(Logger::WARN)
+      evaluator.start
     end
-    
-    @exports = evaluator.globals
+
+    #puts evaluator.stack[0].value
+
+    ##@exports = evaluator.globals
 
     # Generate IR
     # This will be implemented later. It will actually come before evaluation.

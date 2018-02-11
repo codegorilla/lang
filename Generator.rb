@@ -64,8 +64,8 @@ class Generator
         add(Instruction.new(:HALT))
       end
       node.setAttribute('chain', @chain)
-      pp @chain
-      popChain
+      #pp @chain
+      #popChain
       @chain
     end
   
@@ -80,8 +80,10 @@ class Generator
       @logger.debug("statement")
       n = node.child
       expression(n)
-      # Might need to pop and throw away any results
-      # Or perhaps VM is built on non-functional model to avoid useless pops
+      # Need to pop and throw away any results
+      add(Instruction.new(:POP))
+      # Perhaps VM is built on non-functional model to avoid useless pops
+      # for functions that return unit
     end
 
     def expression (node)
@@ -161,7 +163,7 @@ class Generator
       expr(node.child)
       opcode =
         case node.text
-        when '-' then :UMINUS
+        when '-' then :NEG
         when '~' then :BNOT
         when '!' then :NOT
         end

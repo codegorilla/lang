@@ -1,7 +1,7 @@
 // Test file
 
-import math;
-import complex;
+//import math;
+//import complex;
 //import List;
 
 //module main;
@@ -10,9 +10,17 @@ import complex;
 //var math1 = Namespace.make();
 //print math1;
 
-var math1 = 0;
+//var math1 = 112;
 
-math1.PI.x = 3.14159;
+//math1;
+
+//var math2 = 3.14159;
+
+//math2;
+
+
+
+//math1.PI.x = 3.14159;
 
 
 //var pi = math1.PI;
@@ -32,12 +40,12 @@ math1.PI.x = 3.14159;
 //myfun2 = lambda (x, y) => x + y;
 //print myfun2(4, 6);
 
-//null;
-//();
-//true;
-//!2;
-//~4;
-//-3.14;
+null;
+();
+true;
+!2;
+~4;
+-3.14;
 
 //-1 + 4;
 
@@ -112,7 +120,8 @@ print 1 > 1.5;
 
 var ir = Int.make(102);
 print ir + 10;
-print Int.add(ir, 10);
+
+//print Int.add(ir, 10);
 
 
 // Test Float type
@@ -128,24 +137,24 @@ print 1.2 < 2.0;
 print 1.2 >= 2.0;
 print 1.2 <= 2.0;
 
-var fr = Float.make(92);
-print fr;
+//var fr = Float.make(92);
+//print fr;
 
 
 // Test Complex type
 
 
-var Comp = complex.Complex;
-print Comp;
-var z1 = Comp.make(3, 4);
-print z1;
-print z1.real;
-print z1.imag;
-print z1.type;
+//var Comp = complex.Complex;
+//print Comp;
+//var z1 = Comp.make(3, 4);
+//print z1;
+//print z1.real;
+//print z1.imag;
+//print z1.type;
 
-var z2 = Comp.make(1, 2);
-var z3 = Comp.add(z1, z2);
-print Comp.toString(z3);
+//var z2 = Comp.make(1, 2);
+//var z3 = Comp.add(z1, z2);
+//print Comp.toString(z3);
 
 
 // Test String type
