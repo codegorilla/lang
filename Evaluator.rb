@@ -23,6 +23,24 @@ class Evaluator
       chain.each do |inst|
         case inst.kind
 
+        when :ADD then
+          xObj = @stack.pop
+          thisObj = @stack.pop
+          classObj = thisObj.type
+          methodObj = classObj.getMember('add')
+          method = methodObj.value[1]
+          result = method.call([thisObj, xObj])
+          @stack << result
+
+        when :BAND then
+          xObj = @stack.pop
+          thisObj = @stack.pop
+          classObj = thisObj.type
+          methodObj = classObj.getMember('band')
+          method = methodObj.value[1]
+          result = method.call([thisObj, xObj])
+          @stack << result
+
         when :BEGIN then
           puts "<BEGIN>"
 
@@ -32,6 +50,24 @@ class Evaluator
           methodObj = classObj.getMember('bnot')
           method = methodObj.value[1]
           result = method.call([obj])
+          @stack << result
+
+        when :BOR then
+          xObj = @stack.pop
+          thisObj = @stack.pop
+          classObj = thisObj.type
+          methodObj = classObj.getMember('bor')
+          method = methodObj.value[1]
+          result = method.call([thisObj, xObj])
+          @stack << result
+
+        when :BXOR then
+          xObj = @stack.pop
+          thisObj = @stack.pop
+          classObj = thisObj.type
+          methodObj = classObj.getMember('bxor')
+          method = methodObj.value[1]
+          result = method.call([thisObj, xObj])
           @stack << result
 
         when :CALL then
@@ -47,21 +83,76 @@ class Evaluator
           result = code.call(args)
           @stack << result
 
+        when :DIV then
+          xObj = @stack.pop
+          thisObj = @stack.pop
+          classObj = thisObj.type
+          methodObj = classObj.getMember('div')
+          method = methodObj.value[1]
+          result = method.call([thisObj, xObj])
+          @stack << result
+          puts result.value
+
+        when :GE then
+          xObj = @stack.pop
+          thisObj = @stack.pop
+          classObj = thisObj.type
+          methodObj = classObj.getMember('ge')
+          method = methodObj.value[1]
+          result = method.call([thisObj, xObj])
+          @stack << result
+
         when :GET then
           # take TOP
           obj = @stack.pop
           # get its member
           obj1 = obj.getMember(inst.text)
           @stack << obj1
-        
+
+        when :GT then
+          xObj = @stack.pop
+          thisObj = @stack.pop
+          classObj = thisObj.type
+          methodObj = classObj.getMember('gt')
+          method = methodObj.value[1]
+          result = method.call([thisObj, xObj])
+          @stack << result
+
         when :HALT then
           puts "<HALT>"
+
+        when :LE then
+          xObj = @stack.pop
+          thisObj = @stack.pop
+          classObj = thisObj.type
+          methodObj = classObj.getMember('le')
+          method = methodObj.value[1]
+          result = method.call([thisObj, xObj])
+          @stack << result
 
         when :LOAD then
           obj = @globals[inst.text]
           if !obj then obj = $builtins[inst.text] end
           @stack << obj
-          if obj != nil then puts obj.value end
+          #if obj != nil then puts obj.value end
+
+        when :LT then
+          xObj = @stack.pop
+          thisObj = @stack.pop
+          classObj = thisObj.type
+          methodObj = classObj.getMember('lt')
+          method = methodObj.value[1]
+          result = method.call([thisObj, xObj])
+          @stack << result
+
+        when :MUL then
+          xObj = @stack.pop
+          thisObj = @stack.pop
+          classObj = thisObj.type
+          methodObj = classObj.getMember('mul')
+          method = methodObj.value[1]
+          result = method.call([thisObj, xObj])
+          @stack << result
 
         when :NEG then
           obj = @stack.pop
@@ -106,7 +197,34 @@ class Evaluator
         when :STORE then
           @globals[inst.text] = @stack.pop
 
-        else
+        when :SHL then
+          xObj = @stack.pop
+          thisObj = @stack.pop
+          classObj = thisObj.type
+          methodObj = classObj.getMember('shl')
+          method = methodObj.value[1]
+          result = method.call([thisObj, xObj])
+          @stack << result
+
+        when :SHR then
+          xObj = @stack.pop
+          thisObj = @stack.pop
+          classObj = thisObj.type
+          methodObj = classObj.getMember('shr')
+          method = methodObj.value[1]
+          result = method.call([thisObj, xObj])
+          @stack << result
+
+        when :SUB then
+          xObj = @stack.pop
+          thisObj = @stack.pop
+          classObj = thisObj.type
+          methodObj = classObj.getMember('sub')
+          method = methodObj.value[1]
+          result = method.call([thisObj, xObj])
+          @stack << result
+
+          else
           puts "Some other instruction!"
         end
       end
