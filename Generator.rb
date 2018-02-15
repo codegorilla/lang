@@ -32,7 +32,11 @@ class Generator
     def setLogLevel (level)
       @logger.level = level
     end
-  
+    
+    def nextLabel ()
+      @label += 1
+    end
+
     def start ()
       @logger.debug("start")
       pushChain
@@ -80,10 +84,17 @@ class Generator
       @logger.debug("statement")
       n = node.child
       expression(n)
-      # Need to pop and throw away any results
+      # Need to discard (pop) result from operand stack
       add(Instruction.new(:POP))
       # Perhaps VM is built on non-functional model to avoid useless pops
       # for functions that return unit
+    end
+
+    def preserveStatement (node)
+      @logger.debug("preserveStatement")
+      # Do not discard (pop) result from operand stack
+      n = node.child
+      expression(n)
     end
 
     def expression (node)
@@ -117,6 +128,48 @@ class Generator
 
     def printExpr (node)
       #puts node.kind
+    end
+
+    def whileExpr (node)
+      @logger.debug("whileExpr")
+      label = nextLabel
+      add(Instruction.new(:LAB, "L#{label}"))
+      condNode = node.child(0)
+      expression(condNode)
+
+      exitLabel = nextLabel
+      add(Instruction.new(:BF, "L#{exitLabel}"))
+      bodyNode = node.child(1)
+      bodyExpr(n, entryLabel, exitLabel)
+
+      # if bodyNode.kind == :BLOCK
+      #   blockExpr(n, entryLabel, exitLabel)
+      # else
+      #   blockElement(n, entryLabel, exitLabel)
+      # end
+    end
+
+    def bodyExpr (node, entryLabel, exitLabel)
+
+    end
+
+    def whileStmt (node)
+      @logger.debug("whileStmt")
+      label = nextLabel
+      add(Instruction.new(:LAB, "L#{label}"))
+      n = node.child(0)
+      expression(n)
+      exitLabel = nextLabel
+      add(Instruction.new(:BF, "L#{exitLabel}"))
+      # do body
+      n = node.child(1)
+      if n.kind == :BLOCK
+        block(n, entryLabel, exitLabel)
+      else
+        blockElement(n, entryLabel, exitLabel)
+      end
+      add(Instruction.new(:JUMP, "L#{label}"))
+      add(Instruction.new(:LAB, "L#{exitLabel}"))
     end
 
     def assignmentExpr (node)
@@ -171,7 +224,21 @@ class Generator
     end
 
     def blockExpr (node)
-      
+      # I think a block at the VM level should only be fore loops and what not
+      # They shouldn't necessarily be spawned for every block expression
+      # But this needs to be determined, because, presumably each block
+      # expression has its own set of local variables
+      # push block?
+#      n = node.child(0)
+      for i in 0..node.count-2 do
+        statement(node.child(i))
+      end
+
+      # Remaining statement is value of the block expression so we dont want to
+      # pop it off the operand stack, but re-use it instead
+      preserveStatement(node.child(node.count-1))
+
+
     end
 
     def functionCall (node)

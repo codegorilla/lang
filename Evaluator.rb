@@ -93,6 +93,15 @@ class Evaluator
           @stack << result
           puts result.value
 
+        when :EQU then
+          xObj = @stack.pop
+          thisObj = @stack.pop
+          classObj = thisObj.type
+          methodObj = classObj.getMember('equ')
+          method = methodObj.value[1]
+          result = method.call([thisObj, xObj])
+          @stack << result
+
         when :GE then
           xObj = @stack.pop
           thisObj = @stack.pop
@@ -160,6 +169,15 @@ class Evaluator
           methodObj = classObj.getMember('neg')
           method = methodObj.value[1]
           result = method.call([obj])
+          @stack << result
+
+        when :NEQ then
+          xObj = @stack.pop
+          thisObj = @stack.pop
+          classObj = thisObj.type
+          methodObj = classObj.getMember('neq')
+          method = methodObj.value[1]
+          result = method.call([thisObj, xObj])
           @stack << result
 
         when :NOT then
