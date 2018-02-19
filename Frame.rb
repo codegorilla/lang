@@ -3,7 +3,18 @@ class Frame
   def initialize (dynamicLink = nil, staticLink = nil)
     @dynamicLink = dynamicLink
     @staticLink = staticLink
+
+    # Locals array
     @locals = []
+
+    # Block stack
+    @blocks = []
+
+    # Block pointer
+    @bp = -1
+
+    # Operand stack
+    @stack = []
   end
 
   def dynamicLink ()
@@ -26,12 +37,43 @@ class Frame
   # runtime frames. This is where the static link (aka access link) comes into
   # play.  Need to compute the access link.
 
+  # deprecate
   def store (index, value)
     @locals[index] = value
   end
 
+  # deprecate
   def load (index)
     @locals[index]
+  end
+
+  def blocks ()
+    @blocks
+  end
+
+  def bp ()
+    @bp
+  end
+
+  def currentBlock ()
+    @blocks[@bp]
+  end
+
+  def pushBlock ()
+    @bp += 1
+    @blocks[@bp] = Block.new
+  end
+
+  def popBlock ()
+    @bp -= 1
+  end
+
+  def locals ()
+    @locals
+  end
+
+  def stack ()
+    @stack
   end
 
 end

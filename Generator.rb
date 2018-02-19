@@ -14,6 +14,11 @@ class Generator
   
       # Each chain is a list of instructions
       @chain = []
+
+      # Scope pointer
+      @scope = nil
+
+      @globalScope = true
     end
     
     def pushChain ()
@@ -37,10 +42,16 @@ class Generator
       @label += 1
     end
 
+    def globalScope? ()
+      @scope.link == nil
+    end
+
     def start ()
       @logger.debug("start")
       pushChain
       node = @root
+      @scope = node.getAttribute("scope")      
+
       case node.kind
       when :PROGRAM
         inst = Instruction.new(:BEGIN)
@@ -107,6 +118,7 @@ class Generator
       result =
         case node.kind
         when :PRINT_EXPR then printExpr(node)
+        when :WHILE_EXPR then whileExpr(node)
         when :ASSIGNMENT_EXPR then assignmentExpr(node)
         when :BINARY_EXPR then binaryExpr(node)
         when :UNARY_EXPR then unaryExpr(node)
@@ -140,8 +152,11 @@ class Generator
       exitLabel = nextLabel
       add(Instruction.new(:BF, "L#{exitLabel}"))
       bodyNode = node.child(1)
-      bodyExpr(n, entryLabel, exitLabel)
-
+      expression(bodyNode)
+      #bodyExpr(bodyNode)
+      add(Instruction.new(:JUMP, "L#{label}"))
+      add(Instruction.new(:LAB, "L#{exitLabel}"))
+      
       # if bodyNode.kind == :BLOCK
       #   blockExpr(n, entryLabel, exitLabel)
       # else
@@ -179,7 +194,16 @@ class Generator
       if lhs.kind == :OBJECT_ACCESS then
         objectSet(lhs)
       else
-        add(Instruction.new(:STORE, lhs.text))
+        # Determine if this is global or local scope
+        # If global scope then STORE will be used to store into global hash
+        # If local scope then STORL will be used to store into an index
+        if globalScope?
+          add(Instruction.new(:STORE, lhs.text))
+        else
+          # Convert the text into an index
+          index = @scope.lookup(lhs.text)
+          add(Instruction.new(:STORL, index.to_s))
+        end
       end
     end
 
@@ -224,20 +248,28 @@ class Generator
     end
 
     def blockExpr (node)
-      # I think a block at the VM level should only be fore loops and what not
-      # They shouldn't necessarily be spawned for every block expression
-      # But this needs to be determined, because, presumably each block
-      # expression has its own set of local variables
-      # push block?
-#      n = node.child(0)
+      # Fetch the scope attribute stored in the node
+      saveScope = @scope
+      @scope = node.getAttribute("scope")
+
+      add(Instruction.new(:PUSH_BLOCK))
+
       for i in 0..node.count-2 do
-        statement(node.child(i))
+        n = node.child(i)
+        case n.kind
+        when :VARIABLE_DECL then variableDecl(n)
+        when :STATEMENT then statement(n)
+        end
       end
 
       # Remaining statement is value of the block expression so we dont want to
       # pop it off the operand stack, but re-use it instead
       preserveStatement(node.child(node.count-1))
 
+      add(Instruction.new(:POP_BLOCK))
+
+      # restore scope
+      @scope = saveScope
 
     end
 
@@ -256,7 +288,12 @@ class Generator
     end
 
     def name (node)
-      add(Instruction.new(:LOAD, node.text))
+      if globalScope? then
+        add(Instruction.new(:LOAD, node.text))
+      else
+        index = @scope.lookup(node.text)
+        add(Instruction.new(:LOADL, index.to_s))
+      end
     end
 
     def nullLiteral (node)
