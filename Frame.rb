@@ -68,6 +68,10 @@ class Frame
     @bp -= 1
   end
 
+  def blocklocals ()
+    @blocklocals
+  end
+
   def locals ()
     @locals
   end

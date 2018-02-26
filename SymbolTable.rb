@@ -2,12 +2,15 @@ class SymbolTable
 
   def initialize ()
     @table = {}
-    @counter = 0
+    
+    # Counting function has to be moved to scopes because symbol table doesn't
+    # have enough information to properly assign count
+    #@counter = 0
   end
 
-  def put (symbol)
-    @table[symbol] = @counter
-    @counter += 1
+  def put (symbol, count)
+    @table[symbol] = count
+    #@counter += 1
   end
 
   def get (symbol)

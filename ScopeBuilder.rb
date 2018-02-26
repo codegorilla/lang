@@ -12,6 +12,8 @@ class ScopeBuilder
     # Maintain a stack of scopes
     @scope = nil
 
+    @level = 0
+
     # Maintain an import dependency list so that we know what compilation units
     # that this particular chunk relies on.
     # This combines with other dependency lists to create a dependency graph
@@ -46,7 +48,7 @@ class ScopeBuilder
   def program (node)
     @logger.debug("program")
     # Create global scope
-    @scope = Scope.new
+    @scope = Scope.new(:GLOBAL)
     for i in 0..node.count-1
       n = node.child(i)
       case n.kind
@@ -96,7 +98,8 @@ class ScopeBuilder
   def function (node)
     @logger.debug("function")
     # Push a new scope
-    @scope = Scope.new(@scope)
+    @scope = Scope.new(:LOCAL, @level, @scope)
+    @level += 1
     # Scope needs to be attached to the function, not the declaration, because
     # the interpreter will jump to the function, not the declaration!
     node.setAttribute("scope", @scope)
@@ -113,8 +116,15 @@ class ScopeBuilder
       expression(node.child(1))
     end
 
+    # Get the current scope's counter
+    counter = @scope.counter
+
     # Pop the scope
     @scope = @scope.link
+    @level -= 1
+
+    # Set the restored scope's counter
+    @scope.setCounter(counter)
   end
 
   def parameters (node)
@@ -286,14 +296,23 @@ class ScopeBuilder
   def blockExpr (node)
     @logger.debug("blockExpr")
     # Push a new scope
-    @scope = Scope.new(@scope)
+    @scope = Scope.new(:BLOCK_LOCAL, @level, @scope)
+    @level += 1
     node.setAttribute("scope", @scope)
     for i in 0..node.count-1
       n = node.child(i)
       blockElement(n)
     end
+
+    # Get the current scope's counter
+    counter = @scope.counter
+
     # Pop the scope
     @scope = @scope.link
+    @level -= 1
+
+    # Set the restored scope's counter
+    @scope.setCounter(counter)
   end
 
   def blockElement (node)

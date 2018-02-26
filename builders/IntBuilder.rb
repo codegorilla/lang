@@ -89,8 +89,10 @@ class IntBuilder
     y = params[1]
     result =
       case y.type
-      when @Int then TauObject.new($Bool, x.value > y.value)
-      when $Float then TauObject.new($Bool, x.value > y.value)
+      when @Int then
+        if x.value > y.value then $true else $false end
+      when $Float then
+        if x.value > y.value then $true else $false end
       else
         TauObject.new($Exception, "Type error: unsupported operand types for >: Int and <other>")
       end
@@ -102,8 +104,10 @@ class IntBuilder
     y = params[1]
     result =
       case y.type
-      when @Int then TauObject.new($Bool, x.value < y.value)
-      when $Float then TauObject.new($Bool, x.value < y.value)
+      when @Int then
+        if x.value < y.value then $true else $false end
+      when $Float then
+        if x.value < y.value then $true else $false end
       else
         TauObject.new($Exception, "Type error: unsupported operand types for <: Int and <other>")
       end
@@ -115,8 +119,10 @@ class IntBuilder
     y = params[1]
     result =
       case y.type
-      when @Int then TauObject.new($Bool, x.value >= y.value)
-      when $Float then TauObject.new($Bool, x.value >= y.value)
+      when @Int then
+        if x.value >= y.value then $true else $false end
+      when $Float then
+        if x.value >= y.value then $true else $false end
       else
         TauObject.new($Exception, "Type error: unsupported operand types for >=: Int and <other>")
       end
@@ -128,8 +134,10 @@ class IntBuilder
     y = params[1]
     result =
       case y.type
-      when @Int then TauObject.new($Bool, x.value <= y.value)
-      when $Float then TauObject.new($Bool, x.value <= y.value)
+      when @Int then
+        if x.value <= y.value then $true else $false end
+      when $Float then
+        if x.value <= y.value then $true else $false end
       else
         TauObject.new($Exception, "Type error: unsupported operand types for <=: Int and <other>")
       end

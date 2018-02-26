@@ -43,7 +43,11 @@ class Generator
     end
 
     def globalScope? ()
-      @scope.link == nil
+      @scope.kind == :GLOBAL
+    end
+
+    def localScope? ()
+      @scope.kind == :LOCAL
     end
 
     def start ()
@@ -144,19 +148,24 @@ class Generator
 
     def whileExpr (node)
       @logger.debug("whileExpr")
-      label = nextLabel
-      add(Instruction.new(:LAB, "L#{label}"))
+      entryLabel = nextLabel
+      add(Instruction.new(:LAB, "L#{entryLabel}"))
+      entryAddress = @chain.length
       condNode = node.child(0)
       expression(condNode)
 
       exitLabel = nextLabel
-      add(Instruction.new(:BF, "L#{exitLabel}"))
+      bfInst = Instruction.new(:BF, nil)
+      add(bfInst)
       bodyNode = node.child(1)
       expression(bodyNode)
       #bodyExpr(bodyNode)
-      add(Instruction.new(:JUMP, "L#{label}"))
+      add(Instruction.new(:JUMP, entryAddress))
       add(Instruction.new(:LAB, "L#{exitLabel}"))
-      
+      # Need to back-patch the BF instruction
+      exitAddress = @chain.length
+      bfInst.setText(exitAddress)
+
       # if bodyNode.kind == :BLOCK
       #   blockExpr(n, entryLabel, exitLabel)
       # else
@@ -164,44 +173,29 @@ class Generator
       # end
     end
 
-    def bodyExpr (node, entryLabel, exitLabel)
-
-    end
-
-    def whileStmt (node)
-      @logger.debug("whileStmt")
-      label = nextLabel
-      add(Instruction.new(:LAB, "L#{label}"))
-      n = node.child(0)
-      expression(n)
-      exitLabel = nextLabel
-      add(Instruction.new(:BF, "L#{exitLabel}"))
-      # do body
-      n = node.child(1)
-      if n.kind == :BLOCK
-        block(n, entryLabel, exitLabel)
-      else
-        blockElement(n, entryLabel, exitLabel)
-      end
-      add(Instruction.new(:JUMP, "L#{label}"))
-      add(Instruction.new(:LAB, "L#{exitLabel}"))
-    end
-
     def assignmentExpr (node)
+      puts "entered assignmentExpr"
       lhs = node.leftChild
       rhs = node.rightChild
       expr(rhs)
       if lhs.kind == :OBJECT_ACCESS then
         objectSet(lhs)
       else
-        # Determine if this is global or local scope
+        # Determine if this is global or local scope or block-local scope
         # If global scope then STORE will be used to store into global hash
         # If local scope then STORL will be used to store into an index
+        # If block-local scope then STORB will be used to store an index
         if globalScope?
           add(Instruction.new(:STORE, lhs.text))
         else
           # Convert the text into an index
           index = @scope.lookup(lhs.text)
+          # If not found in this scope then head to higher scope
+          # TODO: Make this go all the way up to global scope!
+          if !index then
+            hiScope = @scope.link
+            index = hiScope.lookup(lhs.text)
+          end
           add(Instruction.new(:STORL, index.to_s))
         end
       end
@@ -252,13 +246,22 @@ class Generator
       saveScope = @scope
       @scope = node.getAttribute("scope")
 
-      add(Instruction.new(:PUSH_BLOCK))
+      # Might do away with blocks
+      #add(Instruction.new(:PUSH_BLOCK))
+      
+        puts "node count is #{node.count}"
 
       for i in 0..node.count-2 do
         n = node.child(i)
         case n.kind
-        when :VARIABLE_DECL then variableDecl(n)
-        when :STATEMENT then statement(n)
+        when :VARIABLE_DECL then
+          puts "vardecl"
+          variableDecl(n)
+        when :STATEMENT then
+          puts "found a stmt"
+          statement(n)
+        else
+          puts "other"
         end
       end
 
@@ -266,7 +269,8 @@ class Generator
       # pop it off the operand stack, but re-use it instead
       preserveStatement(node.child(node.count-1))
 
-      add(Instruction.new(:POP_BLOCK))
+      # Might do away with blocks
+      #add(Instruction.new(:POP_BLOCK))
 
       # restore scope
       @scope = saveScope
@@ -292,6 +296,12 @@ class Generator
         add(Instruction.new(:LOAD, node.text))
       else
         index = @scope.lookup(node.text)
+        # If not found in this scope then head to higher scope
+        # TODO: Make this go all the way up to global scope!
+        if !index then
+          hiScope = @scope.link
+          index = hiScope.lookup(node.text)
+        end
         add(Instruction.new(:LOADL, index.to_s))
       end
     end
