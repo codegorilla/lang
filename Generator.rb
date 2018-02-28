@@ -123,8 +123,11 @@ class Generator
       case node.kind
       when :BREAK_EXPR then breakExpr(node)
       when :PRINT_EXPR then printExpr(node)
+      when :RETURN_EXPR then returnExpr(node)
       when :WHILE_EXPR then whileExpr(node)
       when :ASSIGNMENT_EXPR then assignmentExpr(node)
+      when :LOGICAL_OR_EXPR then logicalOrExpr(node)
+      when :LOGICAL_AND_EXPR then logicalAndExpr(node)
       when :BINARY_EXPR then binaryExpr(node)
       when :UNARY_EXPR then unaryExpr(node)
       when :IF_EXPR then ifExpr(node)
@@ -152,6 +155,12 @@ class Generator
     #puts node.kind
   end
 
+  def returnExpr (node)
+    @logger.debug("returnExpr")
+    expression(node.child)
+    add(Instruction.new(:RET))
+  end
+
   def whileExpr (node)
     @logger.debug("whileExpr")
     entryLabel = nextLabel
@@ -159,13 +168,13 @@ class Generator
     entryAddress = @chain.length
     condNode = node.child(0)
     expression(condNode)
-    exitLabel = nextLabel
     # Reference to BF instruction used for back-patching
     bfInst = Instruction.new(:BF, nil)
     add(bfInst)
     bodyNode = node.child(1)
     expression(bodyNode)
     add(Instruction.new(:JUMP, entryAddress))
+    exitLabel = nextLabel
     add(Instruction.new(:LAB, "L#{exitLabel}"))
     # Back-patch the BF instruction
     exitAddress = @chain.length
@@ -220,14 +229,61 @@ class Generator
     end
   end
 
+  def logicalOrExpr (node)
+    @logger.debug("logicalOrExpr")
+    # Equivalent to 'if (a) true else b'
+    expr(node.leftChild)
+    # Reference to BF instruction used for back-patching
+    bfInst = Instruction.new(:BF, nil)
+    add(bfInst)
+    add(Instruction.new(:PUSH_BOOL, "true"))
+    # Reference to JUMP instruction used for back-patching
+    jumpInst = Instruction.new(:JUMP, nil)
+    add(jumpInst)
+    label = nextLabel
+    add(Instruction.new(:LAB, "L#{label}"))
+    # Back-patch the BF instruction
+    address = @chain.length
+    bfInst.setText(address)
+    expr(node.rightChild)
+    exitLabel = nextLabel
+    add(Instruction.new(:LAB, "L#{exitLabel}"))
+    # Back-patch the JUMP instruction
+    exitAddress = @chain.length
+    jumpInst.setText(exitAddress)
+  end
+
+  def logicalAndExpr (node)
+    # Equivalent to 'if (a) b else false'
+    expr(node.leftChild)
+    # Reference to BF instruction used for back-patching
+    bfInst = Instruction.new(:BF, nil)
+    add(bfInst)
+    expr(node.rightChild)
+    # Reference to JUMP instruction used for back-patching
+    jumpInst = Instruction.new(:JUMP, nil)
+    add(jumpInst)
+    label = nextLabel
+    add(Instruction.new(:LAB, "L#{label}"))
+    # Back-patch the BF instruction
+    address = @chain.length
+    bfInst.setText(address)
+    add(Instruction.new(:PUSH_BOOL, "false"))
+    exitLabel = nextLabel
+    add(Instruction.new(:LAB, "L#{exitLabel}"))
+    # Back-patch the JUMP instruction
+    exitAddress = @chain.length
+    jumpInst.setText(exitAddress)
+  end
+
   def binaryExpr (node)
     expr(node.leftChild)
     expr(node.rightChild)
     opcode =
       case node.text
-      when '|' then :BOR
-      when '^' then :BXOR
-      when '&' then :BAND
+      when '|' then :OR
+      when '^' then :XOR
+      when '&' then :AND
       when '==' then :EQU
       when '!=' then :NEQ
       when '>' then :GT
@@ -259,12 +315,12 @@ class Generator
     @logger.debug("ifExpr")
     condNode = node.child(0)
     expression(condNode)
-    exitLabel = nextLabel
     # Reference to BF instruction used for back-patching
     bfInst = Instruction.new(:BF, nil)
     add(bfInst)
     bodyNode = node.child(1)
     expression(bodyNode)
+    exitLabel = nextLabel
     add(Instruction.new(:LAB, "L#{exitLabel}"))
     # Back-patch the BF instruction
     exitAddress = @chain.length

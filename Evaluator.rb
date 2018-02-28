@@ -33,7 +33,7 @@ class Evaluator
           @fp.stack << result
           pc += 1
 
-        when :BAND then
+        when :AND then
           xObj = @fp.stack.pop
           thisObj = @fp.stack.pop
           classObj = thisObj.type
@@ -61,26 +61,6 @@ class Evaluator
           methodObj = classObj.getMember('bnot')
           method = methodObj.value[1]
           result = method.call([obj])
-          @fp.stack << result
-          pc += 1
-          
-        when :BOR then
-          xObj = @fp.stack.pop
-          thisObj = @fp.stack.pop
-          classObj = thisObj.type
-          methodObj = classObj.getMember('bor')
-          method = methodObj.value[1]
-          result = method.call([thisObj, xObj])
-          @fp.stack << result
-          pc += 1
-          
-        when :BXOR then
-          xObj = @fp.stack.pop
-          thisObj = @fp.stack.pop
-          classObj = thisObj.type
-          methodObj = classObj.getMember('bxor')
-          method = methodObj.value[1]
-          result = method.call([thisObj, xObj])
           @fp.stack << result
           pc += 1
           
@@ -228,6 +208,16 @@ class Evaluator
           @fp.stack << result
           pc += 1
           
+        when :OR then
+          xObj = @fp.stack.pop
+          thisObj = @fp.stack.pop
+          classObj = thisObj.type
+          methodObj = classObj.getMember('bor')
+          method = methodObj.value[1]
+          result = method.call([thisObj, xObj])
+          @fp.stack << result
+          pc += 1
+          
         when :POP then
           @fp.stack.pop
           pc += 1
@@ -265,7 +255,11 @@ class Evaluator
           obj = TauObject.new($Float, inst.text.to_f)
           @fp.stack << obj
           pc += 1
-          
+        
+        when :RET then
+          # need to pop frame and move fp back to previous one
+          pc += 1
+
         when :SHL then
           xObj = @fp.stack.pop
           thisObj = @fp.stack.pop
@@ -306,7 +300,17 @@ class Evaluator
           @fp.stack << result
           pc += 1
           
-          else
+        when :XOR then
+          xObj = @fp.stack.pop
+          thisObj = @fp.stack.pop
+          classObj = thisObj.type
+          methodObj = classObj.getMember('bxor')
+          method = methodObj.value[1]
+          result = method.call([thisObj, xObj])
+          @fp.stack << result
+          pc += 1
+
+        else
           puts "Some other instruction!"
         end
       end
