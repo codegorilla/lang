@@ -17,7 +17,6 @@ class Evaluator
     end
 
     def program (chain)
-      #chain.each do |inst|
       done = false
       pc = 0
       while !done do
@@ -289,11 +288,12 @@ class Evaluator
           
         when :STORE then
           @globals[inst.text] = @fp.stack.pop
+          puts "Global value stored is #{@globals[inst.text].value}"
           pc += 1
-          
+
         when :STORL then
           @fp.locals[inst.text.to_i] = @fp.stack.pop
-          #puts "Local value stored is #{@fp.locals[inst.text.to_i].value}"
+          puts "Local value stored is #{@fp.locals[inst.text.to_i].value}"
           pc += 1
           
         when :SUB then
