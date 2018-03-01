@@ -100,7 +100,11 @@ class Generator
     n = node.child
     expression(n)
     # Need to discard (pop) result from operand stack
-    add(Instruction.new(:POP))
+    # But assignments already remove the result from the operand stack
+    if n.child.kind != :ASSIGNMENT_EXPR
+      add(Instruction.new(:POP))
+    end
+
     # Perhaps VM is built on non-functional model to avoid useless pops
     # for functions that return unit
   end
@@ -148,7 +152,9 @@ class Generator
   end
 
   def breakExpr (node)
-    # This needs to jump to nearest exit
+    # Jump to nearest exit
+    @logger.debug("breakExpr")
+    add(Instruction.new(:JUMP, "L#{@exit}"))
   end
 
   def printExpr (node)
@@ -164,6 +170,7 @@ class Generator
   def whileExpr (node)
     @logger.debug("whileExpr")
     entryLabel = nextLabel
+    exitLabel = nextLabel
     add(Instruction.new(:LAB, "L#{entryLabel}"))
     entryAddress = @chain.length
     condNode = node.child(0)
@@ -171,10 +178,13 @@ class Generator
     # Reference to BF instruction used for back-patching
     bfInst = Instruction.new(:BF, nil)
     add(bfInst)
+    saveExit = @exit
+    @exit = exitLabel
     bodyNode = node.child(1)
     expression(bodyNode)
+    @exit = saveExit
     add(Instruction.new(:JUMP, entryAddress))
-    exitLabel = nextLabel
+    #exitLabel = nextLabel
     add(Instruction.new(:LAB, "L#{exitLabel}"))
     # Back-patch the BF instruction
     exitAddress = @chain.length
